@@ -1,0 +1,1567 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+
+
+<dom-module id="filter-modalDateStats">
+
+<style>
+
+</style>
+
+<template>
+
+
+
+  <!-- <div  class="state col-lg-12">
+    <div style = "background-color: #424242">
+    <paper-button type="button" on-tap = "openModal" style = "color:white">
+
+      <span class="glyphicon glyphicon-cog" style = "color:white"></span>
+
+      Filter
+    </paper-button>
+
+  </div>
+  </div>
+
+  <div id = "mainGraphContainer" style = "background-color: white; height :400px;" class="state col-lg-12"></div> -->
+
+
+  <div   class="state col-lg-12">
+  <div style = "background-color: #424242">
+  <paper-button type="button" on-tap = "openModal" style = "color:white">
+
+    <span class="glyphicon glyphicon-cog" style = "color:white"></span>
+
+    Filter
+  </paper-button>
+
+  <paper-button type="button" on-tap = "deleteChart" style = "color:white" >
+
+    <span class="glyphicon glyphicon-remove" style = "color:white"></span>
+
+    Delete
+  </paper-button>
+
+</div>
+</div>
+
+<div class="state col-lg-12">
+<div  id = "mainGraphContainer" style = "height: 500px; margin-bottom : 20px" ></div>
+</div>
+
+
+
+
+  <div class="modal fade" id="graphFilterOptions" tabindex="-1" role="dialog" aria-labelledby="Table Options">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+
+        <div class="modal-header" style = "background-color: #424242">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" style = "color: white"><span aria-hidden="true" style = "color: white">&times;</span></button>
+          <h4 class="modal-title" style = "color: white">Graph Filter options</h4>
+        </div>
+
+
+        <ul class="nav nav-tabs" id="tabContent">
+          <li class="active"><a href="#graphFilterOptionsAnalytics" id = "modalTab1" data-toggle="tab">Analytic Options</a></li>
+          <li><a href="#graphFilterOptionsMust" id = "modalTab2" data-toggle="tab">Must</a></li>
+          <li><a href="#graphFilterOptionsMustNot" id = "modalTab3" data-toggle="tab">Must Not</a></li>
+          <li><a href="#graphFilterOptionsShould" id = "modalTab4" data-toggle="tab">Should</a></li>
+        </ul>
+
+        <!-- <ul class="nav nav-tabs" id="tabContent">
+          <li class="active"><a href="#" on-tap = "analyticOptionsTab">Analytic Options</a></li>
+          <li><a href="#" on-tap = "mustOptionsTab">Must</a></li>
+          <li><a href="#" on-tap = "mustNotOptionsTab">Must Not</a></li>
+          <li><a href="#" on-tap = "shouldOptionsTab">Should</a></li>
+        </ul> -->
+
+        <div class="tab-content">
+
+
+
+
+
+          <div class="tab-pane" id="graphFilterOptionsMust">
+
+            <div style = "padding-top: 10px; padding-bottom: 10px">
+              <a href="#">
+                <span id = "addFilterOptionsMust" class="glyphicon glyphicon-plus" style = "padding-left: 5px"></span>
+              </a>
+            </div>
+
+            <input id="mustUniqueCounter" type = "hidden" value="2">
+
+            <!-- <input id="currentLastDisplayedFilterMust" type = "hidden" value="1"> -->
+
+            <div id = "mustFilterOptionsGrouping">
+              <dataFilter-optionsMust id = "dataFilterOptionsMust1" unique-id = "1"></dataFilter-optionsMust>
+            </div>
+
+
+
+          </div>
+
+
+
+
+          <div class="tab-pane" id="graphFilterOptionsMustNot">
+
+            <div style = "padding-top: 10px; padding-bottom: 10px">
+              <a href="#">
+                <span id = "addFilterOptionsMustNot" class="glyphicon glyphicon-plus" style = "padding-left: 5px"></span>
+              </a>
+            </div>
+
+            <input id="MustNotUniqueCounter" type = "hidden" value="2">
+
+            <!-- <input id="currentLastDisplayedFilterMustNot" type = "hidden" value="1"> -->
+
+            <div id = "MustNotFilterOptionsGrouping">
+              <dataFilter-optionsMustNot id = "dataFilterOptionsMustNot1" unique-id = "1"></dataFilter-optionsMustNot>
+            </div>
+
+
+
+          </div>
+
+
+
+
+          <div class="tab-pane" id="graphFilterOptionsShould">
+
+            <div style = "padding-top: 10px; padding-bottom: 10px">
+              <a href="#">
+                <span id = "addFilterOptionsShould" class="glyphicon glyphicon-plus" style = "padding-left: 5px"></span>
+              </a>
+            </div>
+
+            <input id="ShouldUniqueCounter" type = "hidden" value="2">
+
+            <!-- <input id="currentLastDisplayedFilterShould" type = "hidden" value="1"> -->
+
+            <div id = "ShouldFilterOptionsGrouping">
+              <dataFilter-optionsShould id = "dataFilterOptionsShould1" unique-id = "1"></dataFilter-optionsShould>
+            </div>
+
+
+
+          </div>
+
+
+
+
+
+
+
+
+          <div class="tab-pane active" id="graphFilterOptionsAnalytics">
+            <div style = "padding-top: 10px; padding-bottom: 10px">
+            </div>
+
+            <div class="form-group" style = "padding: 2px 5px" id = "graphFieldAnalyzed">
+              <label  style = "color: black; font-size: 20px">Field Analyzed</label>
+              <select class="form-control" id = "graphFieldAnalyzedSelect">
+                <option id = "graphFieldAnalyzedBytesSent" selected="selected">Bytes Sent</option>
+                <option id = "graphFieldAnalyzedBodyBytesSent">Body Bytes Sent</option>
+                <option id = "graphFieldAnalyzedBytesReceived">Request Length</option>
+              </select>
+            </div>
+
+            <div class="form-group" style = "padding: 2px 5px" id = "graphFieldAnalyzedType">
+              <label  style = "color: black; font-size: 20px">Analytic Type</label>
+              <select class="form-control" id = "graphFieldAnalyzedTypeSelect">
+                <option id = "graphFieldAnalyzedTypeAvg" selected="selected">Avg</option>
+                <option id = "graphFieldAnalyzedTypeMin">Min</option>
+                <option id = "graphFieldAnalyzedTypeMax">Max</option>
+                <option id = "graphFieldAnalyzedTypeSum">Sum</option>
+              </select>
+            </div>
+
+            <div class="form-group" style = "padding: 2px 5px" id = "graphFieldAnalyzedGranularity">
+              <label  style = "color: black; font-size: 20px">Granularity</label>
+              <select class="form-control" id = "graphFieldAnalyzedGranularitySelect">
+                <option id = "graphFieldAnalyzedGranularitySeconds">Seconds</option>
+                <option id = "graphFieldAnalyzedGranularityMinutes">Minutes</option>
+                <option id = "graphFieldAnalyzedGranularityHours">Hours</option>
+                <option id = "graphFieldAnalyzedGranularityDays" selected="selected">Days</option>
+                <option id = "graphFieldAnalyzedGranularityWeeks">Weeks</option>
+                <option id = "graphFieldAnalyzedGranularityMonths">Months</option>
+                <option id = "graphFieldAnalyzedGranularityYears">Years</option>
+              </select>
+            </div>
+
+            <div class="form-group" style = "padding: 2px 5px" id = "graphFieldAnalyzedGraphType">
+              <label  style = "color: black; font-size: 20px">Graph Type</label>
+              <select class="form-control" id = "graphFieldAnalyzedGraphTypeSelect">
+                <option id = "graphFieldAnalyzedGraphTypeLine" selected="selected">Line</option>
+                <option id = "graphFieldAnalyzedGraphTypeColumn">Column</option>
+                <option id = "graphFieldAnalyzedGraphTypeArea">Area</option>
+              </select>
+            </div>
+
+
+
+
+          </div>
+
+          <div class="modal-footer">
+
+            <paper-button id = "graphFilterOptionsClose" class="secondary" data-dismiss="modal">Close</paper-button>
+            <paper-button id = "graphFilterOptionsSubmit" class="secondary" data-dismiss="modal" on-tap = "submitFunction">Submit</paper-button>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</template>
+
+<script>
+
+Polymer({
+  is: "filter-modalDateStats",
+
+  ready: function(){
+
+
+        mustData = [];
+        mustNotData = [];
+        shouldData = [];
+
+        this.displayGraph(this.bucketData, this.bucketDataAnalyze, this.granularity, this.graphType, mustData, mustNotData, shouldData);
+        this.intializeModal(this.bucketData, this.bucketDataAnalyze, this.granularity, this.graphType);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        //FILTER MODAL///////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        var addFilterOptionsMust = this.$.addFilterOptionsMust;
+        var mustFilterOptionsGrouping = this.$.mustFilterOptionsGrouping;
+        var mustUniqueCounter = this.$.mustUniqueCounter
+
+        $(addFilterOptionsMust).click(function(){
+
+          // var x = $(".mustUniqueCounterHiddenFlag");
+          // var mustUniqueCounter = this.$.mustUniqueCounter;
+          // if($(mustUniqueCounter).val() >= 26 && x.length == 0){
+          //   alert("Maximum Filter Options Reached!")
+          // }
+          // else if(x.length != 0){
+          //   var temp = $(x[0]).val();
+          //   var currentLastDisplayedFilterMust = this.$.currentLastDisplayedFilterMust;
+          //   var temp2 = $(currentLastDisplayedFilterMust).val();
+          //   // var temp2 = parseInt($('#mustUniqueCounter').val(), 10) - 1;
+          //   $('dataFilter-optionsMust[unique-id = "' + temp +'"]').insertAfter($('dataFilter-optionsMust[unique-id = "' + temp2 +'"]'));
+          //   $('dataFilter-optionsMust[unique-id = "' + temp +'"]').show();
+          //   var temp3 = "#mustFilterByOnChangeWrap" + temp;
+          //   $(temp3).show()
+          //   $('#currentLastDisplayedFilterMust').val(temp);
+          //   $(x[0]).remove();
+          // }
+          // else{
+          //   $('dataFilter-optionsMust[unique-id = "' + $('#mustUniqueCounter').val() +'"]').show("slow");
+          //   var adder = $('#mustUniqueCounter').val();
+          //   adder = parseInt(adder, 10) + 1;
+          //   $('#mustUniqueCounter').val(adder);
+          //   $('#currentLastDisplayedFilterMust').val(parseInt(adder, 10) - 1);
+          // }
+
+          var dynamicEl = document.createElement("dataFilter-optionsMust");
+          var idName = "dataFilterOptionsMust" + $(mustUniqueCounter).val();
+          dynamicEl.setAttribute("unique-id", $(mustUniqueCounter).val());
+          dynamicEl.setAttribute("id", idName);
+          $(mustFilterOptionsGrouping).append(dynamicEl);
+          $(mustUniqueCounter).val(parseInt($(mustUniqueCounter).val()) + 1);
+
+        });
+
+
+        var addFilterOptionsMustNot = this.$.addFilterOptionsMustNot;
+        var MustNotFilterOptionsGrouping = this.$.MustNotFilterOptionsGrouping;
+        var MustNotUniqueCounter = this.$.MustNotUniqueCounter
+
+        $(addFilterOptionsMustNot).click(function(){
+
+          // var x = $(".MustNotUniqueCounterHiddenFlag");
+          // var MustNotUniqueCounter = this.$.MustNotUniqueCounter;
+          // if($(MustNotUniqueCounter).val() >= 26 && x.length == 0){
+          //   alert("Maximum Filter Options Reached!")
+          // }
+          // else if(x.length != 0){
+          //   var temp = $(x[0]).val();
+          //   var currentLastDisplayedFilterMustNot = this.$.currentLastDisplayedFilterMustNot;
+          //   var temp2 = $(currentLastDisplayedFilterMustNot).val();
+          //   // var temp2 = parseInt($('#MustNotUniqueCounter').val(), 10) - 1;
+          //   $('dataFilter-optionsMustNot[unique-id = "' + temp +'"]').insertAfter($('dataFilter-optionsMustNot[unique-id = "' + temp2 +'"]'));
+          //   $('dataFilter-optionsMustNot[unique-id = "' + temp +'"]').show();
+          //   var temp3 = "#MustNotFilterByOnChangeWrap" + temp;
+          //   $(temp3).show()
+          //   $('#currentLastDisplayedFilterMustNot').val(temp);
+          //   $(x[0]).remove();
+          // }
+          // else{
+          //   $('dataFilter-optionsMustNot[unique-id = "' + $('#MustNotUniqueCounter').val() +'"]').show("slow");
+          //   var adder = $('#MustNotUniqueCounter').val();
+          //   adder = parseInt(adder, 10) + 1;
+          //   $('#MustNotUniqueCounter').val(adder);
+          //   $('#currentLastDisplayedFilterMustNot').val(parseInt(adder, 10) - 1);
+          // }
+
+          var dynamicEl = document.createElement("dataFilter-optionsMustNot");
+          var idName = "dataFilterOptionsMustNot" + $(MustNotUniqueCounter).val();
+          dynamicEl.setAttribute("unique-id", $(MustNotUniqueCounter).val());
+          dynamicEl.setAttribute("id", idName);
+          $(MustNotFilterOptionsGrouping).append(dynamicEl);
+          $(MustNotUniqueCounter).val(parseInt($(MustNotUniqueCounter).val()) + 1);
+
+        });
+
+
+        var addFilterOptionsShould = this.$.addFilterOptionsShould;
+        var ShouldFilterOptionsGrouping = this.$.ShouldFilterOptionsGrouping;
+        var ShouldUniqueCounter = this.$.ShouldUniqueCounter
+
+        $(addFilterOptionsShould).click(function(){
+
+          // var x = $(".ShouldUniqueCounterHiddenFlag");
+          // var ShouldUniqueCounter = this.$.ShouldUniqueCounter;
+          // if($(ShouldUniqueCounter).val() >= 26 && x.length == 0){
+          //   alert("Maximum Filter Options Reached!")
+          // }
+          // else if(x.length != 0){
+          //   var temp = $(x[0]).val();
+          //   var currentLastDisplayedFilterShould = this.$.currentLastDisplayedFilterShould;
+          //   var temp2 = $(currentLastDisplayedFilterShould).val();
+          //   // var temp2 = parseInt($('#ShouldUniqueCounter').val(), 10) - 1;
+          //   $('dataFilter-optionsShould[unique-id = "' + temp +'"]').insertAfter($('dataFilter-optionsShould[unique-id = "' + temp2 +'"]'));
+          //   $('dataFilter-optionsShould[unique-id = "' + temp +'"]').show();
+          //   var temp3 = "#ShouldFilterByOnChangeWrap" + temp;
+          //   $(temp3).show()
+          //   $('#currentLastDisplayedFilterShould').val(temp);
+          //   $(x[0]).remove();
+          // }
+          // else{
+          //   $('dataFilter-optionsShould[unique-id = "' + $('#ShouldUniqueCounter').val() +'"]').show("slow");
+          //   var adder = $('#ShouldUniqueCounter').val();
+          //   adder = parseInt(adder, 10) + 1;
+          //   $('#ShouldUniqueCounter').val(adder);
+          //   $('#currentLastDisplayedFilterShould').val(parseInt(adder, 10) - 1);
+          // }
+
+          var dynamicEl = document.createElement("dataFilter-optionsShould");
+          var idName = "dataFilterOptionsShould" + $(ShouldUniqueCounter).val();
+          dynamicEl.setAttribute("unique-id", $(ShouldUniqueCounter).val());
+          dynamicEl.setAttribute("id", idName);
+          $(ShouldFilterOptionsGrouping).append(dynamicEl);
+          $(ShouldUniqueCounter).val(parseInt($(ShouldUniqueCounter).val()) + 1);
+
+        });
+
+
+
+
+
+        // var mustUniqueCounter = this.$.mustUniqueCounter
+
+  },
+
+  submitFunction: function(e){
+
+    mustData = [];
+    mustNotData = [];
+    shouldData = [];
+
+
+
+    var mustUniqueCounter = this.$.mustUniqueCounter;
+    for(var i = 0; i < parseInt($(mustUniqueCounter).val(), 10) - 1; i++){
+      // var x = this.$$('#dataFilterOptionsMust' + i)
+      // var uid = $(x[i]).attr("unique-id");
+
+      var uid = parseInt(i, 10)+1;
+
+      var graphFilterOptionsSubmit = this.$.graphFilterOptionsSubmit;
+
+
+
+      var temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterByOnchange' + uid);
+      var mustFilterByValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterTypeOnchange' + uid);
+      var mustFilterTypeValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterTerm' + uid);
+      var mustFilterTermValue = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeLower' + uid);
+      var mustFilterRangeLower = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeUpper' + uid);
+      var mustFilterRangeUpper = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeLowerTime' + uid);
+      var mustFilterRangeLowerTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeUpperTime' + uid);
+      var mustFilterRangeUpperTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeLowerTimeOperation' + uid);
+      var mustFilterRangeLowerTimeOperation = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeUpperTimeOperation' + uid);
+      var mustFilterRangeUpperTimeOperation = $(temp).val();
+
+      var mustPartialMatchCheckboxHandler = this.$$('#dataFilterOptionsMust' + uid).$$('#mustCheckboxValue' + uid);
+      var mustRegexMatchCheckboxHandler = this.$$('#dataFilterOptionsMust' + uid).$$('#mustRegexCheckboxValue' + uid);
+
+
+      if(mustFilterByValue != ""){
+        if(mustFilterTypeValue != ""){
+          if(mustFilterTypeValue == "Term"){
+            if(mustFilterTermValue != ""){
+              if(mustFilterByValue == "IP Address"){
+                mustData.splice(0, 0, { "term" : { "remote_addr" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Time"){
+                mustData.splice(0, 0, { "term" : { "time_iso8601" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Time Elapsed"){
+                mustData.splice(0, 0, { "term" : { "request_time" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Request URI"){
+
+                if($(mustPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = mustFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustData.splice(0, 0, { "query" : { "wildcard" : { "request_uri" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(mustRegexMatchCheckboxHandler).val() == 1){
+                  mustData.splice(0, 0, { "regexp" : { "request_uri" : mustFilterTermValue }})
+                }
+                else{
+                  mustData.splice(0, 0, { "term" : { "request_uri" : mustFilterTermValue }});
+                }
+              }
+              if(mustFilterByValue == "Request Method"){
+                mustFilterTermValue = mustFilterTermValue.toLowerCase();
+                mustData.splice(0, 0, { "term" : { "request_method" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Status Code"){
+                mustData.splice(0, 0, { "term" : { "status" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Request Length"){
+                mustData.splice(0, 0, { "term" : { "bytes_received" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Body Bytes Sent"){
+                mustData.splice(0, 0, { "term" : { "body_bytes_sent" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Bytes Sent"){
+                mustData.splice(0, 0, { "term" : { "bytes_sent" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Host"){
+                if($(mustPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = mustFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustData.splice(0, 0, { "query": { "wildcard" : { "http_host" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(mustRegexMatchCheckboxHandler).val() == 1){
+                  mustData.splice(0, 0, { "regexp" : { "http_host" : mustFilterTermValue }})
+                }
+                else{
+                  mustData.splice(0, 0, { "term" : { "http_host" : mustFilterTermValue }});
+                }
+              }
+              if(mustFilterByValue == "Referer"){
+                if($(mustPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = mustFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustData.splice(0, 0, { "query" : { "wildcard" : { "http_referer" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(mustRegexMatchCheckboxHandler).val() == 1){
+                  mustData.splice(0, 0, { "regexp" : { "http_referer" : mustFilterTermValue }})
+                }
+                else{
+                  mustData.splice(0, 0, { "term" : { "http_referer" : mustFilterTermValue }});
+                }
+              }
+              if(mustFilterByValue == "User Agent"){
+                if($(mustPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = mustFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = stringSplit[xReg].toLowerCase();
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustData.splice(0, 0, { "query" : { "wildcard" : { "http_agent" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(mustRegexMatchCheckboxHandler).val() == 1){
+                  mustData.splice(0, 0, { "regexp" : { "http_agent" : mustFilterTermValue }})
+                }
+                else{
+                  mustData.splice(0, 0, { "term" : { "http_agent" : mustFilterTermValue }});
+                }
+              }
+            }
+          }
+
+          if(mustFilterTypeValue == "Range"){
+            if((mustFilterRangeLower != "" && mustFilterRangeLower != "") || mustFilterByValue == "Time"){
+              if(mustFilterByValue == "IP Address"){
+                mustData.splice(0, 0, {"range" : {"remote_addr" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Time"){
+
+                if(mustFilterRangeLowerTime != "" && mustFilterRangeUpperTime != ""){
+                  if(mustFilterRangeUpperTimeOperation != "" && mustFilterRangeLowerTimeOperation != ""){
+                      mustFilterRangeUpperTime = mustFilterRangeUpperTime.replace(/ /g , "T");
+                      mustFilterRangeLowerTime = mustFilterRangeLowerTime.replace(/ /g , "T");
+                      mustFilterRangeUpperTimeOperation = mustFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                      mustFilterRangeLowerTimeOperation = mustFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                      var upperTime = mustFilterRangeUpperTime + "||" + mustFilterRangeUpperTimeOperation;
+                      var lowerTime = mustFilterRangeLowerTime + "||" + mustFilterRangeLowerTimeOperation;
+                      mustData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(mustFilterRangeUpperTimeOperation != "" && mustFilterRangeLowerTimeOperation == ""){
+                      mustFilterRangeUpperTime = mustFilterRangeUpperTime.replace(/ /g , "T");
+                      mustFilterRangeLowerTime = mustFilterRangeLowerTime.replace(/ /g , "T");
+                      mustFilterRangeUpperTimeOperation = mustFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                      var upperTime = mustFilterRangeUpperTime + "||" + mustFilterRangeUpperTimeOperation;
+                      var lowerTime = mustFilterRangeLowerTime;
+                      mustData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(mustFilterRangeUpperTimeOperation == "" && mustFilterRangeLowerTimeOperation != ""){
+                      mustFilterRangeUpperTime = mustFilterRangeUpperTime.replace(/ /g , "T");
+                      mustFilterRangeLowerTime = mustFilterRangeLowerTime.replace(/ /g , "T");
+                      mustFilterRangeLowerTimeOperation = mustFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                      var upperTime = mustFilterRangeUpperTime;
+                      var lowerTime = mustFilterRangeLowerTime + "||" + mustFilterRangeLowerTimeOperation;
+                      mustData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(mustFilterRangeUpperTimeOperation == "" && mustFilterRangeLowerTimeOperation == ""){
+                      mustFilterRangeUpperTime = mustFilterRangeUpperTime.replace(/ /g , "T");
+                      mustFilterRangeLowerTime = mustFilterRangeLowerTime.replace(/ /g , "T");
+                      var upperTime = mustFilterRangeUpperTime;
+                      var lowerTime = mustFilterRangeLowerTime;
+                      mustData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                }
+              }
+              if(mustFilterByValue == "Time Elapsed"){
+                mustData.splice(0, 0, {"range" : {"request_time" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Request URI"){
+                mustData.splice(0, 0, {"range" : {"request_uri" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Request Method"){
+                mustData.splice(0, 0, {"range" : {"request_method" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Status Code"){
+                mustData.splice(0, 0, {"range" : {"status" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Request Length"){
+                mustData.splice(0, 0, {"range" : {"bytes_received" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Body Bytes Sent"){
+                mustData.splice(0, 0, {"range" : {"body_bytes_sent" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Bytes Sent"){
+                mustData.splice(0, 0, {"range" : {"bytes_sent" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Host"){
+                mustData.splice(0, 0, {"range" : {"http_host" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Referer"){
+                mustData.splice(0, 0, {"range" : {"http_referer" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "User Agent"){
+                mustData.splice(0, 0, {"range" : {"http_agent" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+            }
+          }
+        }
+      }
+    }
+
+
+
+    var MustNotUniqueCounter = this.$.MustNotUniqueCounter;
+    for(var i = 0; i < parseInt($(MustNotUniqueCounter).val(), 10) - 1; i++){
+      // var x = this.$$('#dataFilterOptionsMustNot' + i)
+      // var uid = $(x[i]).attr("unique-id");
+
+      var uid = parseInt(i, 10)+1;
+
+      var graphFilterOptionsSubmit = this.$.graphFilterOptionsSubmit;
+
+      var temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterByOnchange' + uid);
+      var MustNotFilterByValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterTypeOnchange' + uid);
+      var MustNotFilterTypeValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterTerm' + uid);
+      var MustNotFilterTermValue = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeLower' + uid);
+      var MustNotFilterRangeLower = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeUpper' + uid);
+      var MustNotFilterRangeUpper = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeLowerTime' + uid);
+      var MustNotFilterRangeLowerTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeUpperTime' + uid);
+      var MustNotFilterRangeUpperTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeLowerTimeOperation' + uid);
+      var MustNotFilterRangeLowerTimeOperation = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeUpperTimeOperation' + uid);
+      var MustNotFilterRangeUpperTimeOperation = $(temp).val();
+
+      var MustNotPartialMatchCheckboxHandler = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotCheckboxValue' + uid);
+      var MustNotRegexMatchCheckboxHandler = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotRegexCheckboxValue' + uid);
+
+
+      if(MustNotFilterByValue != ""){
+        if(MustNotFilterTypeValue != ""){
+          if(MustNotFilterTypeValue == "Term"){
+            if(MustNotFilterTermValue != ""){
+              if(MustNotFilterByValue == "IP Address"){
+                mustNotData.splice(0, 0, { "term" : { "remote_addr" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Time"){
+                mustNotData.splice(0, 0, { "term" : { "time_iso8601" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Time Elapsed"){
+                mustNotData.splice(0, 0, { "term" : { "request_time" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Request URI"){
+
+                if($(MustNotPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = MustNotFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustNotData.splice(0, 0, { "query" : { "wildcard" : { "request_uri" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(MustNotRegexMatchCheckboxHandler).val() == 1){
+                  mustNotData.splice(0, 0, { "regexp" : { "request_uri" : MustNotFilterTermValue }})
+                }
+                else{
+                  mustNotData.splice(0, 0, { "term" : { "request_uri" : MustNotFilterTermValue }});
+                }
+              }
+              if(MustNotFilterByValue == "Request Method"){
+                MustNotFilterTermValue = MustNotFilterTermValue.toLowerCase();
+                mustNotData.splice(0, 0, { "term" : { "request_method" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Status Code"){
+                mustNotData.splice(0, 0, { "term" : { "status" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Request Length"){
+                mustNotData.splice(0, 0, { "term" : { "bytes_received" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Body Bytes Sent"){
+                mustNotData.splice(0, 0, { "term" : { "body_bytes_sent" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Bytes Sent"){
+                mustNotData.splice(0, 0, { "term" : { "bytes_sent" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Host"){
+                if($(MustNotPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = MustNotFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustNotData.splice(0, 0, { "query" : { "wildcard" : { "http_host" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(MustNotRegexMatchCheckboxHandler).val() == 1){
+                  mustNotData.splice(0, 0, { "regexp" : { "http_host" : MustNotFilterTermValue }})
+                }
+                else{
+                  mustNotData.splice(0, 0, { "term" : { "http_host" : MustNotFilterTermValue }});
+                }
+              }
+              if(MustNotFilterByValue == "Referer"){
+                if($(MustNotPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = MustNotFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustNotData.splice(0, 0, { "query" : { "wildcard" : { "http_referer" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(MustNotRegexMatchCheckboxHandler).val() == 1){
+                  mustNotData.splice(0, 0, { "regexp" : { "http_referer" : MustNotFilterTermValue }})
+                }
+                else{
+                  mustNotData.splice(0, 0, { "term" : { "http_referer" : MustNotFilterTermValue }});
+                }
+              }
+              if(MustNotFilterByValue == "User Agent"){
+                if($(MustNotPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = MustNotFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = stringSplit[xReg].toLowerCase();
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustNotData.splice(0, 0, { "query" : { "wildcard" : { "http_agent" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(MustNotRegexMatchCheckboxHandler).val() == 1){
+                  mustNotData.splice(0, 0, { "regexp" : { "http_agent" : MustNotFilterTermValue }})
+                }
+                else{
+                  mustNotData.splice(0, 0, { "term" : { "http_agent" : MustNotFilterTermValue }});
+                }
+              }
+            }
+          }
+
+          if(MustNotFilterTypeValue == "Range"){
+            if(MustNotFilterRangeLower != "" && MustNotFilterRangeLower != "" || MustNotFilterByValue == "Time"){
+              if(MustNotFilterByValue == "IP Address"){
+                mustNotData.splice(0, 0, {"range" : {"remote_addr" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Time"){
+                if(MustNotFilterRangeLowerTime != "" && MustNotFilterRangeUpperTime != ""){
+                  if(MustNotFilterRangeUpperTimeOperation != "" && MustNotFilterRangeLowerTimeOperation != ""){
+                      MustNotFilterRangeUpperTime = MustNotFilterRangeUpperTime.replace(/ /g , "T");
+                      MustNotFilterRangeLowerTime = MustNotFilterRangeLowerTime.replace(/ /g , "T");
+                      MustNotFilterRangeUpperTimeOperation = MustNotFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                      MustNotFilterRangeLowerTimeOperation = MustNotFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                      var upperTime = MustNotFilterRangeUpperTime + "||" + MustNotFilterRangeUpperTimeOperation;
+                      var lowerTime = MustNotFilterRangeLowerTime + "||" + MustNotFilterRangeLowerTimeOperation;
+                      mustNotData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(MustNotFilterRangeUpperTimeOperation != "" && MustNotFilterRangeLowerTimeOperation == ""){
+                      MustNotFilterRangeUpperTime = MustNotFilterRangeUpperTime.replace(/ /g , "T");
+                      MustNotFilterRangeLowerTime = MustNotFilterRangeLowerTime.replace(/ /g , "T");
+                      MustNotFilterRangeUpperTimeOperation = MustNotFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                      var upperTime = MustNotFilterRangeUpperTime + "||" + MustNotFilterRangeUpperTimeOperation;
+                      var lowerTime = MustNotFilterRangeLowerTime;
+                      mustNotData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(MustNotFilterRangeUpperTimeOperation == "" && MustNotFilterRangeLowerTimeOperation != ""){
+                      MustNotFilterRangeUpperTime = MustNotFilterRangeUpperTime.replace(/ /g , "T");
+                      MustNotFilterRangeLowerTime = MustNotFilterRangeLowerTime.replace(/ /g , "T");
+                      MustNotFilterRangeLowerTimeOperation = MustNotFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                      var upperTime = MustNotFilterRangeUpperTime;
+                      var lowerTime = MustNotFilterRangeLowerTime + "||" + MustNotFilterRangeLowerTimeOperation;
+                      mustNotData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(MustNotFilterRangeUpperTimeOperation == "" && MustNotFilterRangeLowerTimeOperation == ""){
+                      MustNotFilterRangeUpperTime = MustNotFilterRangeUpperTime.replace(/ /g , "T");
+                      MustNotFilterRangeLowerTime = MustNotFilterRangeLowerTime.replace(/ /g , "T");
+                      var upperTime = MustNotFilterRangeUpperTime;
+                      var lowerTime = MustNotFilterRangeLowerTime;
+                      mustNotData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                }
+              }
+              if(MustNotFilterByValue == "Time Elapsed"){
+                mustNotData.splice(0, 0, {"range" : {"request_time" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Request URI"){
+                mustNotData.splice(0, 0, {"range" : {"request_uri" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Request Method"){
+                mustNotData.splice(0, 0, {"range" : {"request_method" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Status Code"){
+                mustNotData.splice(0, 0, {"range" : {"status" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Request Length"){
+                mustNotData.splice(0, 0, {"range" : {"bytes_received" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Body Bytes Sent"){
+                mustNotData.splice(0, 0, {"range" : {"body_bytes_sent" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Bytes Sent"){
+                mustNotData.splice(0, 0, {"range" : {"bytes_sent" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Host"){
+                mustNotData.splice(0, 0, {"range" : {"http_host" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Referer"){
+                mustNotData.splice(0, 0, {"range" : {"http_referer" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "User Agent"){
+                mustNotData.splice(0, 0, {"range" : {"http_agent" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+            }
+          }
+        }
+      }
+    }
+
+
+
+    var ShouldUniqueCounter = this.$.ShouldUniqueCounter;
+    for(var i = 0; i < parseInt($(ShouldUniqueCounter).val(), 10) - 1; i++){
+      // var x = this.$$('#dataFilterOptionsShould' + i)
+      // var uid = $(x[i]).attr("unique-id");
+
+      var uid = parseInt(i, 10)+1;
+
+      var graphFilterOptionsSubmit = this.$.graphFilterOptionsSubmit;
+
+
+
+      var temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterByOnchange' + uid);
+      var ShouldFilterByValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterTypeOnchange' + uid);
+      var ShouldFilterTypeValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterTerm' + uid);
+      var ShouldFilterTermValue = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeLower' + uid);
+      var ShouldFilterRangeLower = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeUpper' + uid);
+      var ShouldFilterRangeUpper = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeLowerTime' + uid);
+      var ShouldFilterRangeLowerTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeUpperTime' + uid);
+      var ShouldFilterRangeUpperTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeLowerTimeOperation' + uid);
+      var ShouldFilterRangeLowerTimeOperation = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeUpperTimeOperation' + uid);
+      var ShouldFilterRangeUpperTimeOperation = $(temp).val();
+
+
+      var ShouldPartialMatchCheckboxHandler = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldCheckboxValue' + uid);
+      var ShouldRegexMatchCheckboxHandler = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldRegexCheckboxValue' + uid);
+
+
+      if(ShouldFilterByValue != ""){
+        if(ShouldFilterTypeValue != ""){
+          if(ShouldFilterTypeValue == "Term"){
+            if(ShouldFilterTermValue != ""){
+              if(ShouldFilterByValue == "IP Address"){
+                shouldData.splice(0, 0, { "term" : { "remote_addr" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Time"){
+                shouldData.splice(0, 0, { "term" : { "time_iso8601" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Time Elapsed"){
+                shouldData.splice(0, 0, { "term" : { "request_time" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Request URI"){
+
+                if($(ShouldPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = ShouldFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    shouldData.splice(0, 0, { "query" : { "wildcard" : { "request_uri" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(ShouldRegexMatchCheckboxHandler).val() == 1){
+                  shouldData.splice(0, 0, { "regexp" : { "request_uri" : ShouldFilterTermValue }})
+                }
+                else{
+                  shouldData.splice(0, 0, { "term" : { "request_uri" : ShouldFilterTermValue }});
+                }
+              }
+              if(ShouldFilterByValue == "Request Method"){
+                ShouldFilterTermValue = ShouldFilterTermValue.toLowerCase();
+                shouldData.splice(0, 0, { "term" : { "request_method" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Status Code"){
+                shouldData.splice(0, 0, { "term" : { "status" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Request Length"){
+                shouldData.splice(0, 0, { "term" : { "bytes_received" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Body Bytes Sent"){
+                shouldData.splice(0, 0, { "term" : { "body_bytes_sent" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Bytes Sent"){
+                shouldData.splice(0, 0, { "term" : { "bytes_sent" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Host"){
+                if($(ShouldPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = ShouldFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    shouldData.splice(0, 0, { "query" : { "wildcard" : { "http_host" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(ShouldRegexMatchCheckboxHandler).val() == 1){
+                  shouldData.splice(0, 0, { "regexp" : { "http_host" : ShouldFilterTermValue }})
+                }
+                else{
+                  shouldData.splice(0, 0, { "term" : { "http_host" : ShouldFilterTermValue }});
+                }
+              }
+              if(ShouldFilterByValue == "Referer"){
+                if($(ShouldPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = ShouldFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    shouldData.splice(0, 0, { "query" : { "wildcard" : { "http_referer" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(ShouldRegexMatchCheckboxHandler).val() == 1){
+                  shouldData.splice(0, 0, { "regexp" : { "http_referer" : ShouldFilterTermValue }})
+                }
+                else{
+                  shouldData.splice(0, 0, { "term" : { "http_referer" : ShouldFilterTermValue }});
+                }
+              }
+              if(ShouldFilterByValue == "User Agent"){
+                if($(ShouldPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = ShouldFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = stringSplit[xReg].toLowerCase();
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    shouldData.splice(0, 0, { "query" : { "wildcard" : { "http_agent" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(ShouldRegexMatchCheckboxHandler).val() == 1){
+                  shouldData.splice(0, 0, { "regexp" : { "http_agent" : ShouldFilterTermValue }})
+                }
+                else{
+                  shouldData.splice(0, 0, { "term" : { "http_agent" : ShouldFilterTermValue }});
+                }
+              }
+            }
+          }
+
+          if(ShouldFilterTypeValue == "Range"){
+            if(ShouldFilterRangeLower != "" && ShouldFilterRangeLower != "" || ShouldFilterByValue == "Time"){
+              if(ShouldFilterByValue == "IP Address"){
+                shouldData.splice(0, 0, {"range" : {"remote_addr" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Time"){
+                if(ShouldFilterRangeLowerTime != "" && ShouldFilterRangeUpperTime != ""){
+                  if(ShouldFilterRangeUpperTimeOperation != "" && ShouldFilterRangeLowerTimeOperation != ""){
+                      ShouldFilterRangeUpperTime = ShouldFilterRangeUpperTime.replace(/ /g , "T");
+                      ShouldFilterRangeLowerTime = ShouldFilterRangeLowerTime.replace(/ /g , "T");
+                      ShouldFilterRangeUpperTimeOperation = ShouldFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                      ShouldFilterRangeLowerTimeOperation = ShouldFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                      var upperTime = ShouldFilterRangeUpperTime + "||" + ShouldFilterRangeUpperTimeOperation;
+                      var lowerTime = ShouldFilterRangeLowerTime + "||" + ShouldFilterRangeLowerTimeOperation;
+                      shouldData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(ShouldFilterRangeUpperTimeOperation != "" && ShouldFilterRangeLowerTimeOperation == ""){
+                      ShouldFilterRangeUpperTime = ShouldFilterRangeUpperTime.replace(/ /g , "T");
+                      ShouldFilterRangeLowerTime = ShouldFilterRangeLowerTime.replace(/ /g , "T");
+                      ShouldFilterRangeUpperTimeOperation = ShouldFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                      var upperTime = ShouldFilterRangeUpperTime + "||" + ShouldFilterRangeUpperTimeOperation;
+                      var lowerTime = ShouldFilterRangeLowerTime;
+                      shouldData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(ShouldFilterRangeUpperTimeOperation == "" && ShouldFilterRangeLowerTimeOperation != ""){
+                      ShouldFilterRangeUpperTime = ShouldFilterRangeUpperTime.replace(/ /g , "T");
+                      ShouldFilterRangeLowerTime = ShouldFilterRangeLowerTime.replace(/ /g , "T");
+                      ShouldFilterRangeLowerTimeOperation = ShouldFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                      var upperTime = ShouldFilterRangeUpperTime;
+                      var lowerTime = ShouldFilterRangeLowerTime + "||" + ShouldFilterRangeLowerTimeOperation;
+                      shouldData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(ShouldFilterRangeUpperTimeOperation == "" && ShouldFilterRangeLowerTimeOperation == ""){
+                      ShouldFilterRangeUpperTime = ShouldFilterRangeUpperTime.replace(/ /g , "T");
+                      ShouldFilterRangeLowerTime = ShouldFilterRangeLowerTime.replace(/ /g , "T");
+                      var upperTime = ShouldFilterRangeUpperTime;
+                      var lowerTime = ShouldFilterRangeLowerTime;
+                      shouldData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                }
+              }
+              if(ShouldFilterByValue == "Time Elapsed"){
+                shouldData.splice(0, 0, {"range" : {"request_time" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Request URI"){
+                shouldData.splice(0, 0, {"range" : {"request_uri" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Request Method"){
+                shouldData.splice(0, 0, {"range" : {"request_method" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Status Code"){
+                shouldData.splice(0, 0, {"range" : {"status" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Request Length"){
+                shouldData.splice(0, 0, {"range" : {"bytes_received" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Body Bytes Sent"){
+                shouldData.splice(0, 0, {"range" : {"body_bytes_sent" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Bytes Sent"){
+                shouldData.splice(0, 0, {"range" : {"bytes_sent" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Host"){
+                shouldData.splice(0, 0, {"range" : {"http_host" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Referer"){
+                shouldData.splice(0, 0, {"range" : {"http_referer" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "User Agent"){
+                shouldData.splice(0, 0, {"range" : {"http_agent" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+            }
+          }
+        }
+      }
+    }
+
+    var bucketDataU;
+    var bucketDataAnalyzeU;
+    var GranularityU;
+    var graphTypeU;
+
+    var graphFieldAnalyzedSelect = this.$.graphFieldAnalyzedSelect;
+
+    if (graphFieldAnalyzedSelect.options[graphFieldAnalyzedSelect.selectedIndex].text == "Bytes Sent"){
+      bucketDataU = "bytes_sent";
+    }
+    else if (graphFieldAnalyzedSelect.options[graphFieldAnalyzedSelect.selectedIndex].text == "Body Bytes Sent"){
+      bucketDataU = "body_bytes_sent";
+    }
+    else if (graphFieldAnalyzedSelect.options[graphFieldAnalyzedSelect.selectedIndex].text == "Request Length"){
+      bucketDataU = "bytes_received";
+    }
+
+
+    var graphFieldAnalyzedTypeSelect = this.$.graphFieldAnalyzedTypeSelect;
+
+    if (graphFieldAnalyzedTypeSelect.options[graphFieldAnalyzedTypeSelect.selectedIndex].text == "Avg"){
+      bucketDataAnalyzeU = "avg";
+    }
+    else if (graphFieldAnalyzedTypeSelect.options[graphFieldAnalyzedTypeSelect.selectedIndex].text == "Min"){
+      bucketDataAnalyzeU = "min";
+    }
+    else if (graphFieldAnalyzedTypeSelect.options[graphFieldAnalyzedTypeSelect.selectedIndex].text == "Max"){
+      bucketDataAnalyzeU = "max";
+    }
+    else if (graphFieldAnalyzedTypeSelect.options[graphFieldAnalyzedTypeSelect.selectedIndex].text == "Sum"){
+      bucketDataAnalyzeU = "sum";
+    }
+
+
+    var graphFieldAnalyzedGranularitySelect = this.$.graphFieldAnalyzedGranularitySelect;
+
+    if (graphFieldAnalyzedGranularitySelect.options[graphFieldAnalyzedGranularitySelect.selectedIndex].text == "Seconds"){
+      GranularityU = "second";
+    }
+    else if (graphFieldAnalyzedGranularitySelect.options[graphFieldAnalyzedGranularitySelect.selectedIndex].text == "Minutes"){
+      GranularityU = "minute";
+    }
+    else if (graphFieldAnalyzedGranularitySelect.options[graphFieldAnalyzedGranularitySelect.selectedIndex].text == "Hours"){
+      GranularityU = "hour";
+    }
+    else if (graphFieldAnalyzedGranularitySelect.options[graphFieldAnalyzedGranularitySelect.selectedIndex].text == "Days"){
+      GranularityU = "day";
+    }
+    if (graphFieldAnalyzedGranularitySelect.options[graphFieldAnalyzedGranularitySelect.selectedIndex].text == "Weeks"){
+      Granularity = "week";
+    }
+    else if (graphFieldAnalyzedGranularitySelect.options[graphFieldAnalyzedGranularitySelect.selectedIndex].text == "Months"){
+      GranularityU = "month";
+    }
+    else if (graphFieldAnalyzedGranularitySelect.options[graphFieldAnalyzedGranularitySelect.selectedIndex].text == "Years"){
+      GranularityU = "year";
+    }
+
+    var graphFieldAnalyzedGraphType = this.$.graphFieldAnalyzedGraphTypeSelect;
+
+    if (graphFieldAnalyzedGraphType.options[graphFieldAnalyzedGraphType.selectedIndex].text == "Line"){
+      graphTypeU = "line";
+    }
+    else if (graphFieldAnalyzedGraphType.options[graphFieldAnalyzedGraphType.selectedIndex].text == "Column"){
+      graphTypeU = "column";
+    }
+    else if (graphFieldAnalyzedGraphType.options[graphFieldAnalyzedGraphType.selectedIndex].text == "Area"){
+      graphTypeU = "area";
+    }
+
+
+    this.displayGraph(bucketDataU, bucketDataAnalyzeU, GranularityU, graphTypeU, mustData, mustNotData, shouldData);
+
+    // var data = {
+    //   'limit': '10',
+    //   'offset': '0',
+    //   'mustData' : JSON.stringify(mustData),
+    //   'mustNotData' : JSON.stringify(mustNotData),
+    //   'shouldData' : JSON.stringify(shouldData)
+    // };
+    //
+    //
+    // $.post( "/elasticsearch/filterOptions", data, function( data ) {
+    //
+    // });
+
+    //
+    // var graphElement = "#graphElement" + $("#currentGraphFiltered").val()
+    // $(graphElement).attr("bucket-data", bucketDataU);
+    // $(graphElement).attr("bucket-data-analyze", bucketDataAnalyzeU);
+    // $(graphElement).attr("granularity", GranularityU);
+    // $(graphElement).attr("must-data", JSON.stringify(mustData));
+    // $(graphElement).attr("must-not-data", JSON.stringify(mustNotData));
+    // $(graphElement).attr("should-data", JSON.stringify(shouldData));
+
+  },
+
+
+
+  properties:{
+    uniqueId: {
+      type: String,
+      value: 'Initializer',
+      observer: 'uniqueIdChanged'
+    },
+    bucketData: {
+      type: String,
+      value: 'bytes_sent'
+    },
+    bucketDataAnalyze: {
+      type: String,
+      value: 'avg'
+    },
+    granularity: {
+      type: String,
+      value: 'day'
+    },
+    graphType: {
+      type: String,
+      value: 'line'
+    }
+
+
+  },
+
+  uniqueIdChanged: function(newValue, oldValue){
+
+    var uniqueID = newValue;
+
+    var temp = "modalTab1" + uniqueID;
+    var element = this.$.modalTab1;
+    element.id = temp;
+
+    var temp = "modalTab2" + uniqueID;
+    var element = this.$.modalTab2;
+    element.id = temp;
+
+    var temp = "modalTab3" + uniqueID;
+    var element = this.$.modalTab3;
+    element.id = temp;
+
+    var temp = "modalTab4" + uniqueID;
+    var element = this.$.modalTab4;
+    element.id = temp;
+
+    var temp = "graphFilterOptionsAnalytics" + uniqueID;
+    var element = this.$.graphFilterOptionsAnalytics;
+    element.id = temp;
+
+    var temp = "graphFilterOptionsMust" + uniqueID;
+    var element = this.$.graphFilterOptionsMust;
+    element.id = temp;
+
+    var temp = "graphFilterOptionsMustNot" + uniqueID;
+    var element = this.$.graphFilterOptionsMustNot;
+    element.id = temp;
+
+    var temp = "graphFilterOptionsShould" + uniqueID;
+    var element = this.$.graphFilterOptionsShould;
+    element.id = temp;
+
+    var temp = this.$$("#modalTab1" + uniqueID);
+    var ref = "#graphFilterOptionsAnalytics" + uniqueID;
+    $(temp).attr("href", ref);
+
+    var temp = this.$$("#modalTab2" + uniqueID);
+    var ref = "#graphFilterOptionsMust" + uniqueID;
+    $(temp).attr("href", ref);
+
+    var temp = this.$$("#modalTab3" + uniqueID);
+    var ref = "#graphFilterOptionsMustNot" + uniqueID;
+    $(temp).attr("href", ref);
+
+    var temp = this.$$("#modalTab4" + uniqueID);
+    var ref = "#graphFilterOptionsShould" + uniqueID;
+    $(temp).attr("href", ref);
+
+
+  },
+
+  openModal: function(e){
+    var graphFilterOptions = this.$.graphFilterOptions;
+    $(graphFilterOptions).modal('toggle');
+
+  },
+
+  deleteChart: function(){
+    // $(this).hide('slow', function(){ $(this).remove(); });
+    $(this).slideUp();
+
+  },
+
+
+  displayGraph: function(bucketDataP, bucketDataAnalyzeP, granularityP, graphTypeP, mustDataP, mustNotDataP, shouldDataP){
+
+
+    var bucketData = bucketDataP;
+    var bucketDataAnalyze = bucketDataAnalyzeP;
+    var granularity = granularityP;
+    var graphType = graphTypeP;
+
+    var mustData = mustDataP;
+    var mustNotData = mustNotDataP;
+    var shouldData = shouldDataP;
+
+    var name;
+
+    if(bucketDataAnalyze == "avg"){
+        name = "Average ";
+    }
+    else if(bucketDataAnalyze == "min"){
+        name = "Minimum ";
+    }
+    else if(bucketDataAnalyze == "max"){
+        name = "Maximum ";
+    }
+    else if(bucketDataAnalyze == "sum"){
+        name = "Total ";
+    }
+
+
+    if(bucketData == "bytes_sent"){
+        name = name + "Bytes Sent ";
+    }
+    else if(bucketData == "body_bytes_sent"){
+        name = name + "Body Bytes Sent ";
+    }
+    else if(bucketData == "bytes_received"){
+        name = name + "Request Length ";
+    }
+
+
+
+    if (granularity == "second"){
+        name = name + "by Seconds";
+    }
+    else if (granularity == "minute"){
+        name = name + "by Minutes";
+    }
+    else if (granularity == "hour"){
+        name = name + "by Hours";
+    }
+    else if (granularity == "day"){
+        name = name + "by Days";
+    }
+    else if (granularity == "week"){
+        name = name + "by Weeks";
+    }
+    else if (granularity == "month"){
+        name = name + "by Months";
+    }
+    else if (granularity == "year"){
+        name = name + "by Years";
+    }
+
+    var regexWordMatch = "by"
+    var regex = new RegExp('\\b' + regexWordMatch + '\\b');
+    var name2Index=name.search(regex);
+    name2 = name.substring(0, name2Index);
+
+    var mainGraphContainer = this.$.mainGraphContainer;
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    //Sort Time Function///////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+
+      var sort_by = function(field, reverse, primer){
+
+        var key = primer ?
+        function(x) {return primer(x[field])} :
+        function(x) {return x[field]};
+
+        reverse = !reverse ? 1 : -1;
+
+        return function (a, b) {
+          return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+        }
+      }
+
+
+
+      /////////////////////////////////////////////////////////////////////////////////////////////////
+      //Graph Container 1///////////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////////////////////////
+
+      var options = {
+        rangeSelector : {
+          buttons : [{
+            type : 'day',
+            count : 1,
+            text : '1D'
+          }, {
+            type : 'week',
+            count : 1,
+            text : '1W'
+          }, {
+            type : 'month',
+            count : 1,
+            text : '1M'
+          }, {
+            type : 'all',
+            count : 1,
+            text : 'All'
+          }],
+          selected : 3,
+          inputEnabled : false
+        },
+
+        chart: {
+          renderTo: mainGraphContainer,
+          defaultSeriesType: graphType,
+          panning: 'true'
+        },
+
+        title: {
+          text: name
+        },
+        xAxis: {
+          type: 'datetime',
+          dateTimeLabelFormats: { // don't display the dummy year
+          day: '%b %e',
+          week: '%b %e',
+          month: '%b %e',
+          year: '%y'
+        },
+        title: {
+          text: 'Date'
+        }
+      },
+      yAxis: {
+        min: 0
+      },
+      tooltip: {
+
+      },
+
+      plotOptions: {
+        area: {
+          fillColor: {
+            linearGradient: {
+              x1: 0,
+              y1: 0,
+              x2: 0,
+              y2: 1
+            },
+            stops: [
+              [0, Highcharts.getOptions().colors[0]],
+              [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+            ]
+          },
+          marker: {
+            radius: 2
+          },
+          lineWidth: 1,
+          states: {
+            hover: {
+              lineWidth: 1
+            }
+          },
+          threshold: null
+        }
+      },
+
+      series: [],
+
+    };
+
+
+    var dps = [];
+
+    var currentdate = new Date();
+    var datetimeNow = ('0' + currentdate.getDate()).slice(-2) + "/" + ('0' + (currentdate.getMonth()+1)).slice(-2)  + "/" + currentdate.getFullYear() + " @ " + ('0' + currentdate.getHours()).slice(-2) + ":" + ('0' + currentdate.getMinutes()).slice(-2) + ":" + ('0' + currentdate.getSeconds()).slice(-2);
+
+
+    var user = this.getCookie('laserficheCloudAccessLogUser');
+
+    var data2 = {
+      'bucketData': bucketData,
+      'bucketDataAnalyze': bucketDataAnalyze,
+      'granularity': granularity,
+      'limit': '0',
+      'offset': '0',
+      'mustData' : JSON.stringify(mustData),
+      'mustNotData' : JSON.stringify(mustNotData),
+      'shouldData' : JSON.stringify(shouldData),
+      'datetimeNow' : datetimeNow,
+      'user' : user
+
+    };
+
+    $.post( "/elasticsearch/dateHistogram", data2, function( data3 ){
+
+      var myDate
+      $.each(data3.grouping.buckets, function(index,value ){
+
+        // alert(data3.grouping.buckets[index].key_as_string);
+        myDate = new Date(data3.grouping.buckets[index].key_as_string);
+
+        var myEpoch = myDate.getTime()/1000.0;
+        // alert(data3.grouping.buckets[index].dataAnalyzeReturned.value);
+        dps.push({x: myEpoch, y: data3.grouping.buckets[index].dataAnalyzeReturned.value});
+
+
+      });
+      dps.sort(sort_by('x', false, parseInt));
+
+      dataHolder = [];
+      $.each(dps, function(index, value){
+        dataHolder.push([ dps[index]["x"]*1000, dps[index]["y"] ]);
+      });
+
+
+      options.series = [{name : "Data", data: dataHolder}];
+
+      var chart = new Highcharts.StockChart(options);
+      chart.pointer.cmd = chart.pointer.onContainerMouseDown;
+      chart.pointer.onContainerMouseDown = function (a){
+        this.zoomX=this.zoomHor=this.hasZoom=a.shiftKey;
+        this.cmd(a);
+      };
+    });
+
+
+  },
+
+  getCookie: function(cname) {
+      var name = cname + "=";
+      var ca = document.cookie.split(';');
+      for(var i=0; i<ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1);
+          if (c.indexOf(name) == 0) {
+              return c.substring(name.length, c.length);
+          }
+      }
+      return "";
+  },
+
+  intializeModal: function(bucketData, bucketDataAnalyze, granularity, graphType){
+
+    var graphFieldAnalyzedSelect = this.$.graphFieldAnalyzedSelect;
+
+    if (bucketData == "bytes_sent"){
+      graphFieldAnalyzedSelect.selectedIndex = "0";
+    }
+    else if (bucketData == "body_bytes_sent"){
+      graphFieldAnalyzedSelect.selectedIndex = "1";
+    }
+    else if (bucketData == "bytes_received"){
+      graphFieldAnalyzedSelect.selectedIndex = "2";
+    }
+
+
+    var graphFieldAnalyzedTypeSelect = this.$.graphFieldAnalyzedTypeSelect;
+
+    if (bucketDataAnalyze == "avg"){
+      graphFieldAnalyzedTypeSelect.selectedIndex = "0";
+    }
+    else if (bucketDataAnalyze == "min"){
+      graphFieldAnalyzedTypeSelect.selectedIndex = "1";
+    }
+    else if (bucketDataAnalyze == "max"){
+      graphFieldAnalyzedTypeSelect.selectedIndex = "2";
+    }
+    else if (bucketDataAnalyze == "sum"){
+      graphFieldAnalyzedTypeSelect.selectedIndex = "3";
+    }
+
+    var graphFieldAnalyzedGranularitySelect = this.$.graphFieldAnalyzedGranularitySelect;
+
+    if (granularity == "second"){
+      graphFieldAnalyzedGranularitySelect.selectedIndex = "0";
+    }
+    else if (granularity == "minute"){
+      graphFieldAnalyzedGranularitySelect.selectedIndex = "1";
+    }
+    else if (granularity == "hour"){
+      graphFieldAnalyzedGranularitySelect.selectedIndex = "2";
+    }
+    else if (granularity == "day"){
+      graphFieldAnalyzedGranularitySelect.selectedIndex = "3";
+    }
+    else if (granularity == "week"){
+      graphFieldAnalyzedGranularitySelect.selectedIndex = "4";
+    }
+    else if (granularity == "month"){
+      graphFieldAnalyzedGranularitySelect.selectedIndex = "5";
+    }
+    else if (granularity == "year"){
+      graphFieldAnalyzedGranularitySelect.selectedIndex = "6";
+    }
+
+    var graphFieldAnalyzedGraphType = this.$.graphFieldAnalyzedGraphTypeSelect;
+
+    if (graphType == "line"){
+      graphFieldAnalyzedGraphType.selectedIndex = "0";
+    }
+    else if (graphType == "column"){
+      graphFieldAnalyzedGraphType.selectedIndex = "1";
+    }
+    else if (graphType == "area"){
+      graphFieldAnalyzedGraphType.selectedIndex = "2";
+    }
+
+
+
+
+
+  }
+
+
+
+
+});
+
+
+</script>
+
+</dom-module>

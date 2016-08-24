@@ -1,0 +1,168 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="global-header">
+
+  <template>
+    <header class="header white-bg">
+
+      <a href="index.html" class="accessLogLogo"><span>Cloud</span>  Access Log <span class="lite"> Viewer</span></a>
+
+
+
+      <div class="top-nav notification-row">
+        <!-- notificatoin dropdown start-->
+        <ul class="nav pull-right top-menu">
+
+          <!-- task notificatoin start -->
+          <!-- <li id="customDashboard" class="dropdown">
+            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+              <span class="glyphicon glyphicon-cog"></span>
+
+            </a>
+            <ul class="dropdown-menu extended tasks-bar">
+              <div class="notify-arrow notify-arrow-blue"></div>
+              <li>
+                <p class="blue">Settings</p>
+              </li>
+
+
+              <li>
+                <a href = "#" id = "customDateRangeButton">Custom Date Range</a>
+                <div class = "customDateRange" style = "display: none" shown = "false">
+                  <div class="form-group">
+                    <label for="lower">Start Time</label>
+                    <input type="text" class="form-control" id="lower" value = "">
+                  </div>
+                  <div class="form-group">
+                    <label for="upper">End Time</label>
+                    <input type="text" class="form-control" id="upper"  value = "">
+                  </div>
+                </div>
+              </li>
+
+              <li>
+                <a href = "#" id = "customURIButton">Custom URI</a>
+                <div class = "customURI" style = "display: none" shown = "false">
+                  <div class="form-group">
+                    <label for="customURIinput">URI</label>
+                    <input type="text" class="form-control" id="customURIInput" value = "">
+                  </div>
+                </div>
+              </li>
+
+
+            </ul>
+          </li> -->
+
+          <li class="dropdown">
+            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+              <span id = "username" class="username"></span>
+              <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu extended logout">
+              <div class="notify-arrow notify-arrow-blue"></div>
+              <li class="eborder-top">
+                <a href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> My Profile</a>
+              </li>
+              <li>
+                <a href="#" on-tap = "logout"><span class="glyphicon glyphicon-off" aria-hidden="true"></span> Log Out</a>
+              </li>
+            </ul>
+          </li>
+          <!-- user login dropdown end -->
+        </ul>
+        <!-- notificatoin dropdown end-->
+      </div>
+    </header>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'global-header',
+
+      ready: function() {
+
+        var username = this.getCookie('laserficheCloudAccessLogUser');
+        var element = this.$.username;
+        element.innerHTML = username;
+
+        $('#customDashboard .dropdown-menu').on({
+          "click":function(e){
+            e.stopPropagation();
+          }
+
+
+        });
+
+        $("#customDateRangeButton").click(function(){
+
+
+          if($(".customDateRange").attr("shown") == "false"){
+            $(".customDateRange").first().show( "slow", function showNext() {
+              $( this ).next( "div" ).show( "slow", showNext );
+            });
+
+            $(".customDateRange").attr("shown", "true");
+
+          }
+          else{
+            $(".customDateRange").hide(600);
+            $(".customDateRange").attr("shown", "false");
+
+          }
+        });
+
+
+
+        $("#customURIButton").click(function(){
+
+
+          if($(".customURI").attr("shown") == "false"){
+            $(".customURI").first().show( "slow", function showNext() {
+              $( this ).next( "div" ).show( "slow", showNext );
+            });
+
+            $(".customURI").attr("shown", "true");
+
+          }
+          else{
+            $(".customURI").hide(600);
+            $(".customURI").attr("shown", "false");
+
+          }
+        });
+
+
+
+
+
+
+      },
+
+      getCookie: function(cname) {
+          var name = cname + "=";
+          var ca = document.cookie.split(';');
+          for(var i=0; i<ca.length; i++) {
+              var c = ca[i];
+              while (c.charAt(0)==' ') c = c.substring(1);
+              if (c.indexOf(name) == 0) {
+                  return c.substring(name.length, c.length);
+              }
+          }
+          return "";
+      },
+
+      logout: function(){
+        document.cookie = "laserficheCloudAccessLogUser=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+        window.location.replace("../../");
+
+      }
+
+    });
+
+  </script>
+
+</dom-module>

@@ -1,0 +1,836 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+
+
+<dom-module id="dataFilter-optionsmustNot">
+
+<style>
+hr {
+  border: 0;
+  height: 2px;
+  background: #333;
+}
+</style>
+
+<template>
+  <div id = "graphFilterOptionsmustNotWrap">
+
+    <div class="form-group" style = "padding: 2px 5px" id = "mustNotFilterByOnChangeWrap">
+      <label  style = "color: black; font-size: 20px">Filter By</label>
+      <a href="#">
+        <span class="glyphicon glyphicon-chevron-up" style = "padding-left: 5px; display: none" id = "toggleFilterOptionsmustNot"></span>
+      </a>
+      <a href="#">
+        <span class="glyphicon glyphicon-remove" style = "padding-left: 5px; display: none" id = "deleteFilterOptionsmustNot"></span>
+      </a>
+      <select class="form-control" id = "mustNotFilterByOnChange">
+        <option id = "mustNotFilterByDefaultSelected" selected="selected" value=""></option>
+        <option id = "mustNotFilterByRemoteAddr">IP Address</option>
+        <option id = "mustNotFilterByTimeIso8601">Time</option>
+        <option id = "mustNotFilterByRequestTime">Time Elapsed</option>
+        <option id = "mustNotFilterByRequestUri">Request URI</option>
+        <option id = "mustNotFilterByRequestMethod">Request Method</option>
+        <option id = "mustNotFilterByStatus">Status Code</option>
+        <option id = "mustNotFilterByRequestLength">Request Length</option>
+        <option id = "mustNotFilterByBodyBytesSent">Body Bytes Sent</option>
+        <option id = "mustNotFilterByBytesSent">Bytes Sent</option>
+        <option id = "mustNotFilterByHttpHost">Host</option>
+        <option id = "mustNotFilterByHttpReferer">Referer</option>
+        <option id = "mustNotFilterByHttpUserAgent">User Agent</option>
+      </select>
+    </div>
+
+    <div class="form-group" style = "padding: 2px 5px; display :none" id = "mustNotFilterTypeOnChangeWrap">
+      <label  style = "color: black">Filter Type</label>
+      <select class="form-control" id = "mustNotFilterTypeOnChange">
+        <option id = "mustNotFilterTypeDefaultSelected" selected="selected" value=""></option>
+        <option id = "mustNotFilterTypeTerm">Term</option>
+        <option id = "mustNotFilterTypeRange">Range</option>
+
+      </select>
+    </div>
+
+
+    <div class="form-group" style = "padding: 2px 5px; display :none" id = "mustNotFilterTermWrap">
+      <label  style = "color: black">Term</label>
+      <label  style = "color: black; float: right; display: none" id = "mustNotPartialMatch"> Partial Match</label>
+      <input type="checkbox" value="" style = "padding-top: 2px; float:right; display : none" id = "mustNotPartialMatchCheckbox">
+      <label  style = "color: black; float: right; display: none; margin-right: 10px" id = "mustNotRegexMatch"> Regex Match</label>
+      <input type="checkbox" value="" style = "padding-top: 2px; float:right; display : none" id = "mustNotRegexMatchCheckbox">
+      <input class="form-control" id="mustNotFilterTerm" value="">
+      <input id = "mustNotCheckboxValue" type = "hidden" value = "0">
+      <input id = "mustNotRegexCheckboxValue" type = "hidden" value = "0">
+    </div>
+
+
+    <div class="form-group" style = "padding: 2px 5px; display:none" id = "mustNotFilterRangeWrapTime">
+      <label  style = "color: black">Date Time Range</label>
+
+      <a href="#" class="glyphicon glyphicon-wrench" data-trigger="focus" aria-hidden="true" id = "popOverToggle" data-toggle="popover" data-placement="left" style = "float:right" title="DATE TIME MATH OPERATIONS" data-content="Please enter a '+' or '-' followed by an integer value along with an unit. Acceptable units are: y (year), M (month), w (week), d (day), h (hour), m (minute), and s (second). Defaults to +0s"></a>
+
+      <div class = "row" style = "margin-bottom: 5px">
+        <div class = "col-md-8">
+          <input class="form-control" id="mustNotFilterRangeUpperTime" placeholder="upper anchor date (use 'now' for now)" value="">
+        </div>
+        <div class = "col-md-4">
+          <input class="form-control" id="mustNotFilterRangeUpperTimeOperation" placeholder="example: -5h+2m" value="">
+        </div>
+      </div>
+      <div class = "row">
+        <div class = "col-md-8">
+          <input class="form-control" id="mustNotFilterRangeLowerTime" placeholder="lower anchor date" value="">
+        </div>
+        <div class = "col-md-4">
+          <input class="form-control" id="mustNotFilterRangeLowerTimeOperation" placeholder="example: +3h+2m" value="">
+        </div>
+      </div>
+    </div>
+
+
+    <div class="form-group" style = "padding: 2px 5px; display :none" id = "mustNotFilterRangeWrap">
+      <label  style = "color: black">Range</label>
+      <div class = "row">
+        <div class = "col-md-6">
+          <input class="form-control" id="mustNotFilterRangeLower" placeholder="lower" value="">
+        </div>
+        <div class = "col-md-6">
+          <input class="form-control" id="mustNotFilterRangeUpper" placeholder="upper" value="">
+        </div>
+      </div>
+    </div>
+
+
+
+  </div>
+
+
+</template>
+
+<script>
+
+Polymer({
+  is: "dataFilter-optionsmustNot",
+
+  ready: function() {
+    var popOverToggle = this.$$("#popOverToggle" + this.uniqueId);
+    $(popOverToggle).popover();
+
+    var mustNotFilterRangeUpperTime = this.$$("#mustNotFilterRangeUpperTime" + this.uniqueId);
+    var mustNotFilterRangeLowerTime = this.$$("#mustNotFilterRangeLowerTime" + this.uniqueId);
+    var mustNotFilterRangeUpperTimeOperation = this.$$("#mustNotFilterRangeUpperTimeOperation" + this.uniqueId);
+    var mustNotFilterRangeLowerTimeOperation = this.$$("#mustNotFilterRangeLowerTimeOperation" + this.uniqueId);
+
+    // var currentdate = new Date();
+    // var datetime = currentdate.getFullYear() + "-" + ('0' + (currentdate.getMonth()+1)).slice(-2) + "-" + ('0' + currentdate.getDate()).slice(-2)  + " " + currentdate.getHours() + ":" + currentdate.getMinutes();
+
+    // mustNotFilterRangeUpperTime.value = "Now";
+
+
+
+    $(mustNotFilterRangeUpperTime).datetimepicker({
+      maxDate:'-1970/01/01',
+      format:'Y-m-d H:i:s',
+      onChangeDateTime: function(dp,$input)
+      {
+        var dateObject = $input.val();
+        mustNotFilterRangeUpperTime.value = dateObject;
+      }
+
+    });
+
+
+
+    $(mustNotFilterRangeLowerTime).datetimepicker({
+      maxDate:'-1970/01/01',
+      format:'Y-m-d H:i:s',
+      onChangeDateTime: function(dp,$input)
+      {
+        var dateObject = $input.val();
+        mustNotFilterRangeLowerTime.value = dateObject;
+      }
+    });
+
+
+    var mustNotFilterRangeWrapTime = this.$$("#mustNotFilterRangeWrapTime" + this.uniqueId);
+
+    var mustNotFilterByOnChange1NJ = this.$$("#mustNotFilterByOnChange" + this.uniqueId);
+    var mustNotFilterByOnChange1 = $(mustNotFilterByOnChange1NJ);
+
+    var mustNotPartialMatchNJ = this.$$('#mustNotPartialMatch' + this.uniqueId);
+    var mustNotPartialMatchCheckboxNJ = this.$$('#mustNotPartialMatchCheckbox' + this.uniqueId);
+    var mustNotCheckboxValueNJ = this.$$('#mustNotCheckboxValue' + this.uniqueId);
+    var mustNotRegexMatchNJ = this.$$('#mustNotRegexMatch' + this.uniqueId);
+    var mustNotRegexMatchCheckboxNJ = this.$$('#mustNotRegexMatchCheckbox' + this.uniqueId);
+    var mustNotRegexCheckboxValueNJ = this.$$('#mustNotRegexCheckboxValue' + this.uniqueId);
+    var mustNotFilterTermHintNJ = this.$$('#mustNotFilterTerm' + this.uniqueId);
+    var mustNotPartialMatch = $(mustNotPartialMatchNJ);
+    var mustNotPartialMatchCheckbox = $(mustNotPartialMatchCheckboxNJ);
+    var mustNotCheckboxValue = $(mustNotCheckboxValueNJ);
+    var mustNotRegexMatch = $(mustNotRegexMatchNJ);
+    var mustNotRegexMatchCheckbox = $(mustNotRegexMatchCheckboxNJ);
+    var mustNotRegexCheckboxValue = $(mustNotRegexCheckboxValueNJ);
+    var mustNotFilterTermHint = $(mustNotFilterTermHintNJ);
+
+    var mustNotFilterTerm = this.$$('#mustNotFilterTerm' + this.uniqueId);
+    var mustNotFilterRangeLower = this.$$('#mustNotFilterRangeLower' + this.uniqueId);
+    var mustNotFilterRangeUpper = this.$$('#mustNotFilterRangeUpper' + this.uniqueId);
+
+    var mustNotFilterTypeOnChangeNJ = this.$$('#mustNotFilterTypeOnChangeWrap' + this.uniqueId);
+    var mustNotFilterTypeOnChange = $(mustNotFilterTypeOnChangeNJ);
+
+
+    var firstFilter = this.$$('#mustNotFilterByOnChange' + this.uniqueId);
+    var secondFilter = this.$$('#mustNotFilterTypeOnChange' + this.uniqueId);
+
+
+    var mustNotFilterTermWrapNJ = this.$$('#mustNotFilterTermWrap' + this.uniqueId);
+    var mustNotFilterRangeWrapNJ = this.$$('#mustNotFilterRangeWrap' + this.uniqueId);
+    var mustNotFilterTermWrap = $(mustNotFilterTermWrapNJ);
+    var mustNotFilterRangeWrap = $(mustNotFilterRangeWrapNJ);
+
+
+    var mustNotFilterTypeRangeNJ = this.$$('#mustNotFilterTypeRange' + this.uniqueId);
+    var mustNotFilterTypeRange = $(mustNotFilterTypeRangeNJ);
+
+    var mustNotFilterTypeTermNJ = this.$$('#mustNotFilterTypeTerm' + this.uniqueId);
+    var mustNotFilterTypeTerm = $(mustNotFilterTypeTermNJ);
+
+
+    var toggleFilterOptionsmustNotNJ = this.$$('#toggleFilterOptionsmustNot' + this.uniqueId);
+    var deleteFilterOptionsmustNotNJ = this.$$('#deleteFilterOptionsmustNot' + this.uniqueId);
+    var toggleFilterOptionsmustNot = $(toggleFilterOptionsmustNotNJ);
+    var deleteFilterOptionsmustNot = $(deleteFilterOptionsmustNotNJ);
+
+
+
+    firstFilter.addEventListener("change", function(){
+      var selectedString = firstFilter.options[firstFilter.selectedIndex].text;
+      mustNotFilterTerm.value = "";
+      mustNotFilterRangeLower.value = "";
+      mustNotFilterRangeUpper.value = "";
+
+      mustNotFilterRangeUpperTime.value = "";
+      mustNotFilterRangeLowerTime.value = "";
+      mustNotFilterRangeUpperTimeOperation.value = "";
+      mustNotFilterRangeLowerTimeOperation.value = "";
+
+      if(selectedString == "IP Address" || selectedString == "Request URI" || selectedString == "Request Method" || selectedString == "Host" || selectedString == "Referer" || selectedString == "User Agent"){
+        mustNotFilterTypeOnChange.show('slow');
+        $(mustNotFilterRangeWrapTime).hide('slow');
+
+        var selectedType = secondFilter.options[secondFilter.selectedIndex].text;
+        if(selectedType == "Range"){
+          secondFilter.selectedIndex = "1";
+          $(mustNotFilterTermWrap).show('slow');
+          $(mustNotFilterRangeWrap).hide('slow');
+        }
+
+
+
+        $(mustNotFilterTypeRange).attr("disabled", "disabled");
+
+        if($(mustNotFilterTypeTerm).attr("disabled") == "disabled"){
+          $(mustNotFilterTypeTerm).removeAttr("disabled");
+        }
+
+        $(toggleFilterOptionsmustNot).show('slow');
+        $(deleteFilterOptionsmustNot).show('slow');
+        $(toggleFilterOptionsmustNot).attr("class", "glyphicon glyphicon-chevron-up");
+
+        if(selectedString == "IP Address"){
+          $(mustNotCheckboxValue).val('0');
+          $(mustNotPartialMatchCheckbox).removeAttr('checked');
+          $(mustNotPartialMatch).hide('slow');
+          $(mustNotPartialMatchCheckbox).hide('slow');
+          $(mustNotRegexCheckboxValue).val('0');
+          $(mustNotRegexMatchCheckbox).removeAttr('checked');
+          $(mustNotRegexMatch).hide('slow');
+          $(mustNotRegexMatchCheckbox).hide('slow');
+          $(mustNotFilterTermHint).attr("placeholder", "example: 52.11.159.159");
+
+        }
+        if(selectedString == "Request URI"){
+          $(mustNotCheckboxValue).val('0');
+          $(mustNotPartialMatchCheckbox).removeAttr('checked');
+          $(mustNotPartialMatch).show('slow');
+          $(mustNotPartialMatchCheckbox).show('slow');
+          $(mustNotRegexCheckboxValue).val('0');
+          $(mustNotRegexMatchCheckbox).removeAttr('checked');
+          $(mustNotRegexMatch).show('slow');
+          $(mustNotRegexMatchCheckbox).show('slow');
+          $(mustNotFilterTermHint).attr("placeholder", "example: /CustomerPortal/PartialViews/Templates/Panel/AdminPanel.htm");
+        }
+
+        if(selectedString == "Request Method"){
+          $(mustNotCheckboxValue).val('0');
+          $(mustNotPartialMatchCheckbox).removeAttr('checked');
+          $(mustNotPartialMatch).hide('slow');
+          $(mustNotPartialMatchCheckbox).hide('slow');
+          $(mustNotRegexCheckboxValue).val('0');
+          $(mustNotRegexMatchCheckbox).removeAttr('checked');
+          $(mustNotRegexMatch).hide('slow');
+          $(mustNotRegexMatchCheckbox).hide('slow');
+          $(mustNotFilterTermHint).attr("placeholder", "example: GET, POST, etc");
+        }
+        if(selectedString == "Host"){
+          $(mustNotCheckboxValue).val('0');
+          $(mustNotPartialMatchCheckbox).removeAttr('checked');
+          $(mustNotPartialMatch).show('slow');
+          $(mustNotPartialMatchCheckbox).show('slow');
+          $(mustNotRegexMatchCheckbox).removeAttr('checked');
+          $(mustNotRegexCheckboxValue).val('0');
+          $(mustNotRegexMatch).show('slow');
+          $(mustNotRegexMatchCheckbox).show('slow');
+          $(mustNotFilterTermHint).attr("placeholder", "example: r-1a44e5a8.clouddev.laserfiche.com");
+        }
+        if(selectedString == "Referer"){
+          $(mustNotCheckboxValue).val('0');
+          $(mustNotPartialMatchCheckbox).removeAttr('checked');
+          $(mustNotPartialMatch).show('slow');
+          $(mustNotPartialMatchCheckbox).show('slow');
+          $(mustNotRegexCheckboxValue).val('0');
+          $(mustNotRegexMatchCheckbox).removeAttr('checked');
+          $(mustNotRegexMatch).show('slow');
+          $(mustNotRegexMatchCheckbox).show('slow');
+          $(mustNotFilterTermHint).attr("placeholder", "example: https://r-1a44e5a8.clouddev.laserfiche.com/laserfiche/");
+        }
+        if(selectedString == "User Agent"){
+          $(mustNotCheckboxValue).val('0');
+          $(mustNotPartialMatchCheckbox).removeAttr('checked');
+          $(mustNotPartialMatch).show('slow');
+          $(mustNotPartialMatchCheckbox).show('slow');
+          $(mustNotRegexCheckboxValue).val('0');
+          $(mustNotRegexMatchCheckbox).removeAttr('checked');
+          $(mustNotRegexMatch).show('slow');
+          $(mustNotRegexMatchCheckbox).show('slow');
+          $(mustNotFilterTermHint).attr("placeholder", "example: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:37.0) Gecko/20100101 Firefox/37.0");
+        }
+
+
+      }
+      else if (selectedString == ""){
+        $(mustNotCheckboxValue).val('0');
+        $(mustNotPartialMatchCheckbox).removeAttr('checked');
+        $(mustNotPartialMatch).hide('slow');
+        $(mustNotPartialMatchCheckbox).hide('slow');
+        $(mustNotRegexMatchCheckbox).removeAttr('checked');
+        $(mustNotRegexMatch).hide('slow');
+        $(mustNotRegexMatchCheckbox).hide('slow');
+        $(mustNotFilterTypeOnChange).hide('slow');
+        $(mustNotFilterTermWrap).hide('slow');
+        $(mustNotFilterRangeWrap).hide('slow');
+        $(mustNotFilterRangeWrapTime).hide('slow');
+        var selectedType = secondFilter.options[secondFilter.selectedIndex].text;
+        secondFilter.selectedIndex = "0";
+        secondFilter.value == "";
+
+      }
+      else if (selectedString == "Time"){
+        var selectedType = secondFilter.options[secondFilter.selectedIndex].text;
+        if(selectedType == "Term"){
+          secondFilter.selectedIndex = "2";
+          $(mustNotFilterTermWrap).hide('slow');
+          $(mustNotFilterRangeWrap).hide('slow');
+          $(mustNotFilterRangeWrapTime).show('slow');
+        }
+        else if(selectedType === "Range"){
+          secondFilter.selectedIndex = "2";
+          $(mustNotFilterTermWrap).hide('slow');
+          $(mustNotFilterRangeWrap).hide('slow');
+          $(mustNotFilterRangeWrapTime).show('slow');
+        }
+
+        $(mustNotCheckboxValue).val('0');
+        $(mustNotPartialMatchCheckbox).removeAttr('checked');
+        $(mustNotPartialMatch).hide('slow');
+        $(mustNotPartialMatchCheckbox).hide('slow');
+        $(mustNotRegexMatchCheckbox).removeAttr('checked');
+        $(mustNotRegexMatch).hide('slow');
+        $(mustNotRegexMatchCheckbox).hide('slow');
+        $(mustNotFilterTypeOnChange).show('slow');
+        if($(mustNotFilterTypeRange).attr("disabled") == "disabled"){
+          $(mustNotFilterTypeRange).removeAttr("disabled");
+        }
+        $(toggleFilterOptionsmustNot).show('slow');
+        $(deleteFilterOptionsmustNot).show('slow');
+        $(toggleFilterOptionsmustNot).attr("class", "glyphicon glyphicon-chevron-up");
+        $(mustNotFilterTypeTerm).attr("disabled", "disabled");
+
+      }
+      else{
+        var selectedType = secondFilter.options[secondFilter.selectedIndex].text;
+        if(selectedType == "Range"){
+          secondFilter.selectedIndex = "2";
+          $(mustNotFilterTermWrap).hide('slow');
+          $(mustNotFilterRangeWrap).show('slow');
+          $(mustNotFilterRangeWrapTime).hide('slow');
+        }
+
+        $(mustNotFilterRangeWrapTime).hide('slow');
+        $(mustNotCheckboxValue).val('0');
+        $(mustNotPartialMatchCheckbox).removeAttr('checked');
+        $(mustNotPartialMatch).hide('slow');
+        $(mustNotPartialMatchCheckbox).hide('slow');
+
+        $(mustNotRegexMatchCheckbox).removeAttr('checked');
+        $(mustNotRegexMatch).hide('slow');
+        $(mustNotRegexMatchCheckbox).hide('slow');
+
+        $(mustNotFilterTypeOnChange).show('slow');
+        if($(mustNotFilterTypeRange).attr("disabled") == "disabled"){
+          $(mustNotFilterTypeRange).removeAttr("disabled");
+        }
+
+
+        if($(mustNotFilterTypeTerm).attr("disabled") == "disabled"){
+          $(mustNotFilterTypeTerm).removeAttr("disabled");
+        }
+
+        $(toggleFilterOptionsmustNot).show('slow');
+        $(deleteFilterOptionsmustNot).show('slow');
+        $(toggleFilterOptionsmustNot).attr("class", "glyphicon glyphicon-chevron-up");
+
+
+        if(selectedString == "Time Elapsed"){
+          $(mustNotFilterTermHint).attr("placeholder", "example: 0.398, 1.235, etc");
+        }
+        if(selectedString == "Status Code"){
+          $(mustNotFilterTermHint).attr("placeholder", "example: 404, 200, etc");
+        }
+        if(selectedString == "Request Length"){
+          $(mustNotFilterTermHint).attr("placeholder", "example: 2846, 4536, etc");
+        }
+        if(selectedString == "Body Bytes Sent"){
+          $(mustNotFilterTermHint).attr("placeholder", "example: 571, 820, etc");
+        }
+        if(selectedString == "Bytes Sent"){
+          $(mustNotFilterTermHint).attr("placeholder", "example: 871, 1230, etc");
+        }
+
+
+      }
+
+    });
+
+
+    $(mustNotPartialMatchCheckbox).change(function(){
+      var selectedString = firstFilter.options[firstFilter.selectedIndex].text;
+      if(this.checked){
+        if(selectedString == "Request URI"){
+          $(mustNotCheckboxValue).val('1');
+          $(mustNotRegexCheckboxValue).val('0');
+          $(mustNotRegexMatchCheckbox).removeAttr('checked');
+          $(mustNotFilterTermHint).attr("placeholder", "example: CustomerPortal, Panel, AdminPanel (separate partial terms by commas)");
+        }
+        if(selectedString == "Host"){
+          $(mustNotCheckboxValue).val('1');
+          $(mustNotRegexCheckboxValue).val('0');
+          $(mustNotRegexMatchCheckbox).removeAttr('checked');
+          $(mustNotFilterTermHint).attr("placeholder", "example: clouddev, laserfiche (separate partial terms by commas)");
+        }
+        if(selectedString == "Referer"){
+          $(mustNotCheckboxValue).val('1');
+          $(mustNotRegexCheckboxValue).val('0');
+          $(mustNotRegexMatchCheckbox).removeAttr('checked');
+          $(mustNotFilterTermHint).attr("placeholder", "example: clouddev, laserfiche (separate partial terms by commas)");
+        }
+        if(selectedString == "User Agent"){
+          $(mustNotCheckboxValue).val('1');
+          $(mustNotRegexCheckboxValue).val('0');
+          $(mustNotRegexMatchCheckbox).removeAttr('checked');
+          $(mustNotFilterTermHint).attr("placeholder", "example: Mozilla, Windows, Firefox (separate partial terms by commas)");
+        }
+      }
+      else{
+        if(selectedString == "Request URI"){
+          $(mustNotCheckboxValue).val('0');
+          $(mustNotFilterTermHint).attr("placeholder", "example: /CustomerPortal/PartialViews/Templates/Panel/AdminPanel.htm");
+        }
+        if(selectedString == "Host"){
+          $(mustNotCheckboxValue).val('0');
+          $(mustNotFilterTermHint).attr("placeholder", "example: r-1a44e5a8.clouddev.laserfiche.com");
+        }
+        if(selectedString == "Referer"){
+          $(mustNotCheckboxValue).val('0');
+          $(mustNotFilterTermHint).attr("placeholder", "example: https://r-1a44e5a8.clouddev.laserfiche.com/laserfiche/");
+        }
+        if(selectedString == "User Agent"){
+          $(mustNotCheckboxValue).val('0');
+          $(mustNotFilterTermHint).attr("placeholder", "example: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:37.0) Gecko/20100101 Firefox/37.0");
+        }
+      }
+    });
+
+
+    $(mustNotRegexMatchCheckbox).change(function(){
+      var selectedString = firstFilter.options[firstFilter.selectedIndex].text;
+      if(this.checked){
+        if(selectedString == "Request URI"){
+          $(mustNotRegexCheckboxValue).val('1');
+          $(mustNotCheckboxValue).val('0');
+          $(mustNotPartialMatchCheckbox).removeAttr('checked');
+          $(mustNotFilterTermHint).attr("placeholder", "example: .*/getrepositories[?]customerID=[0-9]{8,9}");
+        }
+        if(selectedString == "Host"){
+          $(mustNotRegexCheckboxValue).val('1');
+          $(mustNotCheckboxValue).val('0');
+          $(mustNotPartialMatchCheckbox).removeAttr('checked');
+          $(mustNotFilterTermHint).attr("placeholder", "example: .*clouddev\\.laserfiche\\.com.*");
+        }
+        if(selectedString == "Referer"){
+          $(mustNotRegexCheckboxValue).val('1');
+          $(mustNotCheckboxValue).val('0');
+          $(mustNotPartialMatchCheckbox).removeAttr('checked');
+          $(mustNotFilterTermHint).attr("placeholder", "example: r-.*clouddev\\.laserfiche\\.com/laserfiche.*");
+        }
+        if(selectedString == "User Agent"){
+          $(mustNotRegexCheckboxValue).val('1');
+          $(mustNotCheckboxValue).val('0');
+          $(mustNotPartialMatchCheckbox).removeAttr('checked');
+          $(mustNotFilterTermHint).attr("placeholder", "example: Apache-HttpClient.*");
+        }
+      }
+      else{
+        if(selectedString == "Request URI"){
+          $(mustNotRegexCheckboxValue).val('0');
+          $(mustNotFilterTermHint).attr("placeholder", "example: /CustomerPortal/PartialViews/Templates/Panel/AdminPanel.htm");
+        }
+        if(selectedString == "Host"){
+          $(mustNotRegexCheckboxValue).val('0');
+          $(mustNotFilterTermHint).attr("placeholder", "example: r-1a44e5a8.clouddev.laserfiche.com");
+        }
+        if(selectedString == "Referer"){
+          $(mustNotRegexCheckboxValue).val('0');
+          $(mustNotFilterTermHint).attr("placeholder", "example: https://r-1a44e5a8.clouddev.laserfiche.com/laserfiche/");
+        }
+        if(selectedString == "User Agent"){
+          $(mustNotRegexCheckboxValue).val('0');
+          $(mustNotFilterTermHint).attr("placeholder", "example: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:37.0) Gecko/20100101 Firefox/37.0");
+        }
+      }
+    });
+
+
+
+
+
+
+
+
+    $(mustNotFilterTypeOnChange).change(function(){
+      var selectedString = firstFilter.options[firstFilter.selectedIndex].text;
+
+      var selectedType = secondFilter.options[secondFilter.selectedIndex].text;
+      if(selectedType == "Range"){
+        if(selectedString == "Time"){
+          $(mustNotFilterTerm).val('');
+          $(mustNotFilterRangeLower).val('');
+          $(mustNotFilterRangeUpper).val('');
+          $(mustNotFilterRangeWrap).hide('slow');
+          $(mustNotFilterTermWrap).hide('slow');
+          $(mustNotFilterRangeWrapTime).show('slow');
+        }
+        else{
+            $(mustNotFilterTerm).val('');
+            mustNotFilterRangeUpperTime.value = "";
+            mustNotFilterRangeLowerTime.value = "";
+            mustNotFilterRangeUpperTimeOperation.value = "";
+            mustNotFilterRangeLowerTimeOperation.value = "";
+            $(mustNotFilterRangeWrapTime).hide('slow');
+            $(mustNotFilterRangeWrap).show('slow');
+            $(mustNotFilterTermWrap).hide('slow');
+        }
+      }
+      else if(selectedType == "Term"){
+        $(mustNotFilterRangeLower).val('');
+        $(mustNotFilterRangeUpper).val('');
+        mustNotFilterRangeUpperTime.value = "";
+        mustNotFilterRangeLowerTime.value = "";
+        mustNotFilterRangeUpperTimeOperation.value = "";
+        mustNotFilterRangeLowerTimeOperation.value = "";
+        $(mustNotFilterRangeWrapTime).hide('slow');
+        $(mustNotFilterTermWrap).show('slow');
+        $(mustNotFilterRangeWrap).hide('slow');
+
+      }
+      else{
+        $(mustNotFilterTerm).val('');
+        $(mustNotFilterRangeLower).val('');
+        $(mustNotFilterRangeUpper).val('');
+
+        $(mustNotFilterTermWrap).hide('slow');
+        $(mustNotFilterRangeWrap).hide('slow');
+
+        mustNotFilterRangeUpperTime.value = "";
+        mustNotFilterRangeLowerTime.value = "";
+        mustNotFilterRangeUpperTimeOperation.value = "";
+        mustNotFilterRangeLowerTimeOperation.value = "";
+        $(mustNotFilterRangeWrapTime).hide('slow');
+      }
+    });
+
+
+    $(toggleFilterOptionsmustNot).click(function(){
+
+      if($(toggleFilterOptionsmustNot).attr("class") == "glyphicon glyphicon-chevron-up"){
+        $(toggleFilterOptionsmustNot).attr("class", "glyphicon glyphicon-chevron-down");
+        $(mustNotFilterTypeOnChange).hide('slow');
+        $(mustNotFilterTermWrap).hide('slow');
+        $(mustNotFilterRangeWrap).hide('slow');
+        $(mustNotFilterRangeWrapTime).hide('slow');
+        $(mustNotFilterByOnChange1).attr('disabled', 'disabled');
+
+
+      }
+      else {
+        $(toggleFilterOptionsmustNot).attr("class", "glyphicon glyphicon-chevron-up");
+        $(mustNotFilterByOnChange1).removeAttr("disabled");
+
+        var selectedType = secondFilter.options[secondFilter.selectedIndex].text;
+
+        var selectedString = firstFilter.options[firstFilter.selectedIndex].text;
+        if(selectedString != ""){
+          $(mustNotFilterTypeOnChange).show('slow');
+          if(selectedType == "Range"){
+            if(selectedString == "Time"){
+              $(mustNotFilterRangeWrapTime).show('slow');
+            }
+            else{
+              $(mustNotFilterRangeWrap).show('slow');
+            }
+          }
+          else if(selectedType == "Term"){
+            $(mustNotFilterTermWrap).show('slow');
+          }
+          else{
+            $(mustNotFilterTermWrap).hide('slow');
+            $(mustNotFilterRangeWrap).hide('slow');
+            $(mustNotFilterRangeWrapTime).hide('slow');
+          }
+        }
+        else{
+          $(mustNotFilterTypeOnChange).hide('slow');
+        }
+
+      }
+
+    });
+
+
+    $(deleteFilterOptionsmustNot).click(function(){
+      $(mustNotCheckboxValue).val('0');
+      $(mustNotPartialMatchCheckbox).removeAttr('checked');
+      $(mustNotPartialMatch).hide('slow');
+      $(mustNotPartialMatchCheckbox).hide('slow');
+      $(mustNotRegexCheckboxValue).val('0');
+      $(mustNotRegexMatchCheckbox).removeAttr('checked');
+      $(mustNotRegexMatch).hide('slow');
+      $(mustNotRegexMatchCheckbox).hide('slow');
+      $(mustNotFilterTerm).val('');
+      $(mustNotFilterRangeLower).val('');
+      $(mustNotFilterRangeUpper).val('');
+      $(mustNotFilterTypeOnChange).hide('slow');
+      $(mustNotFilterTermWrap).hide('slow');
+      $(mustNotFilterRangeWrap).hide('slow');
+      secondFilter.value="";
+      $(mustNotFilterByOnChange1).val('');
+      $(toggleFilterOptionsmustNot).hide('slow');
+      $(deleteFilterOptionsmustNot).hide('slow');
+      $(toggleFilterOptionsmustNot).attr("class", "glyphicon glyphicon-chevron-up");
+      $(mustNotFilterByOnChange1).removeAttr("disabled");
+      mustNotFilterRangeUpperTime.value = "";
+      mustNotFilterRangeLowerTime.value = "";
+      mustNotFilterRangeUpperTimeOperation.value = "";
+      mustNotFilterRangeLowerTimeOperation.value = "";
+      $(mustNotFilterRangeWrapTime).hide('slow');
+      $(this).parent().parent().hide();
+
+
+    });
+
+
+  },
+
+  properties:{
+    uniqueId: {
+      type: Number,
+      value: '1',
+      observer: 'uniqueIdChanged'
+    }
+
+  },
+
+  uniqueIdChanged: function(newValue, oldValue){
+    var uniqueID = newValue;
+
+    var temp = "mustNotFilterRangeWrapTime" + uniqueID;
+    var element = this.$.mustNotFilterRangeWrapTime;
+    element.id = temp;
+
+    var temp = "popOverToggle" + uniqueID;
+    var element = this.$.popOverToggle;
+    element.id = temp;
+
+    var temp = "mustNotFilterRangeUpperTime" + uniqueID;
+    var element = this.$.mustNotFilterRangeUpperTime;
+    element.id = temp;
+
+    var temp = "mustNotFilterRangeUpperTimeOperation" + uniqueID;
+    var element = this.$.mustNotFilterRangeUpperTimeOperation;
+    element.id = temp;
+
+    var temp = "mustNotFilterRangeLowerTime" + uniqueID;
+    var element = this.$.mustNotFilterRangeLowerTime;
+    element.id = temp;
+
+    var temp = "mustNotFilterRangeLowerTimeOperation" + uniqueID;
+    var element = this.$.mustNotFilterRangeLowerTimeOperation;
+    element.id = temp;
+
+
+    var temp = "graphFilterOptionsmustNotWrap" + uniqueID;
+    var element = this.$.graphFilterOptionsmustNotWrap;
+    element.id = temp;
+
+    var temp = "mustNotFilterByDefaultSelected" + uniqueID;
+    var element = this.$.mustNotFilterByDefaultSelected;
+    element.id = temp;
+
+    var temp = "mustNotFilterByRemoteAddr" + uniqueID;
+    var element = this.$.mustNotFilterByRemoteAddr;
+    element.id = temp;
+
+    var temp = "mustNotFilterByTimeIso8601" + uniqueID;
+    var element = this.$.mustNotFilterByTimeIso8601;
+    element.id = temp;
+
+    var temp = "mustNotFilterByRequestTime" + uniqueID;
+    var element = this.$.mustNotFilterByRequestTime;
+    element.id = temp;
+
+    var temp = "mustNotFilterByRequestUri" + uniqueID;
+    var element = this.$.mustNotFilterByRequestUri;
+    element.id = temp;
+
+    var temp = "mustNotFilterByRequestMethod" + uniqueID;
+    var element = this.$.mustNotFilterByRequestMethod;
+    element.id = temp;
+
+    var temp = "mustNotFilterByStatus" + uniqueID;
+    var element = this.$.mustNotFilterByStatus;
+    element.id = temp;
+
+    var temp = "mustNotFilterByRequestLength" + uniqueID;
+    var element = this.$.mustNotFilterByRequestLength;
+    element.id = temp;
+
+    var temp = "mustNotFilterByBodyBytesSent" + uniqueID;
+    var element = this.$.mustNotFilterByBodyBytesSent;
+    element.id = temp;
+
+    var temp = "mustNotFilterByBytesSent" + uniqueID;
+    var element = this.$.mustNotFilterByBytesSent;
+    element.id = temp;
+
+    var temp = "mustNotFilterByHttpHost" + uniqueID;
+    var element = this.$.mustNotFilterByHttpHost;
+    element.id = temp;
+
+    var temp = "mustNotFilterByHttpReferer" + uniqueID;
+    var element = this.$.mustNotFilterByHttpReferer;
+    element.id = temp;
+
+    var temp = "mustNotFilterByHttpUserAgent" + uniqueID;
+    var element = this.$.mustNotFilterByHttpUserAgent;
+    element.id = temp;
+
+    var temp = "mustNotFilterTypeDefaultSelected" + uniqueID;
+    var element = this.$.mustNotFilterTypeDefaultSelected;
+    element.id = temp;
+
+    var temp = "mustNotFilterTypeTerm" + uniqueID;
+    var element = this.$.mustNotFilterTypeTerm;
+    element.id = temp;
+
+    var temp = "mustNotFilterTypeRange" + uniqueID;
+    var element = this.$.mustNotFilterTypeRange;
+    element.id = temp;
+
+    var temp = "mustNotFilterTerm" + uniqueID;
+    var element = this.$.mustNotFilterTerm;
+    element.id = temp;
+
+    var temp = "mustNotFilterRangeLower" + uniqueID;
+    var element = this.$.mustNotFilterRangeLower;
+    element.id = temp;
+
+    var temp = "mustNotFilterRangeUpper" + uniqueID;
+    var element = this.$.mustNotFilterRangeUpper;
+    element.id = temp;
+
+    var temp = "mustNotFilterByOnChange" + uniqueID;
+    var element = this.$.mustNotFilterByOnChange;
+    element.id = temp;
+
+    var temp = "mustNotFilterTypeOnChange" + uniqueID;
+    var element = this.$.mustNotFilterTypeOnChange;
+    element.id = temp;
+
+    var temp = "mustNotFilterRangeWrap" + uniqueID;
+    var element = this.$.mustNotFilterRangeWrap;
+    element.id = temp;
+
+    var temp = "mustNotFilterTermWrap" + uniqueID;
+    var element = this.$.mustNotFilterTermWrap;
+    element.id = temp;
+
+    var temp = "mustNotFilterTypeOnChangeWrap" + uniqueID;
+    var element = this.$.mustNotFilterTypeOnChangeWrap;
+    element.id = temp;
+
+    var temp = "toggleFilterOptionsmustNot" + uniqueID;
+    var element = this.$.toggleFilterOptionsmustNot;
+    element.id = temp;
+
+    var temp = "deleteFilterOptionsmustNot" + uniqueID;
+    var element = this.$.deleteFilterOptionsmustNot;
+    element.id = temp;
+
+    var temp = "mustNotFilterByOnChangeWrap" + uniqueID;
+    var element = this.$.mustNotFilterByOnChangeWrap;
+    element.id = temp;
+
+    var temp = "mustNotPartialMatch" + uniqueID;
+    var element = this.$.mustNotPartialMatch;
+    element.id = temp;
+
+    var temp = "mustNotPartialMatchCheckbox" + uniqueID;
+    var element = this.$.mustNotPartialMatchCheckbox;
+    element.id = temp;
+
+    var temp = "mustNotCheckboxValue" + uniqueID;
+    var element = this.$.mustNotCheckboxValue;
+    element.id = temp;
+
+    var temp = "mustNotRegexMatch" + uniqueID;
+    var element = this.$.mustNotRegexMatch;
+    element.id = temp;
+
+    var temp = "mustNotRegexMatchCheckbox" + uniqueID;
+    var element = this.$.mustNotRegexMatchCheckbox;
+    element.id = temp;
+
+    var temp = "mustNotRegexCheckboxValue" + uniqueID;
+    var element = this.$.mustNotRegexCheckboxValue;
+    element.id = temp;
+
+  },
+
+
+
+});
+
+
+</script>
+
+</dom-module>

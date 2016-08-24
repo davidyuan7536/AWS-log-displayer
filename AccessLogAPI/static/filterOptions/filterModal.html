@@ -1,0 +1,1084 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+
+
+<dom-module id="filter-modal">
+
+<style>
+
+</style>
+
+<template>
+
+
+
+  <!--
+
+  ///////////////////////////////////////////////////////////////////////////////////////////
+
+
+  Header buttons "Filter" and "delete"
+  mainContainer is an example container that can be used to display filtered data
+
+
+  ///////////////////////////////////////////////////////////////////////////////////////////
+
+  -->
+
+  <div   class="state col-lg-12">
+    <div style = "background-color: #424242">
+      <paper-button type="button" on-tap = "openModal" style = "color:white">
+        <span class="glyphicon glyphicon-cog" style = "color:white"></span>
+        Filter
+      </paper-button>
+
+      <paper-button type="button" on-tap = "delete" style = "color:white" >
+        <span class="glyphicon glyphicon-remove" style = "color:white"></span>
+        Delete
+      </paper-button>
+
+    </div>
+      <div  id = "mainContainer" style = " height : 500px; margin-bottom : 20px; background-color: white" class="state col-lg-12"></div>
+  </div>
+
+
+
+  <!--
+
+  ///////////////////////////////////////////////////////////////////////////////////////////
+
+
+  Begin Modal Implementation
+
+
+  ///////////////////////////////////////////////////////////////////////////////////////////
+
+  -->
+
+
+  <div class="modal fade" id="FilterOptions" tabindex="-1" role="dialog" aria-labelledby="Table Options">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+
+        <div class="modal-header" style = "background-color: #424242">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" style = "color: white"><span aria-hidden="true" style = "color: white">&times;</span></button>
+          <h4 class="modal-title" style = "color: white">Custom Title</h4>
+        </div>
+
+
+        <ul class="nav nav-tabs" id="tabContent">
+          <li class="active"><a href="#FilterOptionsAnalytics" id = "modalTab1" data-toggle="tab">Custom Options</a></li>
+          <li><a href="#FilterOptionsMust" id = "modalTab2" data-toggle="tab">Must</a></li>
+          <li><a href="#FilterOptionsMustNot" id = "modalTab3" data-toggle="tab">Must Not</a></li>
+          <li><a href="#FilterOptionsShould" id = "modalTab4" data-toggle="tab">Should</a></li>
+        </ul>
+
+
+        <div class="tab-content">
+
+          <!--
+          ///////////////////////////////////////////////////////////////////////////////////////////
+          Must Tab
+          ///////////////////////////////////////////////////////////////////////////////////////////
+          -->
+          <div class="tab-pane" id="FilterOptionsMust">
+
+            <div style = "padding-top: 10px; padding-bottom: 10px">
+              <a href="#">
+                <span id = "addFilterOptionsMust" class="glyphicon glyphicon-plus" style = "padding-left: 5px"></span>
+              </a>
+            </div>
+            <input id="mustUniqueCounter" type = "hidden" value="2">
+            <div id = "mustFilterOptionsGrouping">
+              <dataFilter-optionsMust id = "dataFilterOptionsMust1" unique-id = "1"></dataFilter-optionsMust>
+            </div>
+          </div>
+
+          <!--
+          ///////////////////////////////////////////////////////////////////////////////////////////
+          Must Not Tab
+          ///////////////////////////////////////////////////////////////////////////////////////////
+          -->
+          <div class="tab-pane" id="FilterOptionsMustNot">
+            <div style = "padding-top: 10px; padding-bottom: 10px">
+              <a href="#">
+                <span id = "addFilterOptionsMustNot" class="glyphicon glyphicon-plus" style = "padding-left: 5px"></span>
+              </a>
+            </div>
+            <input id="MustNotUniqueCounter" type = "hidden" value="2">
+            <div id = "MustNotFilterOptionsGrouping">
+              <dataFilter-optionsMustNot id = "dataFilterOptionsMustNot1" unique-id = "1"></dataFilter-optionsMustNot>
+            </div>
+          </div>
+
+          <!--
+          ///////////////////////////////////////////////////////////////////////////////////////////
+          Should Tab
+          ///////////////////////////////////////////////////////////////////////////////////////////
+          -->
+          <div class="tab-pane" id="FilterOptionsShould">
+            <div style = "padding-top: 10px; padding-bottom: 10px">
+              <a href="#">
+                <span id = "addFilterOptionsShould" class="glyphicon glyphicon-plus" style = "padding-left: 5px"></span>
+              </a>
+            </div>
+            <input id="ShouldUniqueCounter" type = "hidden" value="2">
+            <div id = "ShouldFilterOptionsGrouping">
+              <dataFilter-optionsShould id = "dataFilterOptionsShould1" unique-id = "1"></dataFilter-optionsShould>
+            </div>
+          </div>
+
+
+          <!--
+          ///////////////////////////////////////////////////////////////////////////////////////////
+          Custom Tab (first tab displayed)
+          ///////////////////////////////////////////////////////////////////////////////////////////
+          -->
+          <div class="tab-pane active" id="FilterOptionsAnalytics">
+            <div style = "padding-top: 10px; padding-bottom: 10px">
+            </div>
+
+            <!--
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+
+
+            Custom field for analytic options. Make sure to write Initializer function to Initialize
+            this field as well as include javascript handlers for pulling custom values for this field
+            on submit.
+
+
+            ///////////////////////////////////////////////////////////////////////////////////////////
+
+            -->
+
+          </div>
+
+
+
+          <div class="modal-footer">
+            <paper-button id = "FilterOptionsClose" class="secondary" data-dismiss="modal">Close</paper-button>
+            <paper-button id = "FilterOptionsSubmit" class="secondary" data-dismiss="modal" on-tap = "submitFunction">Submit</paper-button>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--
+
+  ///////////////////////////////////////////////////////////////////////////////////////////
+
+
+  End Modal Implementation
+
+
+  ///////////////////////////////////////////////////////////////////////////////////////////
+
+  -->
+
+
+</template>
+
+<script>
+
+Polymer({
+  is: "filter-modal",
+
+
+  //////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  //
+  // Ready function: handles adding new filter fields
+  //
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////
+
+  ready: function(){
+    mustData = [];
+    mustNotData = [];
+    shouldData = [];
+
+    this.intializeModal();
+
+    var addFilterOptionsMust = this.$.addFilterOptionsMust;
+    var mustFilterOptionsGrouping = this.$.mustFilterOptionsGrouping;
+    var mustUniqueCounter = this.$.mustUniqueCounter
+
+    $(addFilterOptionsMust).click(function(){
+      var dynamicEl = document.createElement("dataFilter-optionsMust");
+      var idName = "dataFilterOptionsMust" + $(mustUniqueCounter).val();
+      dynamicEl.setAttribute("unique-id", $(mustUniqueCounter).val());
+      dynamicEl.setAttribute("id", idName);
+      $(mustFilterOptionsGrouping).append(dynamicEl);
+      $(mustUniqueCounter).val(parseInt($(mustUniqueCounter).val()) + 1);
+
+    });
+
+    var addFilterOptionsMustNot = this.$.addFilterOptionsMustNot;
+    var MustNotFilterOptionsGrouping = this.$.MustNotFilterOptionsGrouping;
+    var MustNotUniqueCounter = this.$.MustNotUniqueCounter
+
+    $(addFilterOptionsMustNot).click(function(){
+      var dynamicEl = document.createElement("dataFilter-optionsMustNot");
+      var idName = "dataFilterOptionsMustNot" + $(MustNotUniqueCounter).val();
+      dynamicEl.setAttribute("unique-id", $(MustNotUniqueCounter).val());
+      dynamicEl.setAttribute("id", idName);
+      $(MustNotFilterOptionsGrouping).append(dynamicEl);
+      $(MustNotUniqueCounter).val(parseInt($(MustNotUniqueCounter).val()) + 1);
+
+    });
+
+
+    var addFilterOptionsShould = this.$.addFilterOptionsShould;
+    var ShouldFilterOptionsGrouping = this.$.ShouldFilterOptionsGrouping;
+    var ShouldUniqueCounter = this.$.ShouldUniqueCounter
+
+    $(addFilterOptionsShould).click(function(){
+      var dynamicEl = document.createElement("dataFilter-optionsShould");
+      var idName = "dataFilterOptionsShould" + $(ShouldUniqueCounter).val();
+      dynamicEl.setAttribute("unique-id", $(ShouldUniqueCounter).val());
+      dynamicEl.setAttribute("id", idName);
+      $(ShouldFilterOptionsGrouping).append(dynamicEl);
+      $(ShouldUniqueCounter).val(parseInt($(ShouldUniqueCounter).val()) + 1);
+
+    });
+  },
+
+
+
+  //////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  //
+  // Fired everytime submit is clicked
+  //
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////
+
+  submitFunction: function(e){
+
+    mustData = [];
+    mustNotData = [];
+    shouldData = [];
+
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    // This section handles all the user filter selections. Will fill out the mustData, mustNotData,
+    // and shouldData arrays. All three arrays will be JSON arrays.
+    //////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    var mustUniqueCounter = this.$.mustUniqueCounter;
+    for(var i = 0; i < parseInt($(mustUniqueCounter).val(), 10) - 1; i++){
+      // var x = this.$$('#dataFilterOptionsMust' + i)
+      // var uid = $(x[i]).attr("unique-id");
+
+      var uid = parseInt(i, 10)+1;
+
+      var FilterOptionsSubmit = this.$.FilterOptionsSubmit;
+
+
+
+      var temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterByOnchange' + uid);
+      var mustFilterByValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterTypeOnchange' + uid);
+      var mustFilterTypeValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterTerm' + uid);
+      var mustFilterTermValue = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeLower' + uid);
+      var mustFilterRangeLower = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeUpper' + uid);
+      var mustFilterRangeUpper = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeLowerTime' + uid);
+      var mustFilterRangeLowerTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeUpperTime' + uid);
+      var mustFilterRangeUpperTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeLowerTimeOperation' + uid);
+      var mustFilterRangeLowerTimeOperation = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeUpperTimeOperation' + uid);
+      var mustFilterRangeUpperTimeOperation = $(temp).val();
+
+      var mustPartialMatchCheckboxHandler = this.$$('#dataFilterOptionsMust' + uid).$$('#mustCheckboxValue' + uid);
+      var mustRegexMatchCheckboxHandler = this.$$('#dataFilterOptionsMust' + uid).$$('#mustRegexCheckboxValue' + uid);
+
+
+      if(mustFilterByValue != ""){
+        if(mustFilterTypeValue != ""){
+          if(mustFilterTypeValue == "Term"){
+            if(mustFilterTermValue != ""){
+              if(mustFilterByValue == "IP Address"){
+                mustData.splice(0, 0, { "term" : { "remote_addr" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Time"){
+                mustData.splice(0, 0, { "term" : { "time_iso8601" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Time Elapsed"){
+                mustData.splice(0, 0, { "term" : { "request_time" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Request URI"){
+
+                if($(mustPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = mustFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustData.splice(0, 0, { "query" : { "wildcard" : { "request_uri" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(mustRegexMatchCheckboxHandler).val() == 1){
+                  mustData.splice(0, 0, { "regexp" : { "request_uri" : mustFilterTermValue }})
+                }
+                else{
+                  mustData.splice(0, 0, { "term" : { "request_uri" : mustFilterTermValue }});
+                }
+              }
+              if(mustFilterByValue == "Request Method"){
+                mustFilterTermValue = mustFilterTermValue.toLowerCase();
+                mustData.splice(0, 0, { "term" : { "request_method" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Status Code"){
+                mustData.splice(0, 0, { "term" : { "status" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Request Length"){
+                mustData.splice(0, 0, { "term" : { "bytes_received" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Body Bytes Sent"){
+                mustData.splice(0, 0, { "term" : { "body_bytes_sent" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Bytes Sent"){
+                mustData.splice(0, 0, { "term" : { "bytes_sent" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Host"){
+                if($(mustPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = mustFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustData.splice(0, 0, { "query": { "wildcard" : { "http_host" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(mustRegexMatchCheckboxHandler).val() == 1){
+                  mustData.splice(0, 0, { "regexp" : { "http_host" : mustFilterTermValue }})
+                }
+                else{
+                  mustData.splice(0, 0, { "term" : { "http_host" : mustFilterTermValue }});
+                }
+              }
+              if(mustFilterByValue == "Referer"){
+                if($(mustPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = mustFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustData.splice(0, 0, { "query" : { "wildcard" : { "http_referer" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(mustRegexMatchCheckboxHandler).val() == 1){
+                  mustData.splice(0, 0, { "regexp" : { "http_referer" : mustFilterTermValue }})
+                }
+                else{
+                  mustData.splice(0, 0, { "term" : { "http_referer" : mustFilterTermValue }});
+                }
+              }
+              if(mustFilterByValue == "User Agent"){
+                if($(mustPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = mustFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = stringSplit[xReg].toLowerCase();
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustData.splice(0, 0, { "query" : { "wildcard" : { "http_agent" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(mustRegexMatchCheckboxHandler).val() == 1){
+                  mustData.splice(0, 0, { "regexp" : { "http_agent" : mustFilterTermValue }})
+                }
+                else{
+                  mustData.splice(0, 0, { "term" : { "http_agent" : mustFilterTermValue }});
+                }
+              }
+            }
+          }
+
+          if(mustFilterTypeValue == "Range"){
+            if((mustFilterRangeLower != "" && mustFilterRangeLower != "") || mustFilterByValue == "Time"){
+              if(mustFilterByValue == "IP Address"){
+                mustData.splice(0, 0, {"range" : {"remote_addr" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Time"){
+
+                if(mustFilterRangeLowerTime != "" && mustFilterRangeUpperTime != ""){
+                  if(mustFilterRangeUpperTimeOperation != "" && mustFilterRangeLowerTimeOperation != ""){
+                    mustFilterRangeUpperTime = mustFilterRangeUpperTime.replace(/ /g , "T");
+                    mustFilterRangeLowerTime = mustFilterRangeLowerTime.replace(/ /g , "T");
+                    mustFilterRangeUpperTimeOperation = mustFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    mustFilterRangeLowerTimeOperation = mustFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = mustFilterRangeUpperTime + "||" + mustFilterRangeUpperTimeOperation;
+                    var lowerTime = mustFilterRangeLowerTime + "||" + mustFilterRangeLowerTimeOperation;
+                    mustData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(mustFilterRangeUpperTimeOperation != "" && mustFilterRangeLowerTimeOperation == ""){
+                    mustFilterRangeUpperTime = mustFilterRangeUpperTime.replace(/ /g , "T");
+                    mustFilterRangeLowerTime = mustFilterRangeLowerTime.replace(/ /g , "T");
+                    mustFilterRangeUpperTimeOperation = mustFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = mustFilterRangeUpperTime + "||" + mustFilterRangeUpperTimeOperation;
+                    var lowerTime = mustFilterRangeLowerTime;
+                    mustData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(mustFilterRangeUpperTimeOperation == "" && mustFilterRangeLowerTimeOperation != ""){
+                    mustFilterRangeUpperTime = mustFilterRangeUpperTime.replace(/ /g , "T");
+                    mustFilterRangeLowerTime = mustFilterRangeLowerTime.replace(/ /g , "T");
+                    mustFilterRangeLowerTimeOperation = mustFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = mustFilterRangeUpperTime;
+                    var lowerTime = mustFilterRangeLowerTime + "||" + mustFilterRangeLowerTimeOperation;
+                    mustData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(mustFilterRangeUpperTimeOperation == "" && mustFilterRangeLowerTimeOperation == ""){
+                    mustFilterRangeUpperTime = mustFilterRangeUpperTime.replace(/ /g , "T");
+                    mustFilterRangeLowerTime = mustFilterRangeLowerTime.replace(/ /g , "T");
+                    var upperTime = mustFilterRangeUpperTime;
+                    var lowerTime = mustFilterRangeLowerTime;
+                    mustData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                }
+              }
+              if(mustFilterByValue == "Time Elapsed"){
+                mustData.splice(0, 0, {"range" : {"request_time" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Request URI"){
+                mustData.splice(0, 0, {"range" : {"request_uri" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Request Method"){
+                mustData.splice(0, 0, {"range" : {"request_method" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Status Code"){
+                mustData.splice(0, 0, {"range" : {"status" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Request Length"){
+                mustData.splice(0, 0, {"range" : {"bytes_received" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Body Bytes Sent"){
+                mustData.splice(0, 0, {"range" : {"body_bytes_sent" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Bytes Sent"){
+                mustData.splice(0, 0, {"range" : {"bytes_sent" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Host"){
+                mustData.splice(0, 0, {"range" : {"http_host" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Referer"){
+                mustData.splice(0, 0, {"range" : {"http_referer" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "User Agent"){
+                mustData.splice(0, 0, {"range" : {"http_agent" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+            }
+          }
+        }
+      }
+    }
+
+
+
+    var MustNotUniqueCounter = this.$.MustNotUniqueCounter;
+    for(var i = 0; i < parseInt($(MustNotUniqueCounter).val(), 10) - 1; i++){
+      // var x = this.$$('#dataFilterOptionsMustNot' + i)
+      // var uid = $(x[i]).attr("unique-id");
+
+      var uid = parseInt(i, 10)+1;
+
+      var FilterOptionsSubmit = this.$.FilterOptionsSubmit;
+
+      var temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterByOnchange' + uid);
+      var MustNotFilterByValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterTypeOnchange' + uid);
+      var MustNotFilterTypeValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterTerm' + uid);
+      var MustNotFilterTermValue = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeLower' + uid);
+      var MustNotFilterRangeLower = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeUpper' + uid);
+      var MustNotFilterRangeUpper = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeLowerTime' + uid);
+      var MustNotFilterRangeLowerTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeUpperTime' + uid);
+      var MustNotFilterRangeUpperTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeLowerTimeOperation' + uid);
+      var MustNotFilterRangeLowerTimeOperation = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeUpperTimeOperation' + uid);
+      var MustNotFilterRangeUpperTimeOperation = $(temp).val();
+
+      var MustNotPartialMatchCheckboxHandler = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotCheckboxValue' + uid);
+      var MustNotRegexMatchCheckboxHandler = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotRegexCheckboxValue' + uid);
+
+
+      if(MustNotFilterByValue != ""){
+        if(MustNotFilterTypeValue != ""){
+          if(MustNotFilterTypeValue == "Term"){
+            if(MustNotFilterTermValue != ""){
+              if(MustNotFilterByValue == "IP Address"){
+                mustNotData.splice(0, 0, { "term" : { "remote_addr" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Time"){
+                mustNotData.splice(0, 0, { "term" : { "time_iso8601" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Time Elapsed"){
+                mustNotData.splice(0, 0, { "term" : { "request_time" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Request URI"){
+
+                if($(MustNotPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = MustNotFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustNotData.splice(0, 0, { "query" : { "wildcard" : { "request_uri" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(MustNotRegexMatchCheckboxHandler).val() == 1){
+                  mustNotData.splice(0, 0, { "regexp" : { "request_uri" : MustNotFilterTermValue }})
+                }
+                else{
+                  mustNotData.splice(0, 0, { "term" : { "request_uri" : MustNotFilterTermValue }});
+                }
+              }
+              if(MustNotFilterByValue == "Request Method"){
+                MustNotFilterTermValue = MustNotFilterTermValue.toLowerCase();
+                mustNotData.splice(0, 0, { "term" : { "request_method" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Status Code"){
+                mustNotData.splice(0, 0, { "term" : { "status" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Request Length"){
+                mustNotData.splice(0, 0, { "term" : { "bytes_received" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Body Bytes Sent"){
+                mustNotData.splice(0, 0, { "term" : { "body_bytes_sent" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Bytes Sent"){
+                mustNotData.splice(0, 0, { "term" : { "bytes_sent" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Host"){
+                if($(MustNotPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = MustNotFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustNotData.splice(0, 0, { "query" : { "wildcard" : { "http_host" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(MustNotRegexMatchCheckboxHandler).val() == 1){
+                  mustNotData.splice(0, 0, { "regexp" : { "http_host" : MustNotFilterTermValue }})
+                }
+                else{
+                  mustNotData.splice(0, 0, { "term" : { "http_host" : MustNotFilterTermValue }});
+                }
+              }
+              if(MustNotFilterByValue == "Referer"){
+                if($(MustNotPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = MustNotFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustNotData.splice(0, 0, { "query" : { "wildcard" : { "http_referer" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(MustNotRegexMatchCheckboxHandler).val() == 1){
+                  mustNotData.splice(0, 0, { "regexp" : { "http_referer" : MustNotFilterTermValue }})
+                }
+                else{
+                  mustNotData.splice(0, 0, { "term" : { "http_referer" : MustNotFilterTermValue }});
+                }
+              }
+              if(MustNotFilterByValue == "User Agent"){
+                if($(MustNotPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = MustNotFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = stringSplit[xReg].toLowerCase();
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustNotData.splice(0, 0, { "query" : { "wildcard" : { "http_agent" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(MustNotRegexMatchCheckboxHandler).val() == 1){
+                  mustNotData.splice(0, 0, { "regexp" : { "http_agent" : MustNotFilterTermValue }})
+                }
+                else{
+                  mustNotData.splice(0, 0, { "term" : { "http_agent" : MustNotFilterTermValue }});
+                }
+              }
+            }
+          }
+
+          if(MustNotFilterTypeValue == "Range"){
+            if(MustNotFilterRangeLower != "" && MustNotFilterRangeLower != "" || MustNotFilterByValue == "Time"){
+              if(MustNotFilterByValue == "IP Address"){
+                mustNotData.splice(0, 0, {"range" : {"remote_addr" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Time"){
+                if(MustNotFilterRangeLowerTime != "" && MustNotFilterRangeUpperTime != ""){
+                  if(MustNotFilterRangeUpperTimeOperation != "" && MustNotFilterRangeLowerTimeOperation != ""){
+                    MustNotFilterRangeUpperTime = MustNotFilterRangeUpperTime.replace(/ /g , "T");
+                    MustNotFilterRangeLowerTime = MustNotFilterRangeLowerTime.replace(/ /g , "T");
+                    MustNotFilterRangeUpperTimeOperation = MustNotFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    MustNotFilterRangeLowerTimeOperation = MustNotFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = MustNotFilterRangeUpperTime + "||" + MustNotFilterRangeUpperTimeOperation;
+                    var lowerTime = MustNotFilterRangeLowerTime + "||" + MustNotFilterRangeLowerTimeOperation;
+                    mustNotData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(MustNotFilterRangeUpperTimeOperation != "" && MustNotFilterRangeLowerTimeOperation == ""){
+                    MustNotFilterRangeUpperTime = MustNotFilterRangeUpperTime.replace(/ /g , "T");
+                    MustNotFilterRangeLowerTime = MustNotFilterRangeLowerTime.replace(/ /g , "T");
+                    MustNotFilterRangeUpperTimeOperation = MustNotFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = MustNotFilterRangeUpperTime + "||" + MustNotFilterRangeUpperTimeOperation;
+                    var lowerTime = MustNotFilterRangeLowerTime;
+                    mustNotData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(MustNotFilterRangeUpperTimeOperation == "" && MustNotFilterRangeLowerTimeOperation != ""){
+                    MustNotFilterRangeUpperTime = MustNotFilterRangeUpperTime.replace(/ /g , "T");
+                    MustNotFilterRangeLowerTime = MustNotFilterRangeLowerTime.replace(/ /g , "T");
+                    MustNotFilterRangeLowerTimeOperation = MustNotFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = MustNotFilterRangeUpperTime;
+                    var lowerTime = MustNotFilterRangeLowerTime + "||" + MustNotFilterRangeLowerTimeOperation;
+                    mustNotData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(MustNotFilterRangeUpperTimeOperation == "" && MustNotFilterRangeLowerTimeOperation == ""){
+                    MustNotFilterRangeUpperTime = MustNotFilterRangeUpperTime.replace(/ /g , "T");
+                    MustNotFilterRangeLowerTime = MustNotFilterRangeLowerTime.replace(/ /g , "T");
+                    var upperTime = MustNotFilterRangeUpperTime;
+                    var lowerTime = MustNotFilterRangeLowerTime;
+                    mustNotData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                }
+              }
+              if(MustNotFilterByValue == "Time Elapsed"){
+                mustNotData.splice(0, 0, {"range" : {"request_time" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Request URI"){
+                mustNotData.splice(0, 0, {"range" : {"request_uri" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Request Method"){
+                mustNotData.splice(0, 0, {"range" : {"request_method" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Status Code"){
+                mustNotData.splice(0, 0, {"range" : {"status" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Request Length"){
+                mustNotData.splice(0, 0, {"range" : {"bytes_received" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Body Bytes Sent"){
+                mustNotData.splice(0, 0, {"range" : {"body_bytes_sent" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Bytes Sent"){
+                mustNotData.splice(0, 0, {"range" : {"bytes_sent" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Host"){
+                mustNotData.splice(0, 0, {"range" : {"http_host" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Referer"){
+                mustNotData.splice(0, 0, {"range" : {"http_referer" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "User Agent"){
+                mustNotData.splice(0, 0, {"range" : {"http_agent" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+            }
+          }
+        }
+      }
+    }
+
+
+
+    var ShouldUniqueCounter = this.$.ShouldUniqueCounter;
+    for(var i = 0; i < parseInt($(ShouldUniqueCounter).val(), 10) - 1; i++){
+      // var x = this.$$('#dataFilterOptionsShould' + i)
+      // var uid = $(x[i]).attr("unique-id");
+
+      var uid = parseInt(i, 10)+1;
+
+      var FilterOptionsSubmit = this.$.FilterOptionsSubmit;
+
+
+
+      var temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterByOnchange' + uid);
+      var ShouldFilterByValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterTypeOnchange' + uid);
+      var ShouldFilterTypeValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterTerm' + uid);
+      var ShouldFilterTermValue = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeLower' + uid);
+      var ShouldFilterRangeLower = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeUpper' + uid);
+      var ShouldFilterRangeUpper = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeLowerTime' + uid);
+      var ShouldFilterRangeLowerTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeUpperTime' + uid);
+      var ShouldFilterRangeUpperTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeLowerTimeOperation' + uid);
+      var ShouldFilterRangeLowerTimeOperation = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeUpperTimeOperation' + uid);
+      var ShouldFilterRangeUpperTimeOperation = $(temp).val();
+
+
+      var ShouldPartialMatchCheckboxHandler = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldCheckboxValue' + uid);
+      var ShouldRegexMatchCheckboxHandler = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldRegexCheckboxValue' + uid);
+
+
+      if(ShouldFilterByValue != ""){
+        if(ShouldFilterTypeValue != ""){
+          if(ShouldFilterTypeValue == "Term"){
+            if(ShouldFilterTermValue != ""){
+              if(ShouldFilterByValue == "IP Address"){
+                shouldData.splice(0, 0, { "term" : { "remote_addr" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Time"){
+                shouldData.splice(0, 0, { "term" : { "time_iso8601" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Time Elapsed"){
+                shouldData.splice(0, 0, { "term" : { "request_time" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Request URI"){
+
+                if($(ShouldPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = ShouldFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    shouldData.splice(0, 0, { "query" : { "wildcard" : { "request_uri" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(ShouldRegexMatchCheckboxHandler).val() == 1){
+                  shouldData.splice(0, 0, { "regexp" : { "request_uri" : ShouldFilterTermValue }})
+                }
+                else{
+                  shouldData.splice(0, 0, { "term" : { "request_uri" : ShouldFilterTermValue }});
+                }
+              }
+              if(ShouldFilterByValue == "Request Method"){
+                ShouldFilterTermValue = ShouldFilterTermValue.toLowerCase();
+                shouldData.splice(0, 0, { "term" : { "request_method" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Status Code"){
+                shouldData.splice(0, 0, { "term" : { "status" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Request Length"){
+                shouldData.splice(0, 0, { "term" : { "bytes_received" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Body Bytes Sent"){
+                shouldData.splice(0, 0, { "term" : { "body_bytes_sent" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Bytes Sent"){
+                shouldData.splice(0, 0, { "term" : { "bytes_sent" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Host"){
+                if($(ShouldPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = ShouldFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    shouldData.splice(0, 0, { "query" : { "wildcard" : { "http_host" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(ShouldRegexMatchCheckboxHandler).val() == 1){
+                  shouldData.splice(0, 0, { "regexp" : { "http_host" : ShouldFilterTermValue }})
+                }
+                else{
+                  shouldData.splice(0, 0, { "term" : { "http_host" : ShouldFilterTermValue }});
+                }
+              }
+              if(ShouldFilterByValue == "Referer"){
+                if($(ShouldPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = ShouldFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    shouldData.splice(0, 0, { "query" : { "wildcard" : { "http_referer" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(ShouldRegexMatchCheckboxHandler).val() == 1){
+                  shouldData.splice(0, 0, { "regexp" : { "http_referer" : ShouldFilterTermValue }})
+                }
+                else{
+                  shouldData.splice(0, 0, { "term" : { "http_referer" : ShouldFilterTermValue }});
+                }
+              }
+              if(ShouldFilterByValue == "User Agent"){
+                if($(ShouldPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = ShouldFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = stringSplit[xReg].toLowerCase();
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    shouldData.splice(0, 0, { "query" : { "wildcard" : { "http_agent" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(ShouldRegexMatchCheckboxHandler).val() == 1){
+                  shouldData.splice(0, 0, { "regexp" : { "http_agent" : ShouldFilterTermValue }})
+                }
+                else{
+                  shouldData.splice(0, 0, { "term" : { "http_agent" : ShouldFilterTermValue }});
+                }
+              }
+            }
+          }
+
+          if(ShouldFilterTypeValue == "Range"){
+            if(ShouldFilterRangeLower != "" && ShouldFilterRangeLower != "" || ShouldFilterByValue == "Time"){
+              if(ShouldFilterByValue == "IP Address"){
+                shouldData.splice(0, 0, {"range" : {"remote_addr" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Time"){
+                if(ShouldFilterRangeLowerTime != "" && ShouldFilterRangeUpperTime != ""){
+                  if(ShouldFilterRangeUpperTimeOperation != "" && ShouldFilterRangeLowerTimeOperation != ""){
+                    ShouldFilterRangeUpperTime = ShouldFilterRangeUpperTime.replace(/ /g , "T");
+                    ShouldFilterRangeLowerTime = ShouldFilterRangeLowerTime.replace(/ /g , "T");
+                    ShouldFilterRangeUpperTimeOperation = ShouldFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    ShouldFilterRangeLowerTimeOperation = ShouldFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = ShouldFilterRangeUpperTime + "||" + ShouldFilterRangeUpperTimeOperation;
+                    var lowerTime = ShouldFilterRangeLowerTime + "||" + ShouldFilterRangeLowerTimeOperation;
+                    shouldData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(ShouldFilterRangeUpperTimeOperation != "" && ShouldFilterRangeLowerTimeOperation == ""){
+                    ShouldFilterRangeUpperTime = ShouldFilterRangeUpperTime.replace(/ /g , "T");
+                    ShouldFilterRangeLowerTime = ShouldFilterRangeLowerTime.replace(/ /g , "T");
+                    ShouldFilterRangeUpperTimeOperation = ShouldFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = ShouldFilterRangeUpperTime + "||" + ShouldFilterRangeUpperTimeOperation;
+                    var lowerTime = ShouldFilterRangeLowerTime;
+                    shouldData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(ShouldFilterRangeUpperTimeOperation == "" && ShouldFilterRangeLowerTimeOperation != ""){
+                    ShouldFilterRangeUpperTime = ShouldFilterRangeUpperTime.replace(/ /g , "T");
+                    ShouldFilterRangeLowerTime = ShouldFilterRangeLowerTime.replace(/ /g , "T");
+                    ShouldFilterRangeLowerTimeOperation = ShouldFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = ShouldFilterRangeUpperTime;
+                    var lowerTime = ShouldFilterRangeLowerTime + "||" + ShouldFilterRangeLowerTimeOperation;
+                    shouldData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(ShouldFilterRangeUpperTimeOperation == "" && ShouldFilterRangeLowerTimeOperation == ""){
+                    ShouldFilterRangeUpperTime = ShouldFilterRangeUpperTime.replace(/ /g , "T");
+                    ShouldFilterRangeLowerTime = ShouldFilterRangeLowerTime.replace(/ /g , "T");
+                    var upperTime = ShouldFilterRangeUpperTime;
+                    var lowerTime = ShouldFilterRangeLowerTime;
+                    shouldData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                }
+              }
+              if(ShouldFilterByValue == "Time Elapsed"){
+                shouldData.splice(0, 0, {"range" : {"request_time" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Request URI"){
+                shouldData.splice(0, 0, {"range" : {"request_uri" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Request Method"){
+                shouldData.splice(0, 0, {"range" : {"request_method" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Status Code"){
+                shouldData.splice(0, 0, {"range" : {"status" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Request Length"){
+                shouldData.splice(0, 0, {"range" : {"bytes_received" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Body Bytes Sent"){
+                shouldData.splice(0, 0, {"range" : {"body_bytes_sent" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Bytes Sent"){
+                shouldData.splice(0, 0, {"range" : {"bytes_sent" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Host"){
+                shouldData.splice(0, 0, {"range" : {"http_host" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Referer"){
+                shouldData.splice(0, 0, {"range" : {"http_referer" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "User Agent"){
+                shouldData.splice(0, 0, {"range" : {"http_agent" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+            }
+          }
+        }
+      }
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    // When passing the mustData, mustNotData, and shouldData arrays to the server, please use
+    // JSON.stringify() to wrap the arrays and then from the back end, use json.loads() to decode the JSON.
+    //////////////////////////////////////////////////////////////////////////////////////////////
+
+    console.log(mustData);
+    console.log(mustNotData);
+    console.log(shouldData);
+
+  },
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //
+    // Every filte-modal object should have an uniqueId. The UniqueId is used to handle multiple
+    // filter-modal objects on the same HTML page. If two filter-modal has the same uniqueId, there
+    // could be some issues with the bootstrap modal tabs not working properly.
+    //
+    //
+    //////////////////////////////////////////////////////////////////////////////////////////////
+
+
+  properties:{
+    uniqueId: {
+      type: String,
+      value: 'Initializer',
+      observer: 'uniqueIdChanged'
+    }
+
+
+  },
+
+  uniqueIdChanged: function(newValue, oldValue){
+
+    var uniqueID = newValue;
+
+    var temp = "modalTab1" + uniqueID;
+    var element = this.$.modalTab1;
+    element.id = temp;
+
+    var temp = "modalTab2" + uniqueID;
+    var element = this.$.modalTab2;
+    element.id = temp;
+
+    var temp = "modalTab3" + uniqueID;
+    var element = this.$.modalTab3;
+    element.id = temp;
+
+    var temp = "modalTab4" + uniqueID;
+    var element = this.$.modalTab4;
+    element.id = temp;
+
+    var temp = "FilterOptionsAnalytics" + uniqueID;
+    var element = this.$.FilterOptionsAnalytics;
+    element.id = temp;
+
+    var temp = "FilterOptionsMust" + uniqueID;
+    var element = this.$.FilterOptionsMust;
+    element.id = temp;
+
+    var temp = "FilterOptionsMustNot" + uniqueID;
+    var element = this.$.FilterOptionsMustNot;
+    element.id = temp;
+
+    var temp = "FilterOptionsShould" + uniqueID;
+    var element = this.$.FilterOptionsShould;
+    element.id = temp;
+
+    var temp = this.$$("#modalTab1" + uniqueID);
+    var ref = "#FilterOptionsAnalytics" + uniqueID;
+    $(temp).attr("href", ref);
+
+    var temp = this.$$("#modalTab2" + uniqueID);
+    var ref = "#FilterOptionsMust" + uniqueID;
+    $(temp).attr("href", ref);
+
+    var temp = this.$$("#modalTab3" + uniqueID);
+    var ref = "#FilterOptionsMustNot" + uniqueID;
+    $(temp).attr("href", ref);
+
+    var temp = this.$$("#modalTab4" + uniqueID);
+    var ref = "#FilterOptionsShould" + uniqueID;
+    $(temp).attr("href", ref);
+
+
+  },
+
+
+  openModal: function(e){
+    var FilterOptions = this.$.FilterOptions;
+    $(FilterOptions).modal('toggle');
+
+  },
+
+  delete: function(){
+    $(this).hide('slow', function(){ $(this).remove(); });
+
+  },
+
+  //////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  //
+  // Function to use to get the cookie that handles user's login. The cookie name is
+  // "laserficheCloudAccessLogUser". The user name is saved under this cookie. This user
+  // name should be passed to the backend every time an API call is made so that the API call
+  // can be logged. Also, pass in the time that the API call was made as well.
+  //
+  //   var currentdate = new Date();
+  //   var datetimeNow = ('0' + currentdate.getDate()).slice(-2) + "/" + ('0' + (currentdate.getMonth()+1)).slice(-2)  + "/" + currentdate.getFullYear() + " @ " + ('0' + currentdate.getHours()).slice(-2) + ":" + ('0' + currentdate.getMinutes()).slice(-2) + ":" + ('0' + currentdate.getSeconds()).slice(-2);
+  //   datetimeNow should containe the general format on how the datetimeNow is stored when logging user actions
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////
+
+  getCookie: function(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0)==' ') c = c.substring(1);
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  },
+
+  intializeModal: function(){
+
+
+
+  }
+
+
+
+
+});
+
+
+</script>
+
+</dom-module>

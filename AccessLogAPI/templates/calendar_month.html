@@ -1,0 +1,366 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Month Calendar</title>
+
+    <script src="static/jquery.min.js"></script>
+    <script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
+    <link rel="stylesheet" href="static/cal-heatmap.css" type="text/css"/>
+    <script type="text/javascript" src="static/cal-heatmap.min.js"></script>
+
+    <!--  JQUERY -->
+    <!--  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> -->
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+
+    <script src="static/moment.min.js"></script>
+    <script src="static/helper.js"></script>
+
+    <link rel="import" href="../static/bower_components/iron-icons/iron-icons.html">
+    <link rel="import" href="../static/bower_components/paper-tabs/paper-tabs.html">
+
+    <link rel="stylesheet" href="../static/main.css">
+
+</head>
+<body>
+
+    <!-- <h2> {{obj}} </h2> -->
+    <div style="width:950px; margin:0 auto;">
+    <paper-tabs class="cal-tabs" id="cal-tabs" selected={% if obj == "num_request": %}"0"{% elif obj == "bytes_received": %}"1"{% elif obj == "data_out": %}"2"{% else: %} {% endif %}>
+      <paper-tab link onclick="Display_num_request()">
+        <a href="#calendarSection" class="horizontal center-center layout">Request Amount</a>
+      </paper-tab>
+      <paper-tab link onclick="Display_bytes_received()">
+        <a href="#calendarSection" class="horizontal center-center layout">Data Received</a>
+      </paper-tab>
+      <paper-tab link onclick="Display_data_out()">
+        <a href="#calendarSection" class="horizontal center-center layout">Data Sent</a>
+      </paper-tab>
+    </paper-tabs>
+    <style is="custom-style">
+        :root {
+            /*--my-custom-color: red;*/
+            --paper-tab-ink: red;
+
+            /* custom CSS property */
+            --paper-tabs-selection-bar-color: blue;
+
+            /* custom CSS mixin */
+            --paper-tabs: {
+                color: #D15B05; /* variable defined in default-theme.html */
+                font-size: 20px;
+            }
+        }
+        .arrow-size {
+          --iron-icon-height: 20px;
+          --iron-icon-width: 20px;
+        }
+    </style>
+
+
+    <!-- <ul class="nav nav-tabs">
+      <li role="presentation" onclick="Display_num_request()"><a href="#calendarSection">Request Amount</a></li>
+      <li role="presentation" onclick="Display_bytes_received()"><a href="#calendarSection">Data Received</a></li>
+      <li role="presentation" onclick="Display_data_out()"><a href="#calendarSection">Data Sent</a></li>
+    </ul> -->
+
+    <!-- <h3 align="center">{% if obj == "num_request": %} Request Amount {% elif obj == "bytes_received": %} Data Received {% elif obj == "data_out": %} Data Sent {% else: %} {% endif %}</h3><br /> -->
+
+    <section id = "main-content">
+      <section class="wrapper">
+        <div id = "mainContentHeader">
+
+        </div>
+
+        <div style = "padding-top: 20px"></div>
+
+        <div style = "background-color: red; margin-bottom : 10px" class="state col-lg-12"><div id="cal-heatmap"></div></div>
+
+        <div style = "background-color: blue; height : 500px; margin-bottom  : 20px; margin-right: 1%; width : 59%" class="col-md-6">Graph1</div>
+        <div style = "background-color: green; height : 500px; margin-bottom  : 20px; margin-left: 1%; width : 39%" class="col-md-6">Graph2</div>
+
+
+        </section>
+      </section>
+
+
+
+    <iron-icon icon="chevron-left" id="cal-heatmap-PreviousDomain-selector" class="arrow-size"></iron-icon>
+
+    <iron-icon icon="chevron-right" id="cal-heatmap-NextDomain-selector" class="arrow-size"></iron-icon>
+    <!-- <button id="cal-heatmap-PreviousDomain-selector" style="margin-bottom: 10px;" class="glyphicon glyphicon-chevron-left"></button> -->
+    <!-- <button id="cal-heatmap-NextDomain-selector" style="margin-bottom: 10px;" class="glyphicon glyphicon-chevron-right"></button> -->
+
+    <!-- <button id="cal-heatmap-afterLoad-init" style="margin-bottom: 10px;" class="glyphicon glyphicon-refresh"></button> -->
+    <!-- <button onClick="Display_bytes_received()" id="cal-heatmap2-display-in" style="margin-bottom: 10px;" class="glyphicon glyphicon-log-in"></button> -->
+    <!-- <button onClick="Display_data_out()" id="cal-heatmap2-display-out" style="margin-bottom: 10px;" class="glyphicon glyphicon-log-out"></button> -->
+    <!-- <button id="cal-heatmap-destroy" style="margin-bottom: 10px;" class="glyphicon glyphicon-trash"></button> -->
+    <!-- <div><span id="specific-stats"></span</div> -->
+    <!-- <button onclick="Display_num_request()" class="glyphicon glyphicon-home"></button> -->
+
+    </div>
+    <script>
+    function Display_num_request() {
+        // window.history.back();
+        $("#month-cal").load("calendar?domain=month&obj=num_request");
+        $("#day-cal").load("calendar?domain=day&obj=num_request");
+    }
+    function Display_bytes_received() {
+        // window.history.back();
+        $("#month-cal").load("calendar?domain=month&obj=bytes_received");
+        $("#day-cal").load("calendar?domain=day&obj=bytes_received");
+    }
+    function Display_data_out() {
+        // window.history.back();
+        $("#month-cal").load("calendar?domain=month&obj=data_out");
+        $("#day-cal").load("calendar?domain=day&obj=data_out");
+    }
+    </script>
+
+    <script type="text/javascript">
+    var cal = null;
+
+    {% if start != 0: %}
+    // CUSTOM TIME
+      var js_timestamp = {{start*1000}}
+      var target = new Date(js_timestamp);
+      var start = new Date(js_timestamp);
+      // start.setMonth(target.getMonth() - 1);
+      var MinDate = new Date(js_timestamp);
+      MinDate.setMonth(target.getMonth() - 1);
+      var MaxDate = new Date(js_timestamp);
+      MaxDate.setMonth(target.getMonth() + 2)
+    {% else: %}
+    // DEFAULT - initial render
+      var target = new Date();
+      var start = new Date();
+      start.setMonth(target.getMonth() - 3);
+      var MinDate = new Date();
+      MinDate.setMonth(target.getMonth() - 5);
+      var MaxDate = new Date();
+      MaxDate.setMonth(target.getMonth() + 2);
+    {% endif %}
+    // alert("start: " + start +
+    //       "\nHalfYearAgo: " + HalfYearAgo +
+    //       "\nHalfYearLater: " + HalfYearLater +
+    //       "\nYearAgo: " + YearAgo);
+
+    var Must = [];
+    var MustNot = [];
+    var Should = [];
+
+    var data = {};
+    var colors = [];
+    var obj = "{{obj}}";
+    // for time,value in result.items():
+    //   data["{{time}}"] = {{value}};
+    // endfor
+
+    $.post('/calendar_point',
+    {
+      granularity: 'day',
+      obj: obj,
+      method: 'sum',
+      "must": JSON.stringify(Must),
+      "mustNot": JSON.stringify(MustNot),
+      "should": JSON.stringify(Should)
+    }, function(json_data){
+      console.log(json_data);
+      data = json_data.result;
+      colors = json_data.colors;
+
+    console.log(data);
+    // var datas = {"1434092400": 1483}
+
+    var parser = function(data) {
+      var stats = {};
+      for (var d in data) {
+        stats[data[d].date] = data[d].value;
+      }
+      return stats;
+    };
+
+    // function init(){
+      if (cal === null) {
+        cal = new CalHeatMap();
+       }
+
+      cal.init({
+        itemSelector: "#cal-heatmap",
+        domain: "month",
+        subDomain: "x_day",
+        cellSize: 30,
+        range: 4,
+        domainGutter: 10,
+        label: {
+      		position: "top"
+      	},
+        animationDuration: 500,
+        // domainDynamicDimension: false,
+        itemNamespace: "domainDynamicDimension",
+        tooltip: true,
+        minDate: MinDate,
+        maxDate: MaxDate,
+        start: start,
+        data: data,
+        highlight: ["now",],
+        considerMissingDataAsZero: true,
+        legend: colors,
+        displayLegend: true,
+        legendCellSize: 10,
+        legendMargin: [10,0,10,10],
+        itemName: {% if obj == "num_request": %} ["Request", "Requests"] {% else: %} ["Byte", "Bytes"] {% endif %},
+        previousSelector: "#cal-heatmap-PreviousDomain-selector",
+        nextSelector: "#cal-heatmap-NextDomain-selector",
+        weekStartOnMonday: false,
+        // afterLoad: function() {
+        //     start = Date.now();
+        //     init();
+        // },
+        subDomainTextFormat: "%d",
+        // subDomainTitleFormat: {filled: ("{count} {name} {connector} {date}"},
+
+        // onClick: function(date, nb) {
+        //   window.location.href = "http://" + window.location.host + "/calendar2?time=" + moment(date).format();
+        // }
+
+        onClick: function(date, val){
+          if (val !== null) {
+            $.post('/calendar_point',
+            {
+              granularity: 'day',
+              obj: '{{obj}}',
+              method: 'sum',
+              "must": JSON.stringify(Must),
+              "mustNot": JSON.stringify(MustNot),
+              "should": JSON.stringify(Should)
+            // {
+            //   granularity: "day",
+            //   bucketData: "{{obj}}",
+            //   bucketDataAnalyze: "sum",
+            //   time: moment(date).format().substring(0,19)
+              //
+            },
+
+            function(data) {
+              $("#specific-stats").html(
+                " TO DO "
+                // "<h3>" + moment(date).format("LL") + "</h3>" +
+                // // " <button style=\"margin-bottom: 10px;\" onclick=\"location.href='" +
+                // // "http://" + window.location.host + "/calendar?domain=day&obj=" + "{{obj}}" + "&time=" + moment(date).format().substring(0,19) + "'\"><span class=\"glyphicon glyphicon-zoom-in\" aria-hidden=\"true\"></span></button>" +
+                //
+                // {% if obj == "num_request": %}
+                // "<br /> A Total of <b>" + val + "</b> Requests" +
+                // "<br /> Average Request Time: <b>" + data.result["avg_request_time"]*1000 + "</b> ms" +
+                // "<br /> Request Methods: <ol> <li><b>" + data.result["request_method"][1]["name"] + "</b>&nbsp" + ((data.result["request_method"][1]["count"] / val) * 100).toFixed(2) + "%</li>" +
+                //                              "<li><b>" + data.result["request_method"][2]["name"] + "</b>&nbsp" + ((data.result["request_method"][2]["count"] / val) * 100).toFixed(2) + "%</li>" +
+                //                              "<li><b>" + data.result["request_method"][3]["name"] + "</b>&nbsp" + ((data.result["request_method"][3]["count"] / val) * 100).toFixed(2) + "%</li></ol>" +
+                // "<br /> TOP 3 URI:       <ol> <li><b>" + data.result["request_uri"][1]["name"] + "</b>&nbsp" + data.result["request_uri"][1]["count"] + " (" + ((data.result["request_uri"][1]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                //                              "<li><b>" + data.result["request_uri"][2]["name"] + "</b>&nbsp" + data.result["request_uri"][2]["count"] + " (" + ((data.result["request_uri"][2]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                //                              "<li><b>" + data.result["request_uri"][3]["name"] + "</b>&nbsp" + data.result["request_uri"][3]["count"] + " (" + ((data.result["request_uri"][3]["count"] / val) * 100).toFixed(2) + "%) </li></ol>" +
+                // "<br /> TOP 3 Host:      <ol> <li><b>" + data.result["http_host"][1]["name"] + "</b>&nbsp" + data.result["http_host"][1]["count"] + " (" + ((data.result["http_host"][1]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                //                              "<li><b>" + data.result["http_host"][2]["name"] + "</b>&nbsp" + data.result["http_host"][2]["count"] + " (" + ((data.result["http_host"][2]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                //                              "<li><b>" + data.result["http_host"][3]["name"] + "</b>&nbsp" + data.result["http_host"][3]["count"] + " (" + ((data.result["http_host"][3]["count"] / val) * 100).toFixed(2) + "%) </li></ol>" +
+                // "<br /> TOP 3 Client Address:<ol> <li><b>" + data.result["remote_addr"][1]["name"] + "</b>&nbsp" + data.result["remote_addr"][1]["count"] + " (" + ((data.result["remote_addr"][1]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                //                                  "<li><b>" + data.result["remote_addr"][2]["name"] + "</b>&nbsp" + data.result["remote_addr"][2]["count"] + " (" + ((data.result["remote_addr"][2]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                //                                  "<li><b>" + data.result["remote_addr"][3]["name"] + "</b>&nbsp" + data.result["remote_addr"][3]["count"] + " (" + ((data.result["remote_addr"][3]["count"] / val) * 100).toFixed(2) + "%) </li></ol>"
+                //
+                //  {% else: %} // bytes_received or data_out
+                //     {% if obj == "bytes_received": %} // bytes_received
+                //       "<br /> Total of <b>" + packBytes(val, 2) + "</b> Bytes Recieved" +
+                //       "<br /> In Average <b>" + packBytes((val/data.result["num_request"]),2) + "</b> Bytes Received per Request" +
+                //
+                //     {% elif obj == "data_out": %} // data_out
+                //       "<br /> Total of <b>" + packBytes(val, 2) + "</b> Bytes Sent" +
+                //       "<br /> In Average <b>" + packBytes((val/data.result["num_request"]),2) + "</b> Bytes Sent per Request" +
+                //     {% endif %}
+                //
+                //   "<br /> Request Methods: <ol> <li><b>" + data.result["request_method"][1]["name"] + "</b>&nbsp" + packBytes(data.result["request_method"][1]["count"], 2) + " (" + ((data.result["request_method"][1]["count"] / val) * 100).toFixed(2) + ")%</li>" +
+                //                                "<li><b>" + data.result["request_method"][2]["name"] + "</b>&nbsp" + packBytes(data.result["request_method"][2]["count"], 2) + " (" + ((data.result["request_method"][2]["count"] / val) * 100).toFixed(2) + ")%</li>" +
+                //                                "<li><b>" + data.result["request_method"][3]["name"] + "</b>&nbsp" + packBytes(data.result["request_method"][3]["count"], 2) + " (" + ((data.result["request_method"][3]["count"] / val) * 100).toFixed(2) + ")%</li></ol>" +
+                //   "<br /> TOP 3 URI:       <ol> <li><b>" + data.result["request_uri"][1]["name"] + "</b>&nbsp" + packBytes(data.result["request_uri"][1]["count"], 2) + " (" + ((data.result["request_uri"][1]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                //                                "<li><b>" + data.result["request_uri"][2]["name"] + "</b>&nbsp" + packBytes(data.result["request_uri"][2]["count"], 2) + " (" + ((data.result["request_uri"][2]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                //                                "<li><b>" + data.result["request_uri"][3]["name"] + "</b>&nbsp" + packBytes(data.result["request_uri"][3]["count"], 2) + " (" + ((data.result["request_uri"][3]["count"] / val) * 100).toFixed(2) + "%) </li></ol>" +
+                //   "<br /> TOP 3 Host:      <ol> <li><b>" + data.result["http_host"][1]["name"] + "</b>&nbsp" + packBytes(data.result["http_host"][1]["count"], 2) + " (" + ((data.result["http_host"][1]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                //                                "<li><b>" + data.result["http_host"][2]["name"] + "</b>&nbsp" + packBytes(data.result["http_host"][2]["count"], 2) + " (" + ((data.result["http_host"][2]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                //                                "<li><b>" + data.result["http_host"][3]["name"] + "</b>&nbsp" + packBytes(data.result["http_host"][3]["count"], 2) + " (" + ((data.result["http_host"][3]["count"] / val) * 100).toFixed(2) + "%) </li></ol>" +
+                //   "<br /> TOP 3 Client Address:<ol> <li><b>" + data.result["remote_addr"][1]["name"] + "</b>&nbsp" + packBytes(data.result["remote_addr"][1]["count"], 2) + " (" + ((data.result["remote_addr"][1]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                //                                    "<li><b>" + data.result["remote_addr"][2]["name"] + "</b>&nbsp" + packBytes(data.result["remote_addr"][2]["count"], 2) + " (" + ((data.result["remote_addr"][2]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                //                                    "<li><b>" + data.result["remote_addr"][3]["name"] + "</b>&nbsp" + packBytes(data.result["remote_addr"][3]["count"], 2) + " (" + ((data.result["remote_addr"][3]["count"] / val) * 100).toFixed(2) + "%) </li></ol>"
+                //   {% endif %}
+              );
+
+              $("#day-cal").load("calendar?domain=day&obj=" + "{{obj}}" + "&time=" + moment(date).format().substring(0,19));
+            });
+          } // end val!= null
+          else{// val == 0
+            $("#specific-stats").html(
+              "<h3>" + moment(date).format("LL") + "</h3>" +
+              "<br /><h1>No DATA</h1>"
+            )
+          }
+
+        }, // end onClick function
+
+        legendColors: {
+        	min: "#B6E6FF",
+        	max: "MidnightBlue",
+        	empty: "#ededed"
+        }
+      });
+    // } // end function init()
+
+
+    // function destroy(){
+    //   cal = cal.destroy();
+    // }
+    // $("#cal-heatmap-destroy").on("click", function(e) {
+    //   destroy();
+    // });
+    //
+    // $("#cal-heatmap-afterLoad-init").on("click", function(e) {
+    //   // $(this).remove();
+    //   if (cal !== null) {
+    //     destroy();
+    //   }
+    //   if (cal === null) {
+    //     init();
+    //   }
+    // });
+    //
+    $("#cal-heatmap-PreviousDomain-selector").on("click", function(e) {
+    	e.preventDefault();
+    	if (!cal.previous()) {
+    		alert("No more domains to load");
+    	}
+    });
+
+    $("#cal-heatmap-NextDomain-selector").on("click", function(e) {
+    	e.preventDefault();
+    	if (!cal.next()) {
+    		alert("No more domains to load");
+    	}
+    });
+    // $("#cal-heatmap-display-in").on("click", function() {
+    // 	cal.update(in_data);
+    // });
+    //
+    // $("#cal-heatmap-display-out").on("click", function() {
+    // 	cal.update(out_data);
+    // });
+
+  }); // END initial AJAX data load
+    </script>
+
+
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>TESTING</title>
+
+    <link rel="stylesheet" href="../static/filter_form.css" type="text/css"/>
+  </head>
+  <body>
+
+      <div id="filter-tags-div">
+        <ul id="filter-tags">
+        </ul>
+      <!-- </div> -->
+      <button id="new-filter-btn" onclick="newFilter();"> Add Filter </button>
+
+      <!-- FIELD -->
+      <select id="filter-field-selector" class="default-hidden">
+        <option value=""></option>
+        <option value="remote_addr">IP Address</option>
+        <option value="time_iso8601">Timestamp</option>
+        <option value="request_time">Request Time</option>
+        <option value="request_uri">Request URI</option>
+        <option value="request_method">Method</option>
+        <option value="status">Status</option>
+        <option value="bytes_received">Bytes Rcvd</option>
+        <option value="body_bytes_sent">Body Bytes Sent</option>
+        <option value="bytes_sent">Bytes Sent</option>
+        <option value="http_host">HTTP Host</option>
+        <option value="http_referer">HTTP Referer</option>
+        <option value="http_agent">User Agent</option>
+      </select>
+
+      <!-- TYPE -->
+      <select id="filter-type-selector" class="default-hidden">
+        <option value></option>
+        <option value="must">must</option>
+        <option value="mustNot">must not</option>
+        <option value="should">should</option>
+      </select>
+
+      <!-- CONDITION -->
+      <select id="filter-condition1-selector" class="default-hidden">
+        <option value="equal">equal to</option>
+      </select>
+
+      <select id="filter-condition2-selector" class="default-hidden">
+        <option value="range">between</option>
+      </select>
+
+      <select id="filter-condition3-selector" class="default-hidden">
+        <option value></option>
+        <option value="equal">equal to</option>
+        <option value="range">between</option>
+      </select>
+
+      <select id="filter-condition4-selector" class="default-hidden">
+        <option value></option>
+        <option value="equal">equal to</option>
+        <option value="partial">partially match</option>
+        <option value="regex">match Regex</option>
+      </select>
+
+      <!-- VALUE -->
+      <input id="filter-value-input" class="default-hidden"></input>
+
+      <span id="filter-timerange-input" class="default-hidden">
+        <input id="filter-timerange-input-lower" placeholder="2015-05-01T00:00:00+00:00"></input>
+        and
+        <input id="filter-timerange-input-upper" placeholder="2015-10-01T12:30:00+00:00"></input>
+      </span>
+
+      <span id="filter-range-input" class="default-hidden">
+        <input id="filter-range-input-lower"></input>
+        and
+        <input id="filter-range-input-upper"></input>
+      </span>
+
+      <!-- BUTTON -->
+      <button id="add-new-filter-btn" onclick="AddNewFilter();" class="default-hidden"> Add Condition </button>
+      <button id="cancel-new-filter-btn" onclick="CancelNewFilter();" class="default-hidden"> Cancel </button>
+      <button id="del-all-filter-btn" onclick="DeleteAllFilter();" class="default-hidden"> Delete All </button>
+    </div> <!-- END filter-tags-div -->
+
+
+    <button style="margin-top: 20px;" onclick="test();"> Test </button>
+
+  <script src="../static/jquery.min.js"></script>
+  <script src="../static/filter_form.js"></script>
+
+  </body>
+</html>

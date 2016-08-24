@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div><section hero id="theme-info"><h1>Access Log</h1>
+  <div style="padding: 20px 0px 10px 0px; text-align: center;"><div
+            class="download-btn-container"><a
+            title="Upload Log File"
+            href=""><paper-button
+            raised class="primary"> &nbsp;<iron-icon
+                icon="file-download"></iron-icon>&nbsp;Upload&nbsp;Log&nbsp;File&nbsp;</paper-button></a><br /><div
+                class="btn-subtext"><a
+                href=""
+                onclick="document.getElementById('usage-1.0-html-import').open();return false;">Usage Notes</a></div></div><div
+
+
+            class="download-btn-container"><a
+            title="Clear Database"
+            href=""><paper-button
+            raised class="secondary"> &nbsp;<iron-icon
+                icon="file-download"></iron-icon>&nbsp;Clear&nbsp;Database&nbsp;</paper-button></a></a><br /><div
+                class="btn-subtext"><a
+                href=""
+                onclick="document.getElementById('usage-0.5').open();return false;">Usage Notes</a></div></div>
+                <!--
+                <form action="upload" class = "download-btn-container" method="post" enctype="multipart/form-data">
+                  <input type="file" name="file"><br /><br />
+                  <input type="submit" value="Upload!">
+                </form>
+              -->
+</div>
+<div><section hero id="theme-info">
+  <div class="table-responsive-vertical shadow-z-1">
+  <table id="table" class="table table-hover default sortable">
+      <thead>
+        <tr>
+          <th {% if key=="remote_addr": %} style="color:#e8485f" {% endif %}>remote_addr</th>
+          <th {% if key=="time_iso8601": %} style="color:#e8485f" {% endif %}>time_iso8601</th>
+          <th {% if key=="request_time": %} style="color:#e8485f" {% endif %}>request_time</th>
+          <th {% if key=="request_uri": %} style="color:#e8485f" {% endif %}>request_uri </th>
+          <th {% if key=="request_method": %} style="color:#e8485f" {% endif %}>request_method</th>
+          <th {% if key=="status": %} style="color:#e8485f" {% endif %}>status</th>
+          <th {% if key=="request_length": %} style="color:#e8485f" {% endif %}>request_length</th>
+          <th {% if key=="body_bytes_sent": %} style="color:#e8485f" {% endif %}>body_bytes_sent</th>
+          <th {% if key=="bytes_sent": %} style="color:#e8485f" {% endif %}>bytes_sent</th>
+          <th {% if key=="http_host": %} style="color:#e8485f" {% endif %}>http_host</th>
+          <th {% if key=="http_referer": %} style="color:#e8485f" {% endif %}>http_referer</th>
+          <th {% if key=="http_user_agent": %} style="color:#e8485f" {% endif %}>http_user_agent</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows: %}
+        <tr>
+            <td data-title = "remote_addr">
+              <a href = "/remote_addr?q={{ row[1] }}">{{ row[1] }}</a>
+            </td>
+            <td data-title = "time_iso8601">
+              <a href = "/time_iso8601?q={{ row[2] }}">{{ row[2] }}</a>
+            </td>
+            <td data-title = "request_time">
+              <a href = "/request_time?q={{ row[3] }}">{{ row[3] }}</a>
+            </td>
+            <td data-title = "request_uri">
+              <a href = "/request_uri?q={{ row[4] }}">{{  row[4][0:15] }}</a>
+            </td>
+            <td data-title = "request_method">
+              <a href = "/request_method?q={{ row[5] }}">{{ row[5] }}</a>
+            </td>
+            <td data-title = "status">
+              <a href = "/status?q={{ row[6] }}">{{ row[6] }}</a>
+            </td>
+            <td data-title = "request_length">
+              <a href = "/request_length?q={{ row[7] }}">{{ row[7] }}</a>
+            </td>
+            <td data-title = "body_bytes_sent">
+              <a href = "/body_bytes_sent?q={{ row[8] }}">{{ row[8] }}</a>
+            </td>
+            <td data-title = "bytes_sent">
+              <a href = "/bytes_sent?q={{ row[9] }}">{{ row[9] }}</a>
+            </td>
+            <td data-title = "http_host">
+              <a href = "/http_host?q={{ row[10] }}">{{ row[10][0:10] }}</a>
+            </td>
+            <td data-title = "http_referer">
+              <a href = "/http_referer?q={{ row[11] }}">{{ row[11][0:10] }}</a>
+            </td>
+            <td data-title = "http_user_agent">
+              <a href = "/http_user_agent?q={{ row[12] }}">{{ row[12][0:10] }}</a>
+            </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="pager">
+        <img src="http://mottie.github.com/tablesorter/addons/pager/icons/first.png" class="first"/>
+        <img src="http://mottie.github.com/tablesorter/addons/pager/icons/prev.png" class="prev"/>
+        <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+        <img src="http://mottie.github.com/tablesorter/addons/pager/icons/next.png" class="next"/>
+        <img src="http://mottie.github.com/tablesorter/addons/pager/icons/last.png" class="last"/>
+        <select class="pagesize" title="Select page size">
+            <option selected="selected" value="10">10</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="40">40</option>
+        </select>
+        <select class="gotoPage" title="Select page number"></select>
+</div>
+
+</div>
+
+<div style="width: 100%; display: inline-block; vertical-align: top">
+<h2>Table Options</h2>
+<p>
+  <label for="table-bordered">Style: bordered</label>
+  <select id="table-bordered" name="table-bordered">
+    <option selected value="" style="color: black">No</option>
+    <option value="table-bordered" style="color: black">Yes</option>
+  </select>
+</p>
+<!--
+<p>
+  <label for="table-striped">Style: striped</label>
+  <select id="table-striped" name="table-striped">
+    <option selected value="">No</option>
+    <option value="table-striped">Yes</option>
+  </select>
+</p>
+-->
+<p>
+  <label for="table-hover">Style: hover</label>
+  <select id="table-hover" name="table-hover">
+    <option value="" style="color: black">No</option>
+    <option selected value="table-hover" style="color: black">Yes</option>
+  </select>
+</p>
+<!--
+<p>
+  <label for="table-color">Style: color</label>
+  <select id="table-color" name="table-color">
+    <option selected value="">Default</option>
+    <option value="table-mc-red">Red</option>
+    <option value="table-mc-pink">Pink</option>
+    <option value="table-mc-purple">Purple</option>
+    <option value="table-mc-deep-purple">Deep Purple</option>
+    <option value="table-mc-indigo">Indigo</option>
+    <option value="table-mc-blue">Blue</option>
+    <option value="table-mc-light-blue">Light Blue</option>
+    <option value="table-mc-cyan">Cyan</option>
+    <option value="table-mc-teal">Teal</option>
+    <option value="table-mc-green">Green</option>
+    <option value="table-mc-light-green">Light Green</option>
+    <option value="table-mc-lime">Lime</option>
+    <option value="table-mc-yellow">Yellow</option>
+    <option value="table-mc-amber">Amber</option>
+    <option value="table-mc-orange">Orange</option>
+    <option value="table-mc-deep-orange">Deep Orange</option>
+  </select>
+</p>
+-->
+</div>
+
+{% endblock %}

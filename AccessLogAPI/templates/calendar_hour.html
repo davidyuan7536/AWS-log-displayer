@@ -1,0 +1,289 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Month Calendar</title>
+
+    <script src="static/jquery.min.js"></script>
+    <script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
+    <link rel="stylesheet" href="static/cal-heatmap.css" type="text/css"/>
+    <script type="text/javascript" src="static/cal-heatmap.min.js"></script>
+
+    <!--  JQUERY -->
+    <!--  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> -->
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <script src="static/moment.min.js"></script>
+    <script src="static/helper.js"></script>
+
+</head>
+<body>
+
+    <h2> {{obj}} </h2>
+    <div>
+    <div id="cal-heatmap"></div>
+    <button id="cal-heatmap-PreviousDomain-selector" style="margin-bottom: 10px;" class="glyphicon glyphicon-chevron-left"></button>
+    <button id="cal-heatmap-NextDomain-selector" style="margin-bottom: 10px;" class="glyphicon glyphicon-chevron-right"></button>
+
+    <!-- <button id="cal-heatmap-afterLoad-init" style="margin-bottom: 10px;" class="glyphicon glyphicon-refresh"></button> -->
+    <!-- <button id="cal-heatmap-display-in" style="margin-bottom: 10px;" class="glyphicon glyphicon-log-in"></button> -->
+    <!-- <button id="cal-heatmap-display-out" style="margin-bottom: 10px;" class="glyphicon glyphicon-log-out"></button> -->
+    <!-- <button id="cal-heatmap-destroy" style="margin-bottom: 10px;" class="glyphicon glyphicon-trash"></button> -->
+    </div>
+    <div><span id="specific-stats"></span</div>
+    <button onclick="goBack()" class="glyphicon glyphicon-circle-arrow-left"></button>
+
+    <script>
+    function goBack() {
+        window.history.back();
+    }
+    </script>
+
+
+    <script type="text/javascript">
+    var cal = null;
+
+    {% if start != 0: %}
+      var js_timestamp = {{start*1000}}
+      var start = new Date(js_timestamp);
+      // var HalfMonthAgo = new Date(js_timestamp);
+      // var HalfMonthLater = new Date(js_timestamp);
+      var TwoDaysAgo = new Date(js_timestamp);
+      var MonthAgo = new Date(js_timestamp);
+      var MonthLater = new Date(js_timestamp);
+    {% else: %}
+      var start = new Date();
+      // var HalfMonthAgo = new Date();
+      // var HalfMonthLater = new Date();
+      var TwoDaysAgo = new Date();
+      var MonthAgo = new Date();
+      var MonthLater = new Date();
+    {% endif %}
+    // HalfMonthAgo.setDate(start.getDate() - 15);
+    // HalfMonthLater.setDate(start.getDate() + 15);
+    TwoDaysAgo.setDate(start.getDate() - 2);
+    MonthAgo.setMonth(start.getMonth() - 1);
+    MonthLater.setMonth(start.getMonth() + 1);
+    // alert("start: " + start +
+    //       // "\nHalfMonthAgo: " + HalfMonthAgo +
+    //       // "\nHalfMonthLater: " + HalfMonthLater +
+    //       "\nMonthAgo: " + MonthAgo +
+    //       "\nMonthLater: " + MonthLater);
+
+    var data = {}
+    {% for time,value in result.items():%}
+      data["{{time}}"] = {{value}};
+    {%endfor%}
+
+    // var datas = {"1434092400": 1483}
+
+    var parser = function(data) {
+      var stats = {};
+      for (var d in data) {
+        stats[data[d].date] = data[d].value;
+      }
+      return stats;
+    };
+
+    // function init(){
+      if (cal === null) {
+        cal = new CalHeatMap();
+       }
+
+      cal.init({
+        itemSelector: "#cal-heatmap",
+        domain: "hour",
+        subDomain: "minute",
+        cellSize: 15,
+        range: 10,
+        colLimit: 60,
+        verticalOrientation: true,
+        animationDuration: 500,
+        label: {
+          position: "left",
+          width: 46
+        },
+        // domainDynamicDimension: false,
+        itemNamespace: "domainDynamicDimension",
+        tooltip: true,
+        minDate: MonthAgo,
+        maxDate: MonthLater,
+        start: TwoDaysAgo,
+        data: data,
+        highlight: ["now",],
+        considerMissingDataAsZero: true,
+        legend: {{colors}},
+        displayLegend: true,
+        legendCellSize: 10,
+        legendMargin: [10,0,10,10],
+        itemName: {% if obj == "num_request": %} ["Request", "Requests"] {% else: %} ["Byte", "Bytes"] {% endif %},
+        previousSelector: "#cal-heatmap-PreviousDomain-selector",
+        nextSelector: "#cal-heatmap-NextDomain-selector",
+        // afterLoad: function() {
+        //     start = Date.now();
+        //     init();
+        // },
+        subDomainTextFormat: function(date ,value) {
+          {% if obj == "data_in" or "data_out": %}
+            if (value/1000000000000000 > 1) {
+              return (value/1000000000000000).toFixed(0) + "P";
+            }
+            if (value/1000000000000 > 1) {
+              return (value/1000000000000).toFixed(0) + "T";
+            }
+            if (value/1000000000 > 1) {
+              return (value/1000000000).toFixed(0) + "G";
+            }
+            if (value/1000000 > 1) {
+              return (value/1000000).toFixed(0) + "M";
+            }
+            if (value/1000 > 1) {
+              return (value/1000).toFixed(0) + "K";
+            }
+          {% elif obj == "num_request": %}
+            if (value/1000000000000 > 1) {
+              return (value/1000000000000).toFixed(0) + "T";
+            }
+            if (value/1000000000 > 1) {
+              return (value/1000000000).toFixed(0) + "B";
+            }
+            if (value/1000000 > 1) {
+              return (value/1000000).toFixed(0) + "M";
+            }
+            if (value/1000 > 1) {
+              return (value/1000).toFixed(0) + "K";
+            }
+            {% endif %}
+          return value
+
+        },
+
+        // onClick: function(date, nb) {
+        //   window.location.href = "http://" + window.location.host + "/calendar2?time=" + moment(date).format();
+        // }
+
+        onClick: function(date, val){
+          if (val !== null) {
+            $.getJSON('/calendar_stats',
+            {
+              granularity: "minute",
+              obj: "{{obj}}",
+              time: moment(date).format().substring(0,19)
+              //
+            },
+
+            function(data) {
+              $("#specific-stats").html(
+
+                moment(date).format("LLL") + " <button style=\"margin-bottom: 10px;\" onclick=\"location.href='" +
+                "http://" + window.location.host + "/calendar?domain=hour&obj=" + "{{obj}}" + "&time=" + moment(date).format().substring(0,19) + "'\"><span class=\"glyphicon glyphicon-zoom-in\" aria-hidden=\"true\"></span></button>" +
+
+                {% if obj == "num_request": %}
+                "<br /> A Total of <b>" + val + "</b> Requests" +
+                "<br /> Average Request Time: <b>" + data.result["avg_request_time"]*1000 + "</b> ms" +
+                "<br /> Request Methods: <ol> <li><b>" + data.result["request_method"][1]["name"] + "</b>&nbsp" + ((data.result["request_method"][1]["count"] / val) * 100).toFixed(2) + "%</li>" +
+                                             "<li><b>" + data.result["request_method"][2]["name"] + "</b>&nbsp" + ((data.result["request_method"][2]["count"] / val) * 100).toFixed(2) + "%</li>" +
+                                             "<li><b>" + data.result["request_method"][3]["name"] + "</b>&nbsp" + ((data.result["request_method"][3]["count"] / val) * 100).toFixed(2) + "%</li></ol>" +
+                "<br /> TOP 3 URI:       <ol> <li><b>" + data.result["request_uri"][1]["name"] + "</b>&nbsp" + data.result["request_uri"][1]["count"] + " (" + ((data.result["request_uri"][1]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                                             "<li><b>" + data.result["request_uri"][2]["name"] + "</b>&nbsp" + data.result["request_uri"][2]["count"] + " (" + ((data.result["request_uri"][2]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                                             "<li><b>" + data.result["request_uri"][3]["name"] + "</b>&nbsp" + data.result["request_uri"][3]["count"] + " (" + ((data.result["request_uri"][3]["count"] / val) * 100).toFixed(2) + "%) </li></ol>" +
+                "<br /> TOP 3 Host:      <ol> <li><b>" + data.result["http_host"][1]["name"] + "</b>&nbsp" + data.result["http_host"][1]["count"] + " (" + ((data.result["http_host"][1]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                                             "<li><b>" + data.result["http_host"][2]["name"] + "</b>&nbsp" + data.result["http_host"][2]["count"] + " (" + ((data.result["http_host"][2]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                                             "<li><b>" + data.result["http_host"][3]["name"] + "</b>&nbsp" + data.result["http_host"][3]["count"] + " (" + ((data.result["http_host"][3]["count"] / val) * 100).toFixed(2) + "%) </li></ol>" +
+                "<br /> TOP 3 Client Address:<ol> <li><b>" + data.result["remote_addr"][1]["name"] + "</b>&nbsp" + data.result["remote_addr"][1]["count"] + " (" + ((data.result["remote_addr"][1]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                                                 "<li><b>" + data.result["remote_addr"][2]["name"] + "</b>&nbsp" + data.result["remote_addr"][2]["count"] + " (" + ((data.result["remote_addr"][2]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                                                 "<li><b>" + data.result["remote_addr"][3]["name"] + "</b>&nbsp" + data.result["remote_addr"][3]["count"] + " (" + ((data.result["remote_addr"][3]["count"] / val) * 100).toFixed(2) + "%) </li></ol>"
+
+                 {% else: %} // data_in or data_out
+                    {% if obj == "data_in": %} // data_in
+                      "<br /> Total of <b>" + packBytes(val, 2) + "</b> Bytes Recieved" +
+                      "<br /> In Average <b>" + packBytes((val/data.result["num_request"]),2) + "</b> Bytes Received per Request" +
+
+                    {% elif obj == "data_out": %} // data_out
+                      "<br /> Total of <b>" + packBytes(val, 2) + "</b> Bytes Sent" +
+                      "<br /> In Average <b>" + packBytes((val/data.result["num_request"]),2) + "</b> Bytes Sent per Request" +
+                    {% endif %}
+
+                  "<br /> Request Methods: <ol> <li><b>" + data.result["request_method"][1]["name"] + "</b>&nbsp" + packBytes(data.result["request_method"][1]["count"], 2) + " (" + ((data.result["request_method"][1]["count"] / val) * 100).toFixed(2) + ")%</li>" +
+                                               "<li><b>" + data.result["request_method"][2]["name"] + "</b>&nbsp" + packBytes(data.result["request_method"][2]["count"], 2) + " (" + ((data.result["request_method"][2]["count"] / val) * 100).toFixed(2) + ")%</li>" +
+                                               "<li><b>" + data.result["request_method"][3]["name"] + "</b>&nbsp" + packBytes(data.result["request_method"][3]["count"], 2) + " (" + ((data.result["request_method"][3]["count"] / val) * 100).toFixed(2) + ")%</li></ol>" +
+                  "<br /> TOP 3 URI:       <ol> <li><b>" + data.result["request_uri"][1]["name"] + "</b>&nbsp" + packBytes(data.result["request_uri"][1]["count"], 2) + " (" + ((data.result["request_uri"][1]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                                               "<li><b>" + data.result["request_uri"][2]["name"] + "</b>&nbsp" + packBytes(data.result["request_uri"][2]["count"], 2) + " (" + ((data.result["request_uri"][2]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                                               "<li><b>" + data.result["request_uri"][3]["name"] + "</b>&nbsp" + packBytes(data.result["request_uri"][3]["count"], 2) + " (" + ((data.result["request_uri"][3]["count"] / val) * 100).toFixed(2) + "%) </li></ol>" +
+                  "<br /> TOP 3 Host:      <ol> <li><b>" + data.result["http_host"][1]["name"] + "</b>&nbsp" + packBytes(data.result["http_host"][1]["count"], 2) + " (" + ((data.result["http_host"][1]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                                               "<li><b>" + data.result["http_host"][2]["name"] + "</b>&nbsp" + packBytes(data.result["http_host"][2]["count"], 2) + " (" + ((data.result["http_host"][2]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                                               "<li><b>" + data.result["http_host"][3]["name"] + "</b>&nbsp" + packBytes(data.result["http_host"][3]["count"], 2) + " (" + ((data.result["http_host"][3]["count"] / val) * 100).toFixed(2) + "%) </li></ol>" +
+                  "<br /> TOP 3 Client Address:<ol> <li><b>" + data.result["remote_addr"][1]["name"] + "</b>&nbsp" + packBytes(data.result["remote_addr"][1]["count"], 2) + " (" + ((data.result["remote_addr"][1]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                                                   "<li><b>" + data.result["remote_addr"][2]["name"] + "</b>&nbsp" + packBytes(data.result["remote_addr"][2]["count"], 2) + " (" + ((data.result["remote_addr"][2]["count"] / val) * 100).toFixed(2) + "%) </li>" +
+                                                   "<li><b>" + data.result["remote_addr"][3]["name"] + "</b>&nbsp" + packBytes(data.result["remote_addr"][3]["count"], 2) + " (" + ((data.result["remote_addr"][3]["count"] / val) * 100).toFixed(2) + "%) </li></ol>"
+                  {% endif %}
+              );
+            });
+          } // end val!= null
+          else{// val == 0
+            $("#specific-stats").html(
+              moment(date).format("LL") + "<br /><h1>THERE IS NOTHING SCRUB</h1>"
+            )
+          }
+
+        }, // end onClick function
+
+        legendColors: {
+        	min: "#B6E6FF",
+        	max: "MidnightBlue",
+        	empty: "#ededed"
+        }
+      });
+    // } // end function init()
+
+
+    // function destroy(){
+    //   cal = cal.destroy();
+    // }
+    // $("#cal-heatmap-destroy").on("click", function(e) {
+    //   destroy();
+    // });
+    //
+    // $("#cal-heatmap-afterLoad-init").on("click", function(e) {
+    //   // $(this).remove();
+    //   if (cal !== null) {
+    //     destroy();
+    //   }
+    //   if (cal === null) {
+    //     init();
+    //   }
+    // });
+    //
+    // $("#minDate-previous").on("click", function(e) {
+    // 	e.preventDefault();
+    // 	if (!cal.previous()) {
+    // 		alert("No more domains to load");
+    // 	}
+    // });
+    //
+    // $("#minDate-next").on("click", function(e) {
+    // 	e.preventDefault();
+    // 	if (!cal.next()) {
+    // 		alert("No more domains to load");
+    // 	}
+    // });
+    // $("#cal-heatmap-display-in").on("click", function() {
+    // 	cal.update(in_data);
+    // });
+    //
+    // $("#cal-heatmap-display-out").on("click", function() {
+    // 	cal.update(out_data);
+    // });
+    </script>
+
+
+</body>
+</html>

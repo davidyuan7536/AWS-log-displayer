@@ -1,0 +1,97 @@
+Project path for all the filter options: "static\filterOptions"
+
+Everything inside this folder is a polymer element responsible for generating the
+
+
+filterModal.html contains the template for the filter modal. The filter modal will handle all of the user input for must, mustNot, and should filters.
+The data will be returned in three JSON array (one for each filter). This template is how the other pages that contain the filter modal are built.
+All the data handling/displaying is done with additional code added onto this baseline template. For example, after a user inputs all the must, mustNot,
+and should filters, additional code can be used to pass the information to the server and the backend methods will be able to handle the filters and return
+the desired results.
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+filterModalAgg.html handles what is seen on the "Aggregations" page of the website. The html for generating the page is located at "templates/aggregations.html".
+The <filter-modalAgg> element has 7 different initialization options:
+
+unique-id: must be set and unique to each <filter-modal.*> element (this includes all of the filter-modal elements that you want to include on the same html page).
+           unique-id is used to handle renaming the "tab" elements of the modal with unique names so that the bootstrap library can handle them correctly without
+           conflicts
+
+aggField1: defaults to "request_uri" if left uninitialized. This field declares the first level of aggregation. Has options "remote_addr", "time_iso8601", "request_time",
+           "status", "bytes_received", "body_bytes_sent", "bytes_sent, "request_method", "http_host", "http_referer", and "http_agent"
+
+aggType1: defaults to "terms" if left uninitialized. The two choices for this field include "terms" or "stats". The documentation for terms and stats aggregation
+          can be found at "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html"
+
+aggSize1: this field defaults to "10". This field is not used for stats aggregations
+
+aggField2: this field is used for nested aggregation. Nested aggregation documentation can be found at "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-nested-aggregation.html".
+            This field is defaulted an empty string.
+
+aggType2: type of nested aggregation. The choices are "terms" and "stats"
+
+aggSize2: this field defaults to "10". This field is not used for stats aggregations or when there are no nested aggregations
+
+
+There are four possible types of aggregation:
+
+type 1: Aggregation by terms with a nested aggregation by terms
+type 2: Aggregation by terms with a nested aggregation by stats
+type 3: Aggregation by terms
+type 4: Aggregation by stats
+
+All four cases are handled in the "displayagg" function within filterModalAgg.html
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+filterModalDateStats.html handles what is seen on the "stats aggregation" of the graphs page of the website. The html for generating the page is located at "templates/graphStats.html".
+The <filter-modalDateStats> element has 5 different initialization options:
+
+unique-id: must be set and unique to each <filter-modal.*> element (this includes all of the filter-modal elements that you want to include on the same html page).
+           unique-id is used to handle renaming the "tab" elements of the modal with unique names so that the bootstrap library can handle them correctly without
+           conflicts
+
+bucketData: defaults to "bytes_sent". This field can take three different initilized options: "bytes_sent", "bytes_received", and "body_bytes_sent". In the future,
+            "request_time" should also be added as an option and the rest of the code should be modified to accomplish this.
+
+bucketDataAnalyze: defaults to "avg". This field can be initialized with "avg", "max", "min", or "total". This field determines the type of analytics performed
+                    on "bucketData"
+
+granularity: defaults to "day". This field is used to modify the granularity of the graph. Has options "year", "month", "week", "day", "hour", "minute", and "second". Note, choosing a granularity of seconds might cause memory issues with
+            elasticsearch. Please view "https://www.elastic.co/blog/found-crash-elasticsearch" for more information
+
+graphType: defaults to "line". Has options "line", "column", and "area"
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+filterModalDateAgg.html handles what is seen on the "terms aggregation" of the graphs page of the website. The html for generating the page is located at "templates/graphTerms.html".
+The <filter-modalDateAgg> element has 5 different initialization options:
+
+unique-id: must be set and unique to each <filter-modal.*> element (this includes all of the filter-modal elements that you want to include on the same html page).
+           unique-id is used to handle renaming the "tab" elements of the modal with unique names so that the bootstrap library can handle them correctly without
+           conflicts
+
+bucketData: defaults to "bytes_sent". This field can take three different initilized options: "bytes_sent", "bytes_received", and "body_bytes_sent". In the future,
+            "request_time" should also be added as an option and the rest of the code should be modified to accomplish this.
+
+bucketDataSize: defaults to "10". This field can be initialized with any integer number. The larger the number, the more aggregation results will be shown. Refer to
+                Elasticsearch's term aggregation size documentation for more information "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html"
+
+granularity: defaults to "day". This field is used to modify the granularity of the graph. Has options "year", "month", "week", "day", "hour", "minute", and "second". Note, choosing a granularity of seconds might cause memory issues with
+            elasticsearch. Please view "https://www.elastic.co/blog/found-crash-elasticsearch" for more information
+
+dateAggType: defaults to "line". Has options "line", "column", and "area"

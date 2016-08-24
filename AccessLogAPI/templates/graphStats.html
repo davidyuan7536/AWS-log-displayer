@@ -1,0 +1,109 @@
+<head>
+
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <script src="../static/highcharts/highstock.js"></script>
+  <script src="../static/highcharts/drilldown.js"></script>
+  <script src="../static/highcharts/exporting.js"></script>
+
+
+
+
+  <link rel="stylesheet" href="../static/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
+  <link rel="stylesheet" href="../static/bootstrap/dist/css/bootstrap-theme.min.css" type="text/css"/>
+  <script src="../static/bootstrap/dist/js/bootstrap.min.js"></script>
+
+
+  <link rel="stylesheet" href="../static/dashboard/dashboard.css">
+  <script src="../static/dashboard/dashboard.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="../static/datetimepicker-master/jquery.datetimepicker.css"/ >
+  <script src="../static/datetimepicker-master/jquery.datetimepicker.js"></script>
+  <link rel="import" href="../static/bower_components/paper-button/paper-button.html">
+
+  <link rel="import" href="../static/bower_components/polymer/polymer.html">
+  <link rel="import" href="../static/filterOptions/mustFilter.html">
+  <link rel="import" href="../static/filterOptions/mustNotFilter.html">
+  <link rel="import" href="../static/filterOptions/shouldFilter.html">
+  <link rel="import" href="../static/filterOptions/filterModal.html">
+
+  <link rel="import" href="../static/header/header.html">
+  <link rel="import" href="../static/sidebar/sidebar.html">
+  <link rel="import" href="../static/graphs/graphsElement.html">
+
+  <link rel="stylesheet" href="../static/gridster/jquery.gridster.css">
+  <script src="../static/gridster/jquery.gridster.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/packery/1.4.3/packery.pkgd.js"></script>
+
+
+
+</head>
+
+<body>
+  <!-- container section start -->
+  <section id="dashboardContainer" class="">
+
+    <!--header start-->
+    <global-header></global-header>
+    <!--header end-->
+
+    <!--sidebar start-->
+    <global-sidebar></global-sidebar>
+    <!--sidebar end-->
+    <section id = "main-content">
+      <section class="wrapper">
+        <div id = "mainContentHeader">
+          <div id = "toggleSideBarWrap">
+            <div style = "float: right; padding-top: 10px; padding-right: 10px; color: white">GRAPHS STATS AGGREGATION</div>
+            <paper-button id = "addNewGraphButton" type="button" style = "color:white">
+
+              <span class="glyphicon glyphicon-plus-sign" style = "color:white"></span>
+
+              Add New Chart
+            </paper-button>
+
+          </div>
+        </div>
+
+
+        <div style = "padding-top: 20px"></div>
+        <input type = "hidden" value = "3" id = "counter"></input>
+
+        <div id = "graphWrap">
+          <filter-modal unique-id = "defaultGraph1" bucket-data = "bytes_sent" bucket-data-analyze="avg" granularity = "day" graph-type="line"></filter-modal>
+
+
+
+          <filter-modal unique-id = "defaultGraph2" bucket-data = "bytes_sent" bucket-data-analyze="sum" granularity = "day" graph-type="line"></filter-modal>
+        </div>
+
+
+
+
+        <script>
+          $("#addNewGraphButton").click(function(){
+            var dynamicEl = document.createElement("filter-modal");
+            var counter = $("#counter").val();
+            counter = parseInt(counter, 10) + 1;
+            $("#counter").val(counter);
+            dynamicEl.setAttribute("unique-id", "defaultGraph" + counter);
+            dynamicEl.setAttribute("bucket-data", "bytes_received");
+            dynamicEl.setAttribute("bucket-data-analyze", "avg");
+            dynamicEl.setAttribute("granularity", "day");
+            dynamicEl.setAttribute("graphType", "line");
+            $("#graphWrap").append(dynamicEl);
+
+          })
+
+        </script>
+
+
+
+
+
+      </section>
+    </section>
+  </section>
+</body>

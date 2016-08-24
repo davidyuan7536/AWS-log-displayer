@@ -1,0 +1,173 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="global-login">
+  <style>
+
+
+
+  </style>
+
+
+  <template>
+
+    <div class="login">
+
+      <div class = "loginWrap">
+        <div class = "title">
+          <div class = "titleText" id = "titleText"> User Authentication</div>
+          <div class="loader" id = "titleLoad" style = "display:none">
+            <h1>Authenticating</h1>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        </div>
+          <div id = "formWrap">
+            <div class="input-group">
+              <span class="input-group-addon" id="usernameImageBox"><span style = "display: none" id="usernameImage" class="glyphicon glyphicon-user"></span></span>
+              <input type="text" id="username" class="form-control" placeholder="Username" aria-describedby="usernameImage">
+            </div>
+            <div style = "padding-top: 10px"></div>
+            <div class="input-group">
+              <span class="input-group-addon" id="passwordImageBox"><span id="passwordImage" style = "display: none" class="glyphicon glyphicon-lock"></span></span>
+              <input type="password" id="password" class="form-control" placeholder="Password" aria-describedby="passwordImage">
+            </div>
+            <div style = "padding-top: 10px"></div>
+            <div id = "requiredFields" style = "display: none; margin-left:20px">Please Fill Out Required Fields</div>
+            <div id = "wrongFields" style = "display: none; margin-left:20px">Incorrect Username or Password</div>
+
+          </div>
+          <button id = "loginButton" on-tap = "login" >Log In</button>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'global-login',
+
+      ready: function() {
+
+        if(this.getCookie('laserficheCloudAccessLogUser') != ""){
+            window.location.replace("../../dashboard.html");
+        }
+        var username = this.$.username;
+        var password = this.$.password;
+        var usernameImage = this.$.usernameImage;
+        var passwordImage = this.$.passwordImage;
+        var usernameImageBox = this.$.usernameImageBox;
+        var passwordImageBox = this.$.passwordImageBox;
+
+        $(username).focus(function(){
+            $(usernameImage).show("fast");
+        });
+
+        $(username).focusout(function(){
+            $(usernameImage).hide("fast");
+            if($(username).val() != ""){
+              $(usernameImageBox).attr("style", "background-color: #C9FFD8");
+            }
+            else{
+              $(usernameImageBox).removeAttr("style", "background-color: #C9FFD8");
+            }
+        });
+
+
+        $(password).focus(function(){
+            $(passwordImage).show("fast");
+        });
+
+            $(password).focusout(function(){
+            $(passwordImage).hide("fast");
+            if($(password).val() != ""){
+              $(passwordImageBox).attr("style", "background-color: #C9FFD8");
+            }
+            else{
+              $(passwordImageBox).removeAttr("style", "background-color: #C9FFD8");
+            }
+        });
+
+
+      },
+
+
+      login: function(){
+          var form = this.$.formWrap;
+
+          var username = this.$.username;
+          var password = this.$.password;
+
+          var requiredFields = this.$.requiredFields;
+          var wrongFields = this.$.wrongFields;
+
+          var titleText = this.$.titleText;
+          var titleLoad = this.$.titleLoad;
+
+
+          if($(username).val() == "" || $(password).val() ==""){
+            $(requiredFields).show('fast');
+            $(wrongFields).hide('fast');
+          }
+          else{
+            $(requiredFields).hide('fast');
+            $(wrongFields).hide('fast');
+
+            $(titleText).hide('fast');
+            $(titleLoad).show('fast');
+
+            var minUsername = $(username).val();
+            if(minUsername.indexOf("laserfiche") == -1){
+              minUsername = minUsername + "@laserfiche.com";
+            }
+
+            var data = {
+              'username': minUsername,
+              'password': $(password).val()
+            };
+
+            $.post( "/credentials", data, function( data ){
+
+                if(data.loginSuccess == "yes"){
+
+                  var d = new Date();
+                  d.setTime(d.getTime() + (1*24*60*60*1000));
+                  var expires = "expires=" + d.toGMTString();
+                  document.cookie = "laserficheCloudAccessLogUser =" + $(username).val() +"; " + expires;
+                  window.location.replace("../../dashboard.html");
+
+                }
+                else {
+                  $(requiredFields).hide('fast');
+                  $(wrongFields).show('fast');
+                  $(titleText).show('fast');
+                  $(titleLoad).hide('fast');
+                }
+          });
+
+          }
+
+      },
+
+       getCookie: function(cname) {
+          var name = cname + "=";
+          var ca = document.cookie.split(';');
+          for(var i=0; i<ca.length; i++) {
+              var c = ca[i];
+              while (c.charAt(0)==' ') c = c.substring(1);
+              if (c.indexOf(name) == 0) {
+                  return c.substring(name.length, c.length);
+              }
+          }
+          return "";
+      },
+
+
+
+    });
+
+  </script>
+
+</dom-module>

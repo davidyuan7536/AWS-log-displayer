@@ -1,0 +1,259 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Month Calendar</title>
+
+    <link rel="stylesheet" href="static/cal-heatmap.css" type="text/css"/>
+
+    <!--  JQUERY -->
+    <!--  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> -->
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <link rel="stylesheet" href="../static/dashboard/dashboard.css">
+
+    <link rel="import" href="../static/bower_components/iron-icons/iron-icons.html">
+    <link rel="import" href="../static/bower_components/iron-icons/notification-icons.html">
+    <link rel="import" href="../static/bower_components/paper-tabs/paper-tabs.html">
+    <link rel="stylesheet" href="../static/filter_form.css" type="text/css"/>
+    <link rel="stylesheet" href="../static/calendar.css" type="text/css"/>
+
+
+    <link rel="import" href="../static/header/header.html">
+    <link rel="import" href="../static/sidebar/sidebar.html">
+
+    <link rel="stylesheet" href="../static/main.css">
+
+</head>
+<body>
+
+    <!-- <h2> {{obj}} </h2> -->
+    <!-- <div style="width:950px; margin:0 auto;"> -->
+    <!-- <paper-tabs class="cal-tabs" id="cal-tabs" selected={% if obj == "num_request": %}"0"{% elif obj == "bytes_received": %}"1"{% elif obj == "bytes_sent": %}"2"{% else: %} {% endif %}>
+      <paper-tab link onclick="Display_num_request()">
+        <a href="#bytes_received" class="horizontal center-center layout">Request Amount</a>
+      </paper-tab>
+      <paper-tab link onclick="Display_bytes_received()">
+        <a href="#calendarSection" class="horizontal center-center layout">Data Received</a>
+      </paper-tab>
+      <paper-tab link onclick="Display_bytes_sent()">
+        <a href="#calendarSection" class="horizontal center-center layout">Data Sent</a>
+      </paper-tab>
+    </paper-tabs> -->
+
+    <!-- <ul class="nav nav-tabs">
+      <li role="presentation" onclick="Display_num_request()"><a href="#calendarSection">Request Amount</a></li>
+      <li role="presentation" onclick="Display_bytes_received()"><a href="#calendarSection">Data Received</a></li>
+      <li role="presentation" onclick="Display_bytes_sent()"><a href="#calendarSection">Data Sent</a></li>
+    </ul> -->
+
+    <!-- <h3 align="center">{% if obj == "num_request": %} Request Amount {% elif obj == "bytes_received": %} Data Received {% elif obj == "bytes_sent": %} Data Sent {% else: %} {% endif %}</h3><br /> -->
+
+    <!-- <button id="cal-heatmap-PreviousDomain-selector" style="margin-bottom: 10px;" class="glyphicon glyphicon-chevron-left"></button> -->
+    <!-- <button id="cal-heatmap-NextDomain-selector" style="margin-bottom: 10px;" class="glyphicon glyphicon-chevron-right"></button> -->
+
+    <!-- <button id="cal-heatmap-afterLoad-init" style="margin-bottom: 10px;" class="glyphicon glyphicon-refresh"></button> -->
+    <!-- <button onClick="Display_bytes_received()" id="cal-heatmap2-display-in" style="margin-bottom: 10px;" class="glyphicon glyphicon-log-in"></button> -->
+    <!-- <button onClick="Display_bytes_sent()" id="cal-heatmap2-display-out" style="margin-bottom: 10px;" class="glyphicon glyphicon-log-out"></button> -->
+    <!-- <button id="cal-heatmap-destroy" style="margin-bottom: 10px;" class="glyphicon glyphicon-trash"></button> -->
+    <!-- <div><span id="specific-stats"></span</div> -->
+    <!-- <button onclick="Display_num_request()" class="glyphicon glyphicon-home"></button> -->
+
+    <global-header></global-header>
+
+    <global-sidebar></global-sidebar>
+
+    <section id="main-content">
+      <section class="wrapper2">
+
+    <div id = "mainContentHeader">
+      <div id = "toggleSideBarWrap" style="width:100%;">
+        <div style = "float: right; padding-top: 10px; padding-right: 10px; color: white">Calendar</div>
+        <!-- <span id = "toggleSideBar" class="glyphicon glyphicon-align-left" aria-hidden="true"></span> -->
+      </div>
+    </div>
+
+    <div style = "padding-top: 20px"></div>
+
+    <div class="cal-tabs" style="background-color: white;padding: 10px;">
+      <div class="cal-tabs-header">
+      <ul class="cal-tab-links">
+          <li class="active"><a href="#num_request_tab">Number of Requests</a></li>
+          <li><a href="#bytes_received_tab">Bytes Received</a></li>
+          <li><a href="#bytes_sent_tab">Bytes Sent</a></li>
+      </ul>
+    </div>
+
+      <div class="cal-tab-content">
+          <div id="num_request_tab" class="cal-tab active">
+            <div style="width:950px; margin:0 auto;">
+            <div id = "calendar-content_num_request">
+                <div style = "background-color: transparent; height : 300px; margin-bottom : 10px" class="state col-lg-12">
+                  <div id="cal-heatmap" style="position: absolute; border-bottom-style: solid; border-bottom: grey; border-bottom-width:2px;"></div>
+                  <div>
+                    <iron-icon icon="chevron-left" class="arrow-size cal-heatmap-PreviousDomain-selector" onclick="month_previous(1);"></iron-icon>
+                    <iron-icon icon="chevron-right" class="arrow-size cal-heatmap-NextDomain-selector" onclick="month_next(1);"></iron-icon>
+                  </div>
+                </div>
+                <div style = "background-color: transparent; height : 300px; margin-bottom : 10px; width : 64%" class="col-md-6">
+                  <iron-icon icon="expand-less" class="arrow-size cal-heatmap2-PreviousDomain-selector" onclick="day_previous(1);" ondblclick="day_previous(8);"></iron-icon>
+                  <iron-icon id="day_sync_button" icon="notification:sync" class="arrow-size" onclick="toggle_day_sync();"></iron-icon>
+                  <div id="cal-heatmap2"></div>
+                  <iron-icon icon="expand-more" id="cal-heatmap2-NextDomain-selector" class="arrow-size" onclick="day_next(1);" ondblclick="day_next(8);"></iron-icon>
+                </div>
+                <div style = "background-color: transparent; height : 300px; margin-bottom  : 10px; margin-left: 0; width : 36%" class="col-md-6">
+                  <div id="cal-stats_num_request" style = "background-color: transparent; paddling: 5px; height : 100%; width: 100%">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> <!-- num_request -->
+
+          <div id="bytes_received_tab" class="cal-tab">
+            <div style="width:950px; margin:0 auto;">
+            <div id = "calendar-content_bytes_received">
+                <div style = "background-color: transparent; height : 300px; margin-bottom : 10px" class="state col-lg-12">
+                  <div id="cal-heatmap3" style="position: absolute;"></div>
+                  <div>
+                    <iron-icon icon="chevron-left" class="arrow-size cal-heatmap-PreviousDomain-selector" onclick="month_previous(1);"></iron-icon>
+                    <iron-icon icon="chevron-right" class="arrow-size cal-heatmap-NextDomain-selector" onclick="month_next(1);"></iron-icon>
+                  </div>
+                </div>
+                <div style = "background-color: transparent; height : 300px; margin-bottom : 10px; width : 64%" class="col-md-6">
+                  <iron-icon icon="expand-less" class="arrow-size cal-heatmap2-PreviousDomain-selector" onclick="day_previous(1);" ondblclick="day_previous(8);"></iron-icon>
+                  <iron-icon id="day_sync_button2" icon="notification:sync" class="arrow-size" onclick="toggle_day_sync();"></iron-icon>
+                  <div id="cal-heatmap4" ></div>
+                  <iron-icon icon="expand-more" class="arrow-size" onclick="day_next(1);" ondblclick="day_next(8);"></iron-icon>
+                </div>
+                <div style = "background-color: transparent; height : 300px; margin-bottom  : 10px; margin-left: 0; width : 36%" class="col-md-6">
+                  <div id="cal-stats_bytes_received" style = "background-color: transparent; paddling: 5px; height : 100%; width: 100%">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>  <!-- bytes_received -->
+
+          <div id="bytes_sent_tab" class="cal-tab">
+            <div style="width:950px; margin:0 auto;">
+            <div id = "calendar-content_bytes_sent">
+                <div style = "background-color: transparent; height : 300px; margin-bottom : 10px" class="state col-lg-12">
+                  <div id="cal-heatmap5" style="position: absolute;"></div>
+                  <div>
+                    <iron-icon icon="chevron-left" class="arrow-size cal-heatmap-PreviousDomain-selector" onclick="month_previous(1);"></iron-icon>
+                    <iron-icon icon="chevron-right" class="arrow-size cal-heatmap-NextDomain-selector" onclick="month_next(1);"></iron-icon>
+                  </div>
+                </div>
+                <div style = "background-color: transparent; height : 300px; margin-bottom : 10px; width : 64%" class="col-md-6">
+                  <iron-icon icon="expand-less" class="arrow-size cal-heatmap2-PreviousDomain-selector" onclick="day_previous(1);" ondblclick="day_previous(8);"></iron-icon>
+                  <iron-icon id="day_sync_button3" icon="notification:sync" class="arrow-size" onclick="toggle_day_sync();"></iron-icon>
+                  <div id="cal-heatmap6" ></div>
+                  <iron-icon icon="expand-more" class="arrow-size" onclick="day_next(1);" ondblclick="day_next(8);"></iron-icon>
+                </div>
+                <div style = "background-color: transparent; height : 300px; margin-bottom  : 10px; margin-left: 0; width : 36%" class="col-md-6">
+                  <div id="cal-stats_bytes_sent" style = "background-color: transparent; paddling: 5px; height : 100%; width: 100%">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> <!-- bytes_sent -->
+
+      </div>
+
+      <div id="cal-filter-panel"></div>
+
+    </section>
+  </section>
+    <script>
+    // jinja template only recognized in html
+    var Daysync = true;
+    var timescope = [];
+
+    var cal = null;
+    var cal3 = null;
+    var cal5 = null;
+
+    {% if start != 0: %}
+    // CUSTOM TIME
+      var js_timestamp = {{start*1000}}
+      var target = new Date(js_timestamp);
+      var start = new Date(js_timestamp);
+      // start.setMonth(target.getMonth() - 1);
+      var MinDate = new Date(js_timestamp);
+      MinDate.setMonth(target.getMonth() - 1);
+      var MaxDate = new Date(js_timestamp);
+      MaxDate.setMonth(target.getMonth() + 2)
+    {% else: %}
+    // DEFAULT - initial render
+      var target = new Date();
+      var start = new Date();
+      start.setMonth(target.getMonth() - 3);
+      var MinDate = new Date();
+      MinDate.setMonth(target.getMonth() - 5);
+      var MaxDate = new Date();
+      MaxDate.setMonth(target.getMonth() + 2);
+    {% endif %}
+
+    var filters = {
+      must: {},
+      mustNot: {},
+      should: {}
+    };
+
+    var month_data = {};
+    var month_colors = {};
+    var obj = "{{obj}}";
+    // for time,value in result.items():
+    //   data["{{time}}"] = {{value}};
+    // endfor
+
+    var cal2 = null;
+    var cal4 = null;
+    var cal6= null;
+
+    {% if start != 0: %}
+    // CUSTOM TIME
+      var js_timestamp = {{start*1000}}
+      var target2 = new Date(js_timestamp);
+      var start_day = new Date(js_timestamp);
+      start_day.setDate(target2.getDate() - 2);
+      var MinDate2 = new Date(js_timestamp);
+      MinDate2.setDate(target2.getDate() - 10);
+      var MaxDate2 = new Date(js_timestamp);
+      MaxDate2.setDate(target2.getDate() + 14)
+    {% else: %}
+    // DEFAULT - initial render
+      var target2 = new Date();
+      var start_day = new Date();
+      start_day.setDate(target2.getDate() - 7);
+      var MinDate2 = new Date();
+      MinDate2.setDate(target2.getDate() - 21);
+      var MaxDate2 = new Date();;
+      MaxDate2.setDate(target2.getDate() + 5);
+    {% endif %}
+
+    var day_data = {};
+    var day_colors = {};
+    // for time,value in result.items():
+    //   data["{{time}}"] = {{value}};
+    // endfor
+    </script>
+
+    <script src="static/jquery.min.js"></script>
+    <script type="text/javascript" src="../static/d3.v3.min.js"></script>
+    <script type="text/javascript" src="static/cal-heatmap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="static/moment.min.js"></script>
+    <script src="static/helper.js"></script>
+    <script>
+      $("#cal-filter-panel").load("templates/filter_form.html #filter-tags-div");
+    </script>
+    <script src="../static/cal_filter_form.js"></script>
+    <script src="../static/calendar.js"></script>
+</body>
+</html>

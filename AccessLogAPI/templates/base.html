@@ -1,0 +1,107 @@
+
+<html>
+  <head>
+		<title>Cloud Access Log Viewer</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+
+
+    <script src="../static/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+    <script src="../static/bower_components/Chart.js/Chart.js"></script>
+
+    <link rel="import" href="../static/bower_components/paper-header-panel/paper-header-panel.html">
+    <link rel="import" href="../static/bower_components/paper-drawer-panel/paper-drawer-panel.html">
+    <link rel="import" href="../static/bower_components/paper-button/paper-button.html">
+    <link rel="import" href="../static/bower_components/paper-input/paper-input.html">
+    <link rel="import" href="../static/bower_components/paper-toolbar/paper-toolbar.html">
+    <link rel="import" href="../static/bower_components/paper-styles/paper-styles.html">
+
+		<link rel="import" href="../static/melon/citric-flames.html">
+
+		<link rel="stylesheet" href="../static/melon/normalize.css">
+    	<link rel="stylesheet" href="../static/melon/laserfiche.css">
+
+
+
+    <script type='text/javascript' src="https://cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
+
+
+    <style> @import "https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic&subset=latin,cyrillic"; </style>
+
+
+</head>
+
+
+<body>
+
+    <paper-drawer-panel responsive-width="4000px">
+
+    <paper-header-panel drawer>
+      <paper-toolbar>
+        <div style = "font-size: 30px">Navigation</div>
+      </paper-toolbar>
+
+      <div id="theme-selector-menu">
+        <a id = "menu1" class="selected" style="display: block" href="/index">
+          <paper-item role = "listitem" class="x-scope paper-item-0">
+            <paper-item-body two-line class = "x-scope paper-item-body-0">
+              <div style = "font-size: 20px"> Home Page </div>
+            </paper-item-body>
+          </paper-item>
+        </a>
+
+        <a id = "menu1" class="" style="display: block" href="/uri_stat">
+          <paper-item role = "listitem" class="x-scope paper-item-0">
+            <paper-item-body two-line class = "x-scope paper-item-body-0">
+              <div style = "font-size: 20px"> Request# by URI </div>
+            </paper-item-body>
+          </paper-item>
+        </a>
+
+        <a id = "menu1" class="" style="display: block" href="/host_stat">
+          <paper-item role = "listitem" class="x-scope paper-item-0">
+            <paper-item-body two-line class = "x-scope paper-item-body-0">
+              <div style = "font-size: 20px"> Dataflow by Host </div>
+            </paper-item-body>
+          </paper-item>
+        </a>
+
+        <a id = "menu1" class="" style="display: block" href="/search">
+          <paper-item role = "listitem" class="x-scope paper-item-0">
+            <paper-item-body two-line class = "x-scope paper-item-body-0">
+              <div style = "font-size: 20px"> Search for Range </div>
+            </paper-item-body>
+          </paper-item>
+        </a>
+    </div>
+
+    </paper-header-panel>
+
+			<paper-header-panel main>
+		    <paper-toolbar>
+					<paper-button icon="menu" paper-drawer-toggle>MENU</paper-button>
+		        <span class="flex">&nbsp;</span>
+		      		<div id="top-navigation">
+								<a>Test Button 1</a>
+								<a href="/index">Home</a>
+							</div>
+		    </paper-toolbar>
+
+
+
+
+{% block content %}{% endblock %}
+
+
+
+	</paper-header-panel main>
+
+	</body>
+</html>

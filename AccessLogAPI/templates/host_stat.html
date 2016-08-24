@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div><section hero id="theme-info"><h1>Data Summary Grouped by HTTP Host</h1>
+
+<div><section hero id="theme-info">
+  <div class="table-responsive-vertical shadow-z-1">
+  <table id="table" class="table table-hover default">
+      <thead>
+        <tr>
+          <th># of Requests</th>
+          <th>Data Received</th>
+          <th>Data Sent</th>
+          <th>HTTP Host </th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows: %}
+        <tr>
+            <td data-title = "num_of_requests">
+              {{ row[1] }}
+            </td>
+            <td data-title = "ave_request_length">
+              {{ row[2] }}
+            </td>
+            <td data-title = "total_request_length">
+              {{ row[3] }}
+            </td>
+            <td data-title = "http_host">
+              <a href = "/http_host?q={{ row[0] }}">{{  row[0][0:150] }}</a>
+            </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div>
+
+<div style="width: 100%; display: inline-block; vertical-align: top">
+<h2>Table Options</h2>
+<p>
+  <label for="table-bordered">Style: bordered</label>
+  <select id="table-bordered" name="table-bordered">
+    <option selected value="" style="color: black">No</option>
+    <option value="table-bordered" style="color: black">Yes</option>
+  </select>
+</p>
+
+<p>
+  <label for="table-hover">Style: hover</label>
+  <select id="table-hover" name="table-hover">
+    <option value="" style="color: black">No</option>
+    <option selected value="table-hover" style="color: black">Yes</option>
+  </select>
+</p>
+
+</div>
+
+{% endblock %}

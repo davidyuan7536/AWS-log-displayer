@@ -1,0 +1,158 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta content="text/html; charset=iso-8859-1">
+  <title>Table</title>
+
+  <script src="../static/dashboard/dashboard.js"></script>
+
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+
+  <link rel="import" href="../static/bower_components/paper-button/paper-button.html">
+
+  <link rel="stylesheet" href="../static/bootstrap/dist/css/bootstrap.css" type="text/css"/>
+  <link rel="stylesheet" href="../static/bootstrap/dist/css/bootstrap-theme.min.css" type="text/css"/>
+
+  <link rel="stylesheet" href="../static/dashboard/dashboard.css">
+
+  <link rel="stylesheet" type="text/css" href="../static/bootstrap.css">
+  <link rel="stylesheet" href="../static/slick/slick.grid.css" type="text/css"/>
+  <link rel="stylesheet" href="../static/slick/controls/slick.pager.css" type="text/css"/>
+  <link rel="stylesheet" href="../static/lib/jquery-ui-1.8.16.custom.css" type="text/css"/>
+  <link rel="stylesheet" href="../static/slick/slick-table.css" type="text/css"/>
+  <link rel="stylesheet" href="../static/slick/controls/slick.columnpicker.css" type="text/css"/>
+  <link rel="stylesheet" href="../static/slick/plugins/slick.headermenu.css" type="text/css"/>
+  <link rel="stylesheet" href="../static/filter_form.css" type="text/css"/>
+  <link rel="stylesheet" href="../static/table.css" type="text/css"/>
+
+  <link rel="import" href="../static/header/header.html">
+  <link rel="import" href="../static/sidebar/sidebar.html">
+</head>
+<body>
+  <global-header></global-header>
+
+  <global-sidebar></global-sidebar>
+
+<section id="main-content">
+  <section class="wrapper2">
+
+    <div id = "mainContentHeader">
+      <div id = "toggleSideBarWrap" style="width:100%;">
+        <div style = "float: right; padding-top: 10px; padding-right: 10px; color: white">TABLE</div>
+        <!-- <span id = "toggleSideBar" class="glyphicon glyphicon-align-left" aria-hidden="true"></span> -->
+      </div>
+    </div>
+
+    <div style = "padding-top: 20px"></div>
+
+    <div style="position:relative">
+      <div id="table-container" style="width:100%;">
+        <div class="grid-header" style="width:100%">
+          <label>Log Records</label>
+          <span id="reset-table-button" style="float:right" class="ui-icon ui-icon-home" title="Reset Table"
+                onclick="LoadDefaultTable()"></span>
+          <span id="download-table-button" style="float:right" class="ui-icon ui-icon-arrowthickstop-1-s" title="Download Data"
+                onclick="downloadTable()"></span>
+          <span id="share-table-button" style="float:right" class="ui-icon ui-icon-extlink" title="Share Table"
+                onclick="generate_link()"></span>
+          <span id="save-column-button" style="float:right" class="ui-icon ui-icon-folder-collapsed" title="Save Column Schema"
+                onclick="SaveColumns()"></span>
+          <span id="open-schema-button" style="float:right" class="ui-icon ui-icon-folder-open" title="Load/Delete Schema"
+                onclick="LoadColumns()"></span>
+          <span id="toggle-filter-button" style="float:right" class="ui-icon ui-icon-tag" title="Filter Table"
+                onclick="toggleFilterRow()"></span>
+
+        </div>
+        <div id="myGrid" style="width:100%;height:540px;"></div>
+        <div id="pager" style="width:100%;height:20px;"></div>
+      </div>
+
+    </div>
+
+    <div id="inlineFilterPanel" style="width: 100%;"><!-- class="inline-filter-panel"> -->
+      <div id="FilterPanel">
+      </div>
+    </div>
+
+    <div class="options-panel" style="visibility:hidden;">
+      <b>Search:</b>
+      <hr/>
+      <div style="padding:6px;">
+        <label style="width:200px;float:left">Show tasks with % at least: </label>
+
+        <div style="padding:2px;">
+          <div style="width:100px;display:inline-block;" id="pcSlider"></div>
+        </div>
+        <br/>
+        <label style="width:200px;float:left">And title including:</label>
+        <input type=text id="txtSearch" style="width:100px;">
+        <br/><br/>
+        <button id="btnSelectRows">Select first 10 rows</button>
+        <br/>
+        <button type="button" class="btn btn-default" onclick="test_schema()">TEST</button>
+        <button type="button" class="btn btn-default" onclick="generate_link()">Share</button>
+      </div>
+    </div>
+
+    <form id="page_info" style="visibility: hidden;">
+      <input id="page_size" name="page_size" type = "hidden" value={{page_size}}>
+      <input id="page_number" name="page_number" type = "hidden" value={{page_number}}>
+      <input id="total_size" name="total_size" type = "hidden" value={{total_size}}>
+      <input id="total_page" name="total_page" type = "hidden" value={{total_page}}>
+      <input id="sortby" name="sortby" type = "hidden" value={{sortby}}>
+      <input id="order" name="order" type = "hidden" value={{order}}>
+    </form>
+    <div style="display:none;" id="columns">{{columns}}</div>
+
+  </section>
+</section>
+
+<script src="../static/lib/firebugx.js"></script>
+
+<script src="../static/lib/jquery-1.7.min.js"></script>
+<script src="../static/lib/jquery-ui-1.8.16.custom.min.js"></script>
+<script src="../static/lib/jquery.event.drag-2.2.js"></script>
+
+<script src="../static/slick/slick.core.js"></script>
+<script src="../static/slick/slick.formatters.js"></script>
+<script src="../static/slick/slick.editors.js"></script>
+<script src="../static/slick/plugins/slick.rowselectionmodel.js"></script>
+<script src="../static/slick/slick.grid.js"></script>
+<script src="../static/slick/slick.dataview.js"></script>
+<script src="../static/slick/controls/slick.pager.js"></script>
+<script src="../static/slick/controls/slick.columnpicker.js"></script>
+<script src="../static/slick/plugins/slick.autotooltips.js"></script>
+<script src="../static/slick/plugins/slick.headermenu.js"></script>
+
+<script src="../static/moment.min.js"></script>
+<script src="../static/jquery-1.11.3.min.js"></script>
+<script src="../static/bootstrap/dist/js/bootstrap.js"></script>
+<script src="../static/bootbox.min.js"></script>
+<script src="../static/store.min.js"></script>
+<script> $("#FilterPanel").load("templates/filter_form.html #filter-tags-div"); </script>
+<script src="../static/filter_form.js"></script>
+
+<script src="../static/table.js"></script>
+<script>
+  // flask jinja template only recognized in html
+  var display_time_format = {{display_time_format}};
+  var display_status_color = {% if display_status_color: %} true {%else: %} false {%endif%};
+
+  // ENUM
+  var time_format = {
+    RAW: 0,
+    UTC: 1,
+    UTC_NOTIMEZONE: 2,
+    LOCAL: 3,
+    LOCAL_NOTIMEZONE: 4
+  };
+
+  var filters = {
+    must: {},
+    mustNot: {},
+    should: {}
+  };
+</script>
+
+</body>
+</html>

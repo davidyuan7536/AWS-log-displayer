@@ -1,0 +1,11 @@
+api2.py handles all the server side functions. Most of the data processing is done on the front end and api2.py is simpled used to query elasticsearch.
+
+The site is secured with SSL wuth key and certificate located in my-key.pem and my-cert.pem.
+
+All of the backend methods use elastic search's python library. Documentation can be found at "http://elasticsearch-py.readthedocs.org/en/master/"
+
+api2 also logs every single api call (most api calls, the ones that I wrote. The ones that Ryan wrote are unlogged) under
+index="log_index" and doc_type = "user_action_log"
+
+All the amazon cloud access logs are stored under
+index="log_index", doc_type = "log"

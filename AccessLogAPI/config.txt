@@ -1,0 +1,10 @@
+{
+    "Comment" : "This File is used for python server constants setup",
+
+    "UPLOAD_FOLDER" : "/uploads",
+    "host_name" : "v-dev-ubusvr-1",
+    "db_name" : "cloud_access_logs",
+    "user_name" : "ryan.dai",
+    "password" : "ryan.dai",
+    "default_entries_per_page" : 15
+}

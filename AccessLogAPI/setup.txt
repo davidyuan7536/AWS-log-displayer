@@ -1,0 +1,9 @@
+Make sure python3.4 is installed
+
+Install Node and npm and Git if not already installed
+  Node and npm: https://nodejs.org/
+  Git: http://git-scm.com/
+
+Afterwards, run setup.py to install bower and all the bower components along with flask and sandman.
+
+Run the app through cmd with "python api.py"

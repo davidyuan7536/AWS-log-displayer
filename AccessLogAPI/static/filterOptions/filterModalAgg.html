@@ -1,0 +1,2392 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+
+
+<dom-module id="filter-modalAgg">
+
+<style>
+#addNestedAggregation{
+  cursor: pointer;
+}
+#removeNestedAggregation{
+  cursor: pointer;
+}
+</style>
+
+<template>
+
+
+
+  <!-- <div  class="state col-lg-12">
+  <div style = "background-color: #424242">
+  <paper-button type="button" on-tap = "openModal" style = "color:white">
+
+  <span class="glyphicon glyphicon-cog" style = "color:white"></span>
+
+  Filter
+  </paper-button>
+
+  </div>
+  </div>
+
+  <div id = "mainaggContainer" style = "background-color: white; height :400px;" class="state col-lg-12"></div> -->
+
+
+  <div   class="state col-lg-12">
+    <div style = "background-color: #424242">
+      <paper-button type="button" on-tap = "openModal" style = "color:white">
+
+        <span class="glyphicon glyphicon-cog" style = "color:white"></span>
+
+        Filter
+      </paper-button>
+
+      <paper-button type="button" on-tap = "deleteAgg" style = "color:white" >
+
+        <span class="glyphicon glyphicon-remove" style = "color:white"></span>
+
+        Delete
+      </paper-button>
+
+    </div>
+  </div>
+
+  <!-- <div class="state col-lg-12">
+  <div  id = "mainAggContainer"  style="min-width: 310px; height: 500px; margin: 0 auto"></div>
+  </div> -->
+
+  <div class="state col-lg-12">
+    <div id = "mainAggContainerInfo"  style = "background-color: white; height : 500px; overflow-y: auto; overflow-x : auto" class="col-md-6"></div>
+    <div id = "mainAggContainer" style = "background-color: white; height : 500px;" class="col-md-6"></div>
+  </div>
+
+
+
+  <div class="modal fade" id="aggFilterOptions" tabindex="-1" role="dialog" aria-labelledby="Table Options">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+
+        <div class="modal-header" style = "background-color: #424242">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" style = "color: white"><span aria-hidden="true" style = "color: white">&times;</span></button>
+          <h4 class="modal-title" style = "color: white">Aggregation Filter options</h4>
+        </div>
+
+
+        <ul class="nav nav-tabs" id="tabContent">
+          <li class="active"><a href="#aggFilterOptionsAnalytics" id = "modalTab1" data-toggle="tab">Analytic Options</a></li>
+          <li><a href="#aggFilterOptionsMust" id = "modalTab2" data-toggle="tab">Must</a></li>
+          <li><a href="#aggFilterOptionsMustNot" id = "modalTab3" data-toggle="tab">Must Not</a></li>
+          <li><a href="#aggFilterOptionsShould" id = "modalTab4" data-toggle="tab">Should</a></li>
+        </ul>
+
+        <!-- <ul class="nav nav-tabs" id="tabContent">
+        <li class="active"><a href="#" on-tap = "analyticOptionsTab">Analytic Options</a></li>
+        <li><a href="#" on-tap = "mustOptionsTab">Must</a></li>
+        <li><a href="#" on-tap = "mustNotOptionsTab">Must Not</a></li>
+        <li><a href="#" on-tap = "shouldOptionsTab">Should</a></li>
+        </ul> -->
+
+        <div class="tab-content">
+
+
+
+
+
+          <div class="tab-pane" id="aggFilterOptionsMust">
+
+            <div style = "padding-top: 10px; padding-bottom: 10px">
+              <a href="#">
+                <span id = "addFilterOptionsMust" class="glyphicon glyphicon-plus" style = "padding-left: 5px"></span>
+              </a>
+            </div>
+
+            <input id="mustUniqueCounter" type = "hidden" value="2">
+
+            <!-- <input id="currentLastDisplayedFilterMust" type = "hidden" value="1"> -->
+
+            <div id = "mustFilterOptionsGrouping">
+              <dataFilter-optionsMust id = "dataFilterOptionsMust1" unique-id = "1"></dataFilter-optionsMust>
+            </div>
+
+
+
+          </div>
+
+
+
+
+          <div class="tab-pane" id="aggFilterOptionsMustNot">
+
+            <div style = "padding-top: 10px; padding-bottom: 10px">
+              <a href="#">
+                <span id = "addFilterOptionsMustNot" class="glyphicon glyphicon-plus" style = "padding-left: 5px"></span>
+              </a>
+            </div>
+
+            <input id="MustNotUniqueCounter" type = "hidden" value="2">
+
+            <!-- <input id="currentLastDisplayedFilterMustNot" type = "hidden" value="1"> -->
+
+            <div id = "MustNotFilterOptionsGrouping">
+              <dataFilter-optionsMustNot id = "dataFilterOptionsMustNot1" unique-id = "1"></dataFilter-optionsMustNot>
+            </div>
+
+
+
+          </div>
+
+
+
+
+          <div class="tab-pane" id="aggFilterOptionsShould">
+
+            <div style = "padding-top: 10px; padding-bottom: 10px">
+              <a href="#">
+                <span id = "addFilterOptionsShould" class="glyphicon glyphicon-plus" style = "padding-left: 5px"></span>
+              </a>
+            </div>
+
+            <input id="ShouldUniqueCounter" type = "hidden" value="2">
+
+            <!-- <input id="currentLastDisplayedFilterShould" type = "hidden" value="1"> -->
+
+            <div id = "ShouldFilterOptionsGrouping">
+              <dataFilter-optionsShould id = "dataFilterOptionsShould1" unique-id = "1"></dataFilter-optionsShould>
+            </div>
+
+
+
+          </div>
+
+
+
+
+
+
+
+
+          <div class="tab-pane active" id="aggFilterOptionsAnalytics">
+            <div style = "padding-top: 10px; padding-bottom: 10px">
+            </div>
+
+
+            <div class="form-group" style = "padding: 2px 5px" id = "aggFieldAnalyzed1">
+              <label  style = "color: black; font-size: 20px">Aggregation Field</label>
+              <select class="form-control" id = "aggFieldAnalyzed1Select">
+                <option id = "aggFieldAnalyzed1RemoteAddr" selected="selected">IP Address</option>
+                <option id = "aggFieldAnalyzed1Time">Time</option>
+                <option id = "aggFieldAnalyzed1RequestTime">Time Elapsed</option>
+                <option id = "aggFieldAnalyzed1RequestUri">Request URI</option>
+                <option id = "aggFieldAnalyzed1RequestMethod">Request Method</option>
+                <option id = "aggFieldAnalyzed1Status">Status Code</option>
+                <option id = "aggFieldAnalyzed1BytesReceived">Request Length</option>
+                <option id = "aggFieldAnalyzed1BodyBytesSent">Body Bytes Sent</option>
+                <option id = "aggFieldAnalyzed1BytesSent">Bytes Sent</option>
+                <option id = "aggFieldAnalyzed1HttpHost">Host</option>
+                <option id = "aggFieldAnalyzed1HttpReferer">Referer</option>
+                <option id = "aggFieldAnalyzed1HttpUserAgent">User Agent</option>
+              </select>
+            </div>
+
+            <div class="form-group" style = "padding: 2px 5px" id = "aggFieldAnalyzed1Type">
+              <label  style = "color: black; font-size: 20px">Analytic Type</label>
+              <select class="form-control" id = "aggFieldAnalyzed1TypeSelect">
+                <option id = "aggFieldAnalyzed1TypeTerms" selected="selected">Terms</option>
+                <option id = "aggFieldAnalyzed1TypeStats" disabled>Stats</option>
+              </select>
+            </div>
+
+            <div class="form-group" style = "padding: 2px 5px" id = "aggFieldAnalyzed1Size">
+              <label  style = "color: black; font-size: 20px">Maximum Aggregation Size</label>
+              <input class="form-control" id="aggFieldAnalyzed1SizeInput" placeholder="integer value (defaults to 10 if left blank)" value="" disabled>
+            </div>
+
+            <div class="form-group" style = "padding: 2px 5px; display: none" id = "addNestedAggregation">
+              <div>
+                <span id = "addNestedAggregationButton" class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span> Add Nested Aggregation
+              </div>
+            </div>
+
+            <div class="form-group" style = "padding: 2px 5px; display: none" id = "removeNestedAggregation">
+              <div>
+                <span id = "renoveNestedAggregationButton" class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span> Remove Nested Aggregation
+              </div>
+            </div>
+
+            <div id = "nestedAggregationWrap" style = "display: none">
+
+              <div class="form-group" style = "padding: 2px 5px" id = "aggFieldAnalyzed2">
+                <label  style = "color: black; font-size: 20px">Nested Aggregation Field</label>
+                <select class="form-control" id = "aggFieldAnalyzed2Select">
+                  <option id = "aggFieldAnalyzed2DefaultSelected" selected="selected"></option>
+                  <option id = "aggFieldAnalyzed2RemoteAddr">IP Address</option>
+                  <option id = "aggFieldAnalyzed2Time">Time</option>
+                  <option id = "aggFieldAnalyzed2RequestTime">Time Elapsed</option>
+                  <option id = "aggFieldAnalyzed2RequestUri">Request URI</option>
+                  <option id = "aggFieldAnalyzed2RequestMethod">Request Method</option>
+                  <option id = "aggFieldAnalyzed2Status">Status Code</option>
+                  <option id = "aggFieldAnalyzed2BytesReceived">Request Length</option>
+                  <option id = "aggFieldAnalyzed2BodyBytesSent">Body Bytes Sent</option>
+                  <option id = "aggFieldAnalyzed2BytesSent">Bytes Sent</option>
+                  <option id = "aggFieldAnalyzed2HttpHost">Host</option>
+                  <option id = "aggFieldAnalyzed2HttpReferer">Referer</option>
+                  <option id = "aggFieldAnalyzed2HttpUserAgent">User Agent</option>
+                </select>
+              </div>
+
+              <div class="form-group" style = "padding: 2px 5px" id = "aggFieldAnalyzed2Type">
+                <label  style = "color: black; font-size: 20px">Analytic Type</label>
+                <select class="form-control" id = "aggFieldAnalyzed2TypeSelect">
+                  <option id = "aggFieldAnalyzed2TypeDefaultSelected" selected="selected"></option>
+                  <option id = "aggFieldAnalyzed2TypeTerm">Terms</option>
+                  <option id = "aggFieldAnalyzed2TypeStats"  disabled>Stats</option>
+                </select>
+              </div>
+
+              <div class="form-group" style = "padding: 2px 5px" id = "aggFieldAnalyzed2Size">
+                <label  style = "color: black; font-size: 20px">Maximum Aggregation Size</label>
+                <input class="form-control" id="aggFieldAnalyzed2SizeInput" placeholder="integer value (defaults to 10 if left blank)" value=""  disabled>
+              </div>
+
+            </div>
+
+
+
+          </div>
+
+          <div class="modal-footer">
+
+            <paper-button id = "aggFilterOptionsClose" class="secondary" data-dismiss="modal">Close</paper-button>
+            <paper-button id = "aggFilterOptionsSubmit" class="secondary" data-dismiss="modal" on-tap = "submitFunction">Submit</paper-button>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</template>
+
+<script>
+
+Polymer({
+  is: "filter-modalAgg",
+
+  ready: function(){
+
+
+
+
+
+
+
+
+    mustData = [];
+    mustNotData = [];
+    shouldData = [];
+
+    this.displayagg(this.aggField1, this.aggType1, this.aggSize1, this.aggField2, this.aggType2, this.aggSize2, mustData, mustNotData, shouldData);
+    this.intializeModal(this.aggField1, this.aggType1, this.aggSize1, this.aggField2, this.aggType2, this.aggSize2);
+
+    var aggField1 = this.$.aggFieldAnalyzed1Select;
+    var aggType1 = this.$.aggFieldAnalyzed1TypeSelect;
+    var aggSize1 = this.$.aggFieldAnalyzed1SizeInput;
+
+    var aggField2 = this.$.aggFieldAnalyzed2Select;
+    var aggType2 = this.$.aggFieldAnalyzed2TypeSelect;
+    var aggSize2 = this.$.aggFieldAnalyzed2SizeInput;
+
+    var aggFieldAnalyzed1TypeStats = this.$.aggFieldAnalyzed1TypeStats;
+    var aggFieldAnalyzed1SizeInput = this.$.aggFieldAnalyzed1SizeInput;
+
+    var addNestedAggregation = this.$.addNestedAggregation;
+    var removeNestedAggregation = this.$.removeNestedAggregation;
+
+    var nestedAggregationWrap = this.$.nestedAggregationWrap;
+    var aggFieldAnalyzed2TypeStats = this.$.aggFieldAnalyzed2TypeStats;
+    var aggFieldAnalyzed2SizeInput = this.$.aggFieldAnalyzed2SizeInput;
+
+
+
+    var aggField1Text = aggField1.options[aggField1.selectedIndex].text;
+    if(aggField1Text == "Request Length" || aggField1Text == "Body Bytes Sent" || aggField1Text == "Bytes Sent" || aggField1Text == "Time Elapsed"){
+      $(aggFieldAnalyzed1TypeStats).removeAttr("disabled");
+    }
+    else{
+      $(aggFieldAnalyzed1TypeStats).attr("disabled", "disabled");
+    }
+
+    var aggType1Text = aggType1.options[aggType1.selectedIndex].text;
+    if (aggType1Text == "Terms"){
+      $(addNestedAggregation).show();
+      $(aggFieldAnalyzed1SizeInput).removeAttr("disabled");
+    }
+    else{
+      $(addNestedAggregation).hide();
+      $(aggFieldAnalyzed1SizeInput).attr("disabled", "disabled");
+      $(aggFieldAnalyzed1SizeInput).removeAttr("placeholder");
+    }
+
+
+    var aggField2Text = aggField2.options[aggField2.selectedIndex].text;
+
+    if(aggField2Text != ""){
+      $(nestedAggregationWrap).show();
+      if(aggField2Text == "Request Length" || aggField2Text == "Body Bytes Sent" || aggField2Text == "Bytes Sent" || aggField2Text == "Time Elapsed"){
+        $(aggFieldAnalyzed2TypeStats).removeAttr("disabled");
+      }
+      else{
+        $(aggFieldAnalyzed2TypeStats).attr("disabled", "disabled");
+      }
+    }
+
+    var aggType2Text = aggType2.options[aggType2.selectedIndex].text;
+    if (aggType2Text == "Terms"){
+      $(addNestedAggregation).hide();
+      $(removeNestedAggregation).show();
+      $(aggFieldAnalyzed2SizeInput).removeAttr("disabled");
+    }
+    else{
+      $(addNestedAggregation).hide();
+      $(removeNestedAggregation).show();
+      $(aggFieldAnalyzed2SizeInput).attr("disabled", "disabled");
+      $(aggFieldAnalyzed2SizeInput).removeAttr("placeholder");
+    }
+
+
+
+
+
+
+
+    $(aggField1).change(function(){
+      $(removeNestedAggregation).hide();
+      $(addNestedAggregation).hide();
+      $(nestedAggregationWrap).hide('slow');
+      aggField2.selectedIndex = 0;
+      aggType2.selectedIndex = 0;
+      $(aggSize2).val("");
+      $(aggSize1).val("");
+      var aggField1Text = aggField1.options[aggField1.selectedIndex].text;
+      if(aggField1Text == "Request Length" || aggField1Text == "Body Bytes Sent" || aggField1Text == "Bytes Sent" || aggField1Text == "Time Elapsed"){
+        $(aggFieldAnalyzed1TypeStats).removeAttr("disabled");
+        var aggType1Text = aggType1.options[aggType1.selectedIndex].text;
+        if(aggType1Text == "Terms"){
+          $(addNestedAggregation).show();
+          $(aggFieldAnalyzed1SizeInput).attr("placeholder", "integer value (defaults to 10 if left blank)");
+        }
+      }
+      else{
+        var aggType1Text = aggType1.options[aggType1.selectedIndex].text;
+        if(aggType1Text == "Stats"){
+          aggType1.selectedIndex = 0;
+          changeAggType1();
+          $(addNestedAggregation).show();
+        }
+        $(aggFieldAnalyzed1TypeStats).attr("disabled", "disabled");
+        $(addNestedAggregation).show();
+      }
+    });
+
+    $(aggType1).change(changeAggType1);
+
+    function changeAggType1(){
+      var aggType1Text = aggType1.options[aggType1.selectedIndex].text;
+      if(aggType1Text == "Terms"){
+        $(removeNestedAggregation).hide();
+        $(addNestedAggregation).show('fast');
+        $(aggFieldAnalyzed1SizeInput).removeAttr("disabled");
+        $(aggFieldAnalyzed1SizeInput).val("");
+        $(aggFieldAnalyzed1SizeInput).attr("placeholder", "integer value (defaults to 10 if left blank)");
+        $(nestedAggregationWrap).hide('slow');
+        aggField2.selectedIndex = 0;
+        aggType2.selectedIndex = 0;
+        $(aggSize2).val("");
+      }
+      else{
+        $(removeNestedAggregation).hide();
+        $(addNestedAggregation).hide('fast');
+        $(aggFieldAnalyzed1SizeInput).attr("disabled", "disabled");
+        $(aggFieldAnalyzed1SizeInput).val("");
+        $(aggFieldAnalyzed1SizeInput).removeAttr("placeholder");
+        $(nestedAggregationWrap).hide('slow');
+        aggField2.selectedIndex = 0;
+        aggType2.selectedIndex = 0;
+        $(aggSize2).val("");
+      }
+    };
+
+    $(addNestedAggregation).click(function(){
+      aggField2.selectedIndex = 0;
+      aggType2.selectedIndex = 0;
+      $(aggSize2).val("");
+      $(removeNestedAggregation).show();
+      $(addNestedAggregation).hide();
+      $(nestedAggregationWrap).show('slow');
+    });
+
+    $(removeNestedAggregation).click(function(){
+      $(removeNestedAggregation).hide();
+      $(addNestedAggregation).show();
+      $(nestedAggregationWrap).hide('slow');
+      aggField2.selectedIndex = 0;
+      aggType2.selectedIndex = 0;
+      $(aggSize2).val("");
+    });
+
+
+    $(aggField2).change(function(){
+      $(aggSize2).val("");
+      var aggField2Text = aggField2.options[aggField2.selectedIndex].text;
+      if(aggField2Text == ""){
+        aggType2.selectedIndex = 0;
+        $(aggFieldAnalyzed2TypeStats).attr("disabled", "disabled");
+        changeAggType2();
+      }
+      else if(aggField2Text == "Request Length" || aggField2Text == "Body Bytes Sent" || aggField2Text == "Bytes Sent" || aggField2Text == "Time Elapsed"){
+        $(aggFieldAnalyzed2TypeStats).removeAttr("disabled");
+        var aggType2Text = aggType2.options[aggType2.selectedIndex].text;
+        if(aggType2Text == "Terms"){
+          $(aggFieldAnalyzed2SizeInput).attr("placeholder", "integer value (defaults to 10 if left blank)");
+        }
+      }
+      else{
+        var aggType2Text = aggType2.options[aggType2.selectedIndex].text;
+        if(aggType2Text == "Stats"){
+          aggType2.selectedIndex = 1;
+          changeAggType2();
+        }
+        $(aggFieldAnalyzed2TypeStats).attr("disabled", "disabled");
+      }
+    });
+
+    $(aggType2).change(changeAggType2);
+
+    function changeAggType2(){
+      var aggType2Text = aggType2.options[aggType2.selectedIndex].text;
+      if(aggType2Text == ""){
+        $(aggFieldAnalyzed2SizeInput).attr("disabled", "disabled");
+        $(aggFieldAnalyzed2SizeInput).val("");
+        $(aggFieldAnalyzed2SizeInput).removeAttr("placeholder");
+      }
+      else if(aggType2Text == "Terms"){
+        $(aggFieldAnalyzed2SizeInput).removeAttr("disabled");
+        $(aggFieldAnalyzed2SizeInput).val("");
+        $(aggFieldAnalyzed2SizeInput).attr("placeholder", "integer value (defaults to 10 if left blank)");
+
+      }
+      else{
+        $(aggFieldAnalyzed2SizeInput).attr("disabled", "disabled");
+        $(aggFieldAnalyzed2SizeInput).val("");
+        $(aggFieldAnalyzed2SizeInput).removeAttr("placeholder");
+      }
+    };
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    //FILTER MODAL///////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    var addFilterOptionsMust = this.$.addFilterOptionsMust;
+    var mustFilterOptionsGrouping = this.$.mustFilterOptionsGrouping;
+    var mustUniqueCounter = this.$.mustUniqueCounter
+
+    $(addFilterOptionsMust).click(function(){
+
+      // var x = $(".mustUniqueCounterHiddenFlag");
+      // var mustUniqueCounter = this.$.mustUniqueCounter;
+      // if($(mustUniqueCounter).val() >= 26 && x.length == 0){
+      //   alert("Maximum Filter Options Reached!")
+      // }
+      // else if(x.length != 0){
+      //   var temp = $(x[0]).val();
+      //   var currentLastDisplayedFilterMust = this.$.currentLastDisplayedFilterMust;
+      //   var temp2 = $(currentLastDisplayedFilterMust).val();
+      //   // var temp2 = parseInt($('#mustUniqueCounter').val(), 10) - 1;
+      //   $('dataFilter-optionsMust[unique-id = "' + temp +'"]').insertAfter($('dataFilter-optionsMust[unique-id = "' + temp2 +'"]'));
+      //   $('dataFilter-optionsMust[unique-id = "' + temp +'"]').show();
+      //   var temp3 = "#mustFilterByOnChangeWrap" + temp;
+      //   $(temp3).show()
+      //   $('#currentLastDisplayedFilterMust').val(temp);
+      //   $(x[0]).remove();
+      // }
+      // else{
+      //   $('dataFilter-optionsMust[unique-id = "' + $('#mustUniqueCounter').val() +'"]').show("slow");
+      //   var adder = $('#mustUniqueCounter').val();
+      //   adder = parseInt(adder, 10) + 1;
+      //   $('#mustUniqueCounter').val(adder);
+      //   $('#currentLastDisplayedFilterMust').val(parseInt(adder, 10) - 1);
+      // }
+
+      var dynamicEl = document.createElement("dataFilter-optionsMust");
+      var idName = "dataFilterOptionsMust" + $(mustUniqueCounter).val();
+      dynamicEl.setAttribute("unique-id", $(mustUniqueCounter).val());
+      dynamicEl.setAttribute("id", idName);
+      $(mustFilterOptionsGrouping).append(dynamicEl);
+      $(mustUniqueCounter).val(parseInt($(mustUniqueCounter).val()) + 1);
+
+    });
+
+
+    var addFilterOptionsMustNot = this.$.addFilterOptionsMustNot;
+    var MustNotFilterOptionsGrouping = this.$.MustNotFilterOptionsGrouping;
+    var MustNotUniqueCounter = this.$.MustNotUniqueCounter
+
+    $(addFilterOptionsMustNot).click(function(){
+
+      // var x = $(".MustNotUniqueCounterHiddenFlag");
+      // var MustNotUniqueCounter = this.$.MustNotUniqueCounter;
+      // if($(MustNotUniqueCounter).val() >= 26 && x.length == 0){
+      //   alert("Maximum Filter Options Reached!")
+      // }
+      // else if(x.length != 0){
+      //   var temp = $(x[0]).val();
+      //   var currentLastDisplayedFilterMustNot = this.$.currentLastDisplayedFilterMustNot;
+      //   var temp2 = $(currentLastDisplayedFilterMustNot).val();
+      //   // var temp2 = parseInt($('#MustNotUniqueCounter').val(), 10) - 1;
+      //   $('dataFilter-optionsMustNot[unique-id = "' + temp +'"]').insertAfter($('dataFilter-optionsMustNot[unique-id = "' + temp2 +'"]'));
+      //   $('dataFilter-optionsMustNot[unique-id = "' + temp +'"]').show();
+      //   var temp3 = "#MustNotFilterByOnChangeWrap" + temp;
+      //   $(temp3).show()
+      //   $('#currentLastDisplayedFilterMustNot').val(temp);
+      //   $(x[0]).remove();
+      // }
+      // else{
+      //   $('dataFilter-optionsMustNot[unique-id = "' + $('#MustNotUniqueCounter').val() +'"]').show("slow");
+      //   var adder = $('#MustNotUniqueCounter').val();
+      //   adder = parseInt(adder, 10) + 1;
+      //   $('#MustNotUniqueCounter').val(adder);
+      //   $('#currentLastDisplayedFilterMustNot').val(parseInt(adder, 10) - 1);
+      // }
+
+      var dynamicEl = document.createElement("dataFilter-optionsMustNot");
+      var idName = "dataFilterOptionsMustNot" + $(MustNotUniqueCounter).val();
+      dynamicEl.setAttribute("unique-id", $(MustNotUniqueCounter).val());
+      dynamicEl.setAttribute("id", idName);
+      $(MustNotFilterOptionsGrouping).append(dynamicEl);
+      $(MustNotUniqueCounter).val(parseInt($(MustNotUniqueCounter).val()) + 1);
+
+    });
+
+
+    var addFilterOptionsShould = this.$.addFilterOptionsShould;
+    var ShouldFilterOptionsGrouping = this.$.ShouldFilterOptionsGrouping;
+    var ShouldUniqueCounter = this.$.ShouldUniqueCounter
+
+    $(addFilterOptionsShould).click(function(){
+
+      // var x = $(".ShouldUniqueCounterHiddenFlag");
+      // var ShouldUniqueCounter = this.$.ShouldUniqueCounter;
+      // if($(ShouldUniqueCounter).val() >= 26 && x.length == 0){
+      //   alert("Maximum Filter Options Reached!")
+      // }
+      // else if(x.length != 0){
+      //   var temp = $(x[0]).val();
+      //   var currentLastDisplayedFilterShould = this.$.currentLastDisplayedFilterShould;
+      //   var temp2 = $(currentLastDisplayedFilterShould).val();
+      //   // var temp2 = parseInt($('#ShouldUniqueCounter').val(), 10) - 1;
+      //   $('dataFilter-optionsShould[unique-id = "' + temp +'"]').insertAfter($('dataFilter-optionsShould[unique-id = "' + temp2 +'"]'));
+      //   $('dataFilter-optionsShould[unique-id = "' + temp +'"]').show();
+      //   var temp3 = "#ShouldFilterByOnChangeWrap" + temp;
+      //   $(temp3).show()
+      //   $('#currentLastDisplayedFilterShould').val(temp);
+      //   $(x[0]).remove();
+      // }
+      // else{
+      //   $('dataFilter-optionsShould[unique-id = "' + $('#ShouldUniqueCounter').val() +'"]').show("slow");
+      //   var adder = $('#ShouldUniqueCounter').val();
+      //   adder = parseInt(adder, 10) + 1;
+      //   $('#ShouldUniqueCounter').val(adder);
+      //   $('#currentLastDisplayedFilterShould').val(parseInt(adder, 10) - 1);
+      // }
+
+      var dynamicEl = document.createElement("dataFilter-optionsShould");
+      var idName = "dataFilterOptionsShould" + $(ShouldUniqueCounter).val();
+      dynamicEl.setAttribute("unique-id", $(ShouldUniqueCounter).val());
+      dynamicEl.setAttribute("id", idName);
+      $(ShouldFilterOptionsGrouping).append(dynamicEl);
+      $(ShouldUniqueCounter).val(parseInt($(ShouldUniqueCounter).val()) + 1);
+
+    });
+
+
+
+
+
+    // var mustUniqueCounter = this.$.mustUniqueCounter
+
+  },
+
+  submitFunction: function(e){
+
+    mustData = [];
+    mustNotData = [];
+    shouldData = [];
+
+
+
+    var mustUniqueCounter = this.$.mustUniqueCounter;
+    for(var i = 0; i < parseInt($(mustUniqueCounter).val(), 10) - 1; i++){
+      // var x = this.$$('#dataFilterOptionsMust' + i)
+      // var uid = $(x[i]).attr("unique-id");
+
+      var uid = parseInt(i, 10)+1;
+
+      var aggFilterOptionsSubmit = this.$.aggFilterOptionsSubmit;
+
+
+
+      var temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterByOnchange' + uid);
+      var mustFilterByValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterTypeOnchange' + uid);
+      var mustFilterTypeValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterTerm' + uid);
+      var mustFilterTermValue = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeLower' + uid);
+      var mustFilterRangeLower = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeUpper' + uid);
+      var mustFilterRangeUpper = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeLowerTime' + uid);
+      var mustFilterRangeLowerTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeUpperTime' + uid);
+      var mustFilterRangeUpperTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeLowerTimeOperation' + uid);
+      var mustFilterRangeLowerTimeOperation = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMust' + uid).$$('#mustFilterRangeUpperTimeOperation' + uid);
+      var mustFilterRangeUpperTimeOperation = $(temp).val();
+
+      var mustPartialMatchCheckboxHandler = this.$$('#dataFilterOptionsMust' + uid).$$('#mustCheckboxValue' + uid);
+      var mustRegexMatchCheckboxHandler = this.$$('#dataFilterOptionsMust' + uid).$$('#mustRegexCheckboxValue' + uid);
+
+
+      if(mustFilterByValue != ""){
+        if(mustFilterTypeValue != ""){
+          if(mustFilterTypeValue == "Term"){
+            if(mustFilterTermValue != ""){
+              if(mustFilterByValue == "IP Address"){
+                mustData.splice(0, 0, { "term" : { "remote_addr" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Time"){
+                mustData.splice(0, 0, { "term" : { "time_iso8601" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Time Elapsed"){
+                mustData.splice(0, 0, { "term" : { "request_time" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Request URI"){
+
+                if($(mustPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = mustFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustData.splice(0, 0, { "query" : { "wildcard" : { "request_uri" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(mustRegexMatchCheckboxHandler).val() == 1){
+                  mustData.splice(0, 0, { "regexp" : { "request_uri" : mustFilterTermValue }})
+                }
+                else{
+                  mustData.splice(0, 0, { "term" : { "request_uri" : mustFilterTermValue }});
+                }
+              }
+              if(mustFilterByValue == "Request Method"){
+                mustFilterTermValue = mustFilterTermValue.toLowerCase();
+                mustData.splice(0, 0, { "term" : { "request_method" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Status Code"){
+                mustData.splice(0, 0, { "term" : { "status" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Request Length"){
+                mustData.splice(0, 0, { "term" : { "bytes_received" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Body Bytes Sent"){
+                mustData.splice(0, 0, { "term" : { "body_bytes_sent" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Bytes Sent"){
+                mustData.splice(0, 0, { "term" : { "bytes_sent" : mustFilterTermValue }});
+              }
+              if(mustFilterByValue == "Host"){
+                if($(mustPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = mustFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustData.splice(0, 0, { "query": { "wildcard" : { "http_host" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(mustRegexMatchCheckboxHandler).val() == 1){
+                  mustData.splice(0, 0, { "regexp" : { "http_host" : mustFilterTermValue }})
+                }
+                else{
+                  mustData.splice(0, 0, { "term" : { "http_host" : mustFilterTermValue }});
+                }
+              }
+              if(mustFilterByValue == "Referer"){
+                if($(mustPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = mustFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustData.splice(0, 0, { "query" : { "wildcard" : { "http_referer" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(mustRegexMatchCheckboxHandler).val() == 1){
+                  mustData.splice(0, 0, { "regexp" : { "http_referer" : mustFilterTermValue }})
+                }
+                else{
+                  mustData.splice(0, 0, { "term" : { "http_referer" : mustFilterTermValue }});
+                }
+              }
+              if(mustFilterByValue == "User Agent"){
+                if($(mustPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = mustFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = stringSplit[xReg].toLowerCase();
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustData.splice(0, 0, { "query" : { "wildcard" : { "http_agent" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(mustRegexMatchCheckboxHandler).val() == 1){
+                  mustData.splice(0, 0, { "regexp" : { "http_agent" : mustFilterTermValue }})
+                }
+                else{
+                  mustData.splice(0, 0, { "term" : { "http_agent" : mustFilterTermValue }});
+                }
+              }
+            }
+          }
+
+          if(mustFilterTypeValue == "Range"){
+            if((mustFilterRangeLower != "" && mustFilterRangeLower != "") || mustFilterByValue == "Time"){
+              if(mustFilterByValue == "IP Address"){
+                mustData.splice(0, 0, {"range" : {"remote_addr" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Time"){
+
+                if(mustFilterRangeLowerTime != "" && mustFilterRangeUpperTime != ""){
+                  if(mustFilterRangeUpperTimeOperation != "" && mustFilterRangeLowerTimeOperation != ""){
+                    mustFilterRangeUpperTime = mustFilterRangeUpperTime.replace(/ /g , "T");
+                    mustFilterRangeLowerTime = mustFilterRangeLowerTime.replace(/ /g , "T");
+                    mustFilterRangeUpperTimeOperation = mustFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    mustFilterRangeLowerTimeOperation = mustFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = mustFilterRangeUpperTime + "||" + mustFilterRangeUpperTimeOperation;
+                    var lowerTime = mustFilterRangeLowerTime + "||" + mustFilterRangeLowerTimeOperation;
+                    mustData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(mustFilterRangeUpperTimeOperation != "" && mustFilterRangeLowerTimeOperation == ""){
+                    mustFilterRangeUpperTime = mustFilterRangeUpperTime.replace(/ /g , "T");
+                    mustFilterRangeLowerTime = mustFilterRangeLowerTime.replace(/ /g , "T");
+                    mustFilterRangeUpperTimeOperation = mustFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = mustFilterRangeUpperTime + "||" + mustFilterRangeUpperTimeOperation;
+                    var lowerTime = mustFilterRangeLowerTime;
+                    mustData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(mustFilterRangeUpperTimeOperation == "" && mustFilterRangeLowerTimeOperation != ""){
+                    mustFilterRangeUpperTime = mustFilterRangeUpperTime.replace(/ /g , "T");
+                    mustFilterRangeLowerTime = mustFilterRangeLowerTime.replace(/ /g , "T");
+                    mustFilterRangeLowerTimeOperation = mustFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = mustFilterRangeUpperTime;
+                    var lowerTime = mustFilterRangeLowerTime + "||" + mustFilterRangeLowerTimeOperation;
+                    mustData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(mustFilterRangeUpperTimeOperation == "" && mustFilterRangeLowerTimeOperation == ""){
+                    mustFilterRangeUpperTime = mustFilterRangeUpperTime.replace(/ /g , "T");
+                    mustFilterRangeLowerTime = mustFilterRangeLowerTime.replace(/ /g , "T");
+                    var upperTime = mustFilterRangeUpperTime;
+                    var lowerTime = mustFilterRangeLowerTime;
+                    mustData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                }
+              }
+              if(mustFilterByValue == "Time Elapsed"){
+                mustData.splice(0, 0, {"range" : {"request_time" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Request URI"){
+                mustData.splice(0, 0, {"range" : {"request_uri" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Request Method"){
+                mustData.splice(0, 0, {"range" : {"request_method" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Status Code"){
+                mustData.splice(0, 0, {"range" : {"status" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Request Length"){
+                mustData.splice(0, 0, {"range" : {"bytes_received" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Body Bytes Sent"){
+                mustData.splice(0, 0, {"range" : {"body_bytes_sent" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Bytes Sent"){
+                mustData.splice(0, 0, {"range" : {"bytes_sent" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Host"){
+                mustData.splice(0, 0, {"range" : {"http_host" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "Referer"){
+                mustData.splice(0, 0, {"range" : {"http_referer" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+              if(mustFilterByValue == "User Agent"){
+                mustData.splice(0, 0, {"range" : {"http_agent" : {"gte" : ""+mustFilterRangeLower+"", "lte" : ""+mustFilterRangeUpper+""}}});
+              }
+            }
+          }
+        }
+      }
+    }
+
+
+
+    var MustNotUniqueCounter = this.$.MustNotUniqueCounter;
+    for(var i = 0; i < parseInt($(MustNotUniqueCounter).val(), 10) - 1; i++){
+      // var x = this.$$('#dataFilterOptionsMustNot' + i)
+      // var uid = $(x[i]).attr("unique-id");
+
+      var uid = parseInt(i, 10)+1;
+
+      var aggFilterOptionsSubmit = this.$.aggFilterOptionsSubmit;
+
+      var temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterByOnchange' + uid);
+      var MustNotFilterByValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterTypeOnchange' + uid);
+      var MustNotFilterTypeValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterTerm' + uid);
+      var MustNotFilterTermValue = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeLower' + uid);
+      var MustNotFilterRangeLower = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeUpper' + uid);
+      var MustNotFilterRangeUpper = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeLowerTime' + uid);
+      var MustNotFilterRangeLowerTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeUpperTime' + uid);
+      var MustNotFilterRangeUpperTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeLowerTimeOperation' + uid);
+      var MustNotFilterRangeLowerTimeOperation = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotFilterRangeUpperTimeOperation' + uid);
+      var MustNotFilterRangeUpperTimeOperation = $(temp).val();
+
+      var MustNotPartialMatchCheckboxHandler = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotCheckboxValue' + uid);
+      var MustNotRegexMatchCheckboxHandler = this.$$('#dataFilterOptionsMustNot' + uid).$$('#MustNotRegexCheckboxValue' + uid);
+
+
+      if(MustNotFilterByValue != ""){
+        if(MustNotFilterTypeValue != ""){
+          if(MustNotFilterTypeValue == "Term"){
+            if(MustNotFilterTermValue != ""){
+              if(MustNotFilterByValue == "IP Address"){
+                mustNotData.splice(0, 0, { "term" : { "remote_addr" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Time"){
+                mustNotData.splice(0, 0, { "term" : { "time_iso8601" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Time Elapsed"){
+                mustNotData.splice(0, 0, { "term" : { "request_time" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Request URI"){
+
+                if($(MustNotPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = MustNotFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustNotData.splice(0, 0, { "query" : { "wildcard" : { "request_uri" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(MustNotRegexMatchCheckboxHandler).val() == 1){
+                  mustNotData.splice(0, 0, { "regexp" : { "request_uri" : MustNotFilterTermValue }})
+                }
+                else{
+                  mustNotData.splice(0, 0, { "term" : { "request_uri" : MustNotFilterTermValue }});
+                }
+              }
+              if(MustNotFilterByValue == "Request Method"){
+                MustNotFilterTermValue = MustNotFilterTermValue.toLowerCase();
+                mustNotData.splice(0, 0, { "term" : { "request_method" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Status Code"){
+                mustNotData.splice(0, 0, { "term" : { "status" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Request Length"){
+                mustNotData.splice(0, 0, { "term" : { "bytes_received" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Body Bytes Sent"){
+                mustNotData.splice(0, 0, { "term" : { "body_bytes_sent" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Bytes Sent"){
+                mustNotData.splice(0, 0, { "term" : { "bytes_sent" : MustNotFilterTermValue }});
+              }
+              if(MustNotFilterByValue == "Host"){
+                if($(MustNotPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = MustNotFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustNotData.splice(0, 0, { "query" : { "wildcard" : { "http_host" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(MustNotRegexMatchCheckboxHandler).val() == 1){
+                  mustNotData.splice(0, 0, { "regexp" : { "http_host" : MustNotFilterTermValue }})
+                }
+                else{
+                  mustNotData.splice(0, 0, { "term" : { "http_host" : MustNotFilterTermValue }});
+                }
+              }
+              if(MustNotFilterByValue == "Referer"){
+                if($(MustNotPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = MustNotFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustNotData.splice(0, 0, { "query" : { "wildcard" : { "http_referer" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(MustNotRegexMatchCheckboxHandler).val() == 1){
+                  mustNotData.splice(0, 0, { "regexp" : { "http_referer" : MustNotFilterTermValue }})
+                }
+                else{
+                  mustNotData.splice(0, 0, { "term" : { "http_referer" : MustNotFilterTermValue }});
+                }
+              }
+              if(MustNotFilterByValue == "User Agent"){
+                if($(MustNotPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = MustNotFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = stringSplit[xReg].toLowerCase();
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    mustNotData.splice(0, 0, { "query" : { "wildcard" : { "http_agent" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(MustNotRegexMatchCheckboxHandler).val() == 1){
+                  mustNotData.splice(0, 0, { "regexp" : { "http_agent" : MustNotFilterTermValue }})
+                }
+                else{
+                  mustNotData.splice(0, 0, { "term" : { "http_agent" : MustNotFilterTermValue }});
+                }
+              }
+            }
+          }
+
+          if(MustNotFilterTypeValue == "Range"){
+            if(MustNotFilterRangeLower != "" && MustNotFilterRangeLower != "" || MustNotFilterByValue == "Time"){
+              if(MustNotFilterByValue == "IP Address"){
+                mustNotData.splice(0, 0, {"range" : {"remote_addr" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Time"){
+                if(MustNotFilterRangeLowerTime != "" && MustNotFilterRangeUpperTime != ""){
+                  if(MustNotFilterRangeUpperTimeOperation != "" && MustNotFilterRangeLowerTimeOperation != ""){
+                    MustNotFilterRangeUpperTime = MustNotFilterRangeUpperTime.replace(/ /g , "T");
+                    MustNotFilterRangeLowerTime = MustNotFilterRangeLowerTime.replace(/ /g , "T");
+                    MustNotFilterRangeUpperTimeOperation = MustNotFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    MustNotFilterRangeLowerTimeOperation = MustNotFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = MustNotFilterRangeUpperTime + "||" + MustNotFilterRangeUpperTimeOperation;
+                    var lowerTime = MustNotFilterRangeLowerTime + "||" + MustNotFilterRangeLowerTimeOperation;
+                    mustNotData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(MustNotFilterRangeUpperTimeOperation != "" && MustNotFilterRangeLowerTimeOperation == ""){
+                    MustNotFilterRangeUpperTime = MustNotFilterRangeUpperTime.replace(/ /g , "T");
+                    MustNotFilterRangeLowerTime = MustNotFilterRangeLowerTime.replace(/ /g , "T");
+                    MustNotFilterRangeUpperTimeOperation = MustNotFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = MustNotFilterRangeUpperTime + "||" + MustNotFilterRangeUpperTimeOperation;
+                    var lowerTime = MustNotFilterRangeLowerTime;
+                    mustNotData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(MustNotFilterRangeUpperTimeOperation == "" && MustNotFilterRangeLowerTimeOperation != ""){
+                    MustNotFilterRangeUpperTime = MustNotFilterRangeUpperTime.replace(/ /g , "T");
+                    MustNotFilterRangeLowerTime = MustNotFilterRangeLowerTime.replace(/ /g , "T");
+                    MustNotFilterRangeLowerTimeOperation = MustNotFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = MustNotFilterRangeUpperTime;
+                    var lowerTime = MustNotFilterRangeLowerTime + "||" + MustNotFilterRangeLowerTimeOperation;
+                    mustNotData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(MustNotFilterRangeUpperTimeOperation == "" && MustNotFilterRangeLowerTimeOperation == ""){
+                    MustNotFilterRangeUpperTime = MustNotFilterRangeUpperTime.replace(/ /g , "T");
+                    MustNotFilterRangeLowerTime = MustNotFilterRangeLowerTime.replace(/ /g , "T");
+                    var upperTime = MustNotFilterRangeUpperTime;
+                    var lowerTime = MustNotFilterRangeLowerTime;
+                    mustNotData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                }
+              }
+              if(MustNotFilterByValue == "Time Elapsed"){
+                mustNotData.splice(0, 0, {"range" : {"request_time" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Request URI"){
+                mustNotData.splice(0, 0, {"range" : {"request_uri" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Request Method"){
+                mustNotData.splice(0, 0, {"range" : {"request_method" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Status Code"){
+                mustNotData.splice(0, 0, {"range" : {"status" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Request Length"){
+                mustNotData.splice(0, 0, {"range" : {"bytes_received" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Body Bytes Sent"){
+                mustNotData.splice(0, 0, {"range" : {"body_bytes_sent" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Bytes Sent"){
+                mustNotData.splice(0, 0, {"range" : {"bytes_sent" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Host"){
+                mustNotData.splice(0, 0, {"range" : {"http_host" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "Referer"){
+                mustNotData.splice(0, 0, {"range" : {"http_referer" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+              if(MustNotFilterByValue == "User Agent"){
+                mustNotData.splice(0, 0, {"range" : {"http_agent" : {"gte" : ""+MustNotFilterRangeLower+"", "lte" : ""+MustNotFilterRangeUpper+""}}});
+              }
+            }
+          }
+        }
+      }
+    }
+
+
+
+    var ShouldUniqueCounter = this.$.ShouldUniqueCounter;
+    for(var i = 0; i < parseInt($(ShouldUniqueCounter).val(), 10) - 1; i++){
+      // var x = this.$$('#dataFilterOptionsShould' + i)
+      // var uid = $(x[i]).attr("unique-id");
+
+      var uid = parseInt(i, 10)+1;
+
+      var aggFilterOptionsSubmit = this.$.aggFilterOptionsSubmit;
+
+
+
+      var temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterByOnchange' + uid);
+      var ShouldFilterByValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterTypeOnchange' + uid);
+      var ShouldFilterTypeValue = temp.options[temp.selectedIndex].text;
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterTerm' + uid);
+      var ShouldFilterTermValue = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeLower' + uid);
+      var ShouldFilterRangeLower = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeUpper' + uid);
+      var ShouldFilterRangeUpper = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeLowerTime' + uid);
+      var ShouldFilterRangeLowerTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeUpperTime' + uid);
+      var ShouldFilterRangeUpperTime = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeLowerTimeOperation' + uid);
+      var ShouldFilterRangeLowerTimeOperation = $(temp).val();
+
+      temp = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldFilterRangeUpperTimeOperation' + uid);
+      var ShouldFilterRangeUpperTimeOperation = $(temp).val();
+
+
+      var ShouldPartialMatchCheckboxHandler = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldCheckboxValue' + uid);
+      var ShouldRegexMatchCheckboxHandler = this.$$('#dataFilterOptionsShould' + uid).$$('#ShouldRegexCheckboxValue' + uid);
+
+
+      if(ShouldFilterByValue != ""){
+        if(ShouldFilterTypeValue != ""){
+          if(ShouldFilterTypeValue == "Term"){
+            if(ShouldFilterTermValue != ""){
+              if(ShouldFilterByValue == "IP Address"){
+                shouldData.splice(0, 0, { "term" : { "remote_addr" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Time"){
+                shouldData.splice(0, 0, { "term" : { "time_iso8601" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Time Elapsed"){
+                shouldData.splice(0, 0, { "term" : { "request_time" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Request URI"){
+
+                if($(ShouldPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = ShouldFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    shouldData.splice(0, 0, { "query" : { "wildcard" : { "request_uri" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(ShouldRegexMatchCheckboxHandler).val() == 1){
+                  shouldData.splice(0, 0, { "regexp" : { "request_uri" : ShouldFilterTermValue }})
+                }
+                else{
+                  shouldData.splice(0, 0, { "term" : { "request_uri" : ShouldFilterTermValue }});
+                }
+              }
+              if(ShouldFilterByValue == "Request Method"){
+                ShouldFilterTermValue = ShouldFilterTermValue.toLowerCase();
+                shouldData.splice(0, 0, { "term" : { "request_method" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Status Code"){
+                shouldData.splice(0, 0, { "term" : { "status" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Request Length"){
+                shouldData.splice(0, 0, { "term" : { "bytes_received" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Body Bytes Sent"){
+                shouldData.splice(0, 0, { "term" : { "body_bytes_sent" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Bytes Sent"){
+                shouldData.splice(0, 0, { "term" : { "bytes_sent" : ShouldFilterTermValue }});
+              }
+              if(ShouldFilterByValue == "Host"){
+                if($(ShouldPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = ShouldFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    shouldData.splice(0, 0, { "query" : { "wildcard" : { "http_host" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(ShouldRegexMatchCheckboxHandler).val() == 1){
+                  shouldData.splice(0, 0, { "regexp" : { "http_host" : ShouldFilterTermValue }})
+                }
+                else{
+                  shouldData.splice(0, 0, { "term" : { "http_host" : ShouldFilterTermValue }});
+                }
+              }
+              if(ShouldFilterByValue == "Referer"){
+                if($(ShouldPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = ShouldFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    shouldData.splice(0, 0, { "query" : { "wildcard" : { "http_referer" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(ShouldRegexMatchCheckboxHandler).val() == 1){
+                  shouldData.splice(0, 0, { "regexp" : { "http_referer" : ShouldFilterTermValue }})
+                }
+                else{
+                  shouldData.splice(0, 0, { "term" : { "http_referer" : ShouldFilterTermValue }});
+                }
+              }
+              if(ShouldFilterByValue == "User Agent"){
+                if($(ShouldPartialMatchCheckboxHandler).val() == 1){
+                  var stringSplit = ShouldFilterTermValue.split(',');
+                  for(var xReg = 0; xReg < stringSplit.length; xReg++){
+                    stringSplit[xReg] = stringSplit[xReg].replace(/^\s*/, "").replace(/\s*$/, "");
+                    stringSplit[xReg] = stringSplit[xReg].toLowerCase();
+                    stringSplit[xReg] = "*" + stringSplit[xReg] + "*";
+                    shouldData.splice(0, 0, { "query" : { "wildcard" : { "http_agent" : stringSplit[xReg] }}});
+                  }
+                }
+                else if($(ShouldRegexMatchCheckboxHandler).val() == 1){
+                  shouldData.splice(0, 0, { "regexp" : { "http_agent" : ShouldFilterTermValue }})
+                }
+                else{
+                  shouldData.splice(0, 0, { "term" : { "http_agent" : ShouldFilterTermValue }});
+                }
+              }
+            }
+          }
+
+          if(ShouldFilterTypeValue == "Range"){
+            if(ShouldFilterRangeLower != "" && ShouldFilterRangeLower != "" || ShouldFilterByValue == "Time"){
+              if(ShouldFilterByValue == "IP Address"){
+                shouldData.splice(0, 0, {"range" : {"remote_addr" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Time"){
+                if(ShouldFilterRangeLowerTime != "" && ShouldFilterRangeUpperTime != ""){
+                  if(ShouldFilterRangeUpperTimeOperation != "" && ShouldFilterRangeLowerTimeOperation != ""){
+                    ShouldFilterRangeUpperTime = ShouldFilterRangeUpperTime.replace(/ /g , "T");
+                    ShouldFilterRangeLowerTime = ShouldFilterRangeLowerTime.replace(/ /g , "T");
+                    ShouldFilterRangeUpperTimeOperation = ShouldFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    ShouldFilterRangeLowerTimeOperation = ShouldFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = ShouldFilterRangeUpperTime + "||" + ShouldFilterRangeUpperTimeOperation;
+                    var lowerTime = ShouldFilterRangeLowerTime + "||" + ShouldFilterRangeLowerTimeOperation;
+                    shouldData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(ShouldFilterRangeUpperTimeOperation != "" && ShouldFilterRangeLowerTimeOperation == ""){
+                    ShouldFilterRangeUpperTime = ShouldFilterRangeUpperTime.replace(/ /g , "T");
+                    ShouldFilterRangeLowerTime = ShouldFilterRangeLowerTime.replace(/ /g , "T");
+                    ShouldFilterRangeUpperTimeOperation = ShouldFilterRangeUpperTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = ShouldFilterRangeUpperTime + "||" + ShouldFilterRangeUpperTimeOperation;
+                    var lowerTime = ShouldFilterRangeLowerTime;
+                    shouldData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(ShouldFilterRangeUpperTimeOperation == "" && ShouldFilterRangeLowerTimeOperation != ""){
+                    ShouldFilterRangeUpperTime = ShouldFilterRangeUpperTime.replace(/ /g , "T");
+                    ShouldFilterRangeLowerTime = ShouldFilterRangeLowerTime.replace(/ /g , "T");
+                    ShouldFilterRangeLowerTimeOperation = ShouldFilterRangeLowerTimeOperation.replace(/^\s*/, "").replace(/\s*$/, "");
+                    var upperTime = ShouldFilterRangeUpperTime;
+                    var lowerTime = ShouldFilterRangeLowerTime + "||" + ShouldFilterRangeLowerTimeOperation;
+                    shouldData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                  else if(ShouldFilterRangeUpperTimeOperation == "" && ShouldFilterRangeLowerTimeOperation == ""){
+                    ShouldFilterRangeUpperTime = ShouldFilterRangeUpperTime.replace(/ /g , "T");
+                    ShouldFilterRangeLowerTime = ShouldFilterRangeLowerTime.replace(/ /g , "T");
+                    var upperTime = ShouldFilterRangeUpperTime;
+                    var lowerTime = ShouldFilterRangeLowerTime;
+                    shouldData.splice(0, 0, {"range" : {"time_iso8601" : {"gte" : ""+lowerTime+"", "lte" : ""+upperTime+""}}});
+
+                  }
+                }
+              }
+              if(ShouldFilterByValue == "Time Elapsed"){
+                shouldData.splice(0, 0, {"range" : {"request_time" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Request URI"){
+                shouldData.splice(0, 0, {"range" : {"request_uri" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Request Method"){
+                shouldData.splice(0, 0, {"range" : {"request_method" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Status Code"){
+                shouldData.splice(0, 0, {"range" : {"status" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Request Length"){
+                shouldData.splice(0, 0, {"range" : {"bytes_received" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Body Bytes Sent"){
+                shouldData.splice(0, 0, {"range" : {"body_bytes_sent" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Bytes Sent"){
+                shouldData.splice(0, 0, {"range" : {"bytes_sent" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Host"){
+                shouldData.splice(0, 0, {"range" : {"http_host" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "Referer"){
+                shouldData.splice(0, 0, {"range" : {"http_referer" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+              if(ShouldFilterByValue == "User Agent"){
+                shouldData.splice(0, 0, {"range" : {"http_agent" : {"gte" : ""+ShouldFilterRangeLower+"", "lte" : ""+ShouldFilterRangeUpper+""}}});
+              }
+            }
+          }
+        }
+      }
+    }
+
+    var aggField1U;
+    var aggField2U;
+    var aggType1U;
+    var aggType2U;
+    var aggSize1U;
+    var aggSize2U;
+
+
+
+    var aggFieldAnalyzed1Select = this.$.aggFieldAnalyzed1Select;
+
+    if (aggFieldAnalyzed1Select.options[aggFieldAnalyzed1Select.selectedIndex].text == "Bytes Sent"){
+      aggField1U = "bytes_sent";
+    }
+    else if (aggFieldAnalyzed1Select.options[aggFieldAnalyzed1Select.selectedIndex].text == "Body Bytes Sent"){
+      aggField1U = "body_bytes_sent";
+    }
+    else if (aggFieldAnalyzed1Select.options[aggFieldAnalyzed1Select.selectedIndex].text == "Request Length"){
+      aggField1U = "bytes_received";
+    }
+    else if (aggFieldAnalyzed1Select.options[aggFieldAnalyzed1Select.selectedIndex].text == "IP Address"){
+      aggField1U = "remote_addr";
+    }
+    else if (aggFieldAnalyzed1Select.options[aggFieldAnalyzed1Select.selectedIndex].text == "Time Elapsed"){
+      aggField1U = "request_time";
+    }
+    else if (aggFieldAnalyzed1Select.options[aggFieldAnalyzed1Select.selectedIndex].text == "Request URI"){
+      aggField1U = "request_uri";
+    }
+    else if (aggFieldAnalyzed1Select.options[aggFieldAnalyzed1Select.selectedIndex].text == "Request Method"){
+      aggField1U = "request_method";
+    }
+    else if (aggFieldAnalyzed1Select.options[aggFieldAnalyzed1Select.selectedIndex].text == "Status Code"){
+      aggField1U = "status";
+    }
+    else if (aggFieldAnalyzed1Select.options[aggFieldAnalyzed1Select.selectedIndex].text == "Host"){
+      aggField1U = "http_host";
+    }
+    else if (aggFieldAnalyzed1Select.options[aggFieldAnalyzed1Select.selectedIndex].text == "Referer"){
+      aggField1U = "http_referer";
+    }
+    else if (aggFieldAnalyzed1Select.options[aggFieldAnalyzed1Select.selectedIndex].text == "User Agent"){
+      aggField1U = "http_agent";
+    }
+
+
+    var aggFieldAnalyzed1TypeSelect = this.$.aggFieldAnalyzed1TypeSelect;
+
+    if (aggFieldAnalyzed1TypeSelect.options[aggFieldAnalyzed1TypeSelect.selectedIndex].text == "Terms"){
+      aggType1U = "terms";
+    }
+    else if (aggFieldAnalyzed1TypeSelect.options[aggFieldAnalyzed1TypeSelect.selectedIndex].text == "Stats"){
+      aggType1U = "stats";
+    }
+
+    var aggFieldAnalyzed1SizeInput = this.$.aggFieldAnalyzed1SizeInput;
+    aggSize1U = $(aggFieldAnalyzed1SizeInput).val();
+    if(aggSize1U == ""){
+      aggSize1U = 10;
+    }
+
+
+    var aggFieldAnalyzed2Select = this.$.aggFieldAnalyzed2Select;
+
+    if (aggFieldAnalyzed2Select.options[aggFieldAnalyzed2Select.selectedIndex].text == "Bytes Sent"){
+      aggField2U = "bytes_sent";
+    }
+    else if (aggFieldAnalyzed2Select.options[aggFieldAnalyzed2Select.selectedIndex].text == "Body Bytes Sent"){
+      aggField2U = "body_bytes_sent";
+    }
+    else if (aggFieldAnalyzed2Select.options[aggFieldAnalyzed2Select.selectedIndex].text == "Request Length"){
+      aggField2U = "bytes_received";
+    }
+    else if (aggFieldAnalyzed2Select.options[aggFieldAnalyzed2Select.selectedIndex].text == "IP Address"){
+      aggField2U = "remote_addr";
+    }
+    else if (aggFieldAnalyzed2Select.options[aggFieldAnalyzed2Select.selectedIndex].text == "Time Elapsed"){
+      aggField2U = "request_time";
+    }
+    else if (aggFieldAnalyzed2Select.options[aggFieldAnalyzed2Select.selectedIndex].text == "Request URI"){
+      aggField2U = "request_uri";
+    }
+    else if (aggFieldAnalyzed2Select.options[aggFieldAnalyzed2Select.selectedIndex].text == "Request Method"){
+      aggField2U = "request_method";
+    }
+    else if (aggFieldAnalyzed2Select.options[aggFieldAnalyzed2Select.selectedIndex].text == "Status Code"){
+      aggField2U = "status";
+    }
+    else if (aggFieldAnalyzed2Select.options[aggFieldAnalyzed2Select.selectedIndex].text == "Host"){
+      aggField2U = "http_host";
+    }
+    else if (aggFieldAnalyzed2Select.options[aggFieldAnalyzed2Select.selectedIndex].text == "Referer"){
+      aggField2U = "http_referer";
+    }
+    else if (aggFieldAnalyzed2Select.options[aggFieldAnalyzed2Select.selectedIndex].text == "User Agent"){
+      aggField2U = "http_agent";
+    }
+
+
+    var aggFieldAnalyzed2TypeSelect = this.$.aggFieldAnalyzed2TypeSelect;
+
+    if (aggFieldAnalyzed2TypeSelect.options[aggFieldAnalyzed2TypeSelect.selectedIndex].text == "Terms"){
+      aggType2U = "terms";
+    }
+    else if (aggFieldAnalyzed2TypeSelect.options[aggFieldAnalyzed2TypeSelect.selectedIndex].text == "Stats"){
+      aggType2U = "stats";
+    }
+
+    var aggFieldAnalyzed2SizeInput = this.$.aggFieldAnalyzed2SizeInput;
+    aggSize2U = $(aggFieldAnalyzed2SizeInput).val();
+    if(aggSize2U == ""){
+      aggSize2U = 10;
+    }
+
+
+    this.displayagg(aggField1U, aggType1U, aggSize1U, aggField2U, aggType2U, aggSize2U, mustData, mustNotData, shouldData);
+
+
+    // var data = {
+    //   'limit': '10',
+    //   'offset': '0',
+    //   'mustData' : JSON.stringify(mustData),
+    //   'mustNotData' : JSON.stringify(mustNotData),
+    //   'shouldData' : JSON.stringify(shouldData)
+    // };
+    //
+    //
+    // $.post( "/elasticsearch/filterOptions", data, function( data ) {
+    //
+    // });
+
+    //
+    // var aggElement = "#aggElement" + $("#currentaggFiltered").val()
+    // $(aggElement).attr("bucket-data", aggField1U);
+    // $(aggElement).attr("bucket-data-analyze", aggType1U);
+    // $(aggElement).attr("granularity", GranularityU);
+    // $(aggElement).attr("must-data", JSON.stringify(mustData));
+    // $(aggElement).attr("must-not-data", JSON.stringify(mustNotData));
+    // $(aggElement).attr("should-data", JSON.stringify(shouldData));
+
+  },
+
+
+
+  properties:{
+    uniqueId: {
+      type: String,
+      value: 'Initializer',
+      observer: 'uniqueIdChanged'
+    },
+    aggField1: {
+      type: String,
+      value: 'request_uri'
+    },
+    aggType1: {
+      type: String,
+      value: 'terms'
+    },
+    aggSize1: {
+      type: String,
+      value: ''
+    },
+    aggField2: {
+      type: String,
+      value: ''
+    },
+    aggType2: {
+      type: String,
+      value: ''
+    },
+    aggSize2: {
+      type: String,
+      value: ''
+    },
+  },
+
+  uniqueIdChanged: function(newValue, oldValue){
+
+    var uniqueID = newValue;
+
+    var temp = "modalTab1" + uniqueID;
+    var element = this.$.modalTab1;
+    element.id = temp;
+
+    var temp = "modalTab2" + uniqueID;
+    var element = this.$.modalTab2;
+    element.id = temp;
+
+    var temp = "modalTab3" + uniqueID;
+    var element = this.$.modalTab3;
+    element.id = temp;
+
+    var temp = "modalTab4" + uniqueID;
+    var element = this.$.modalTab4;
+    element.id = temp;
+
+    var temp = "aggFilterOptionsAnalytics" + uniqueID;
+    var element = this.$.aggFilterOptionsAnalytics;
+    element.id = temp;
+
+    var temp = "aggFilterOptionsMust" + uniqueID;
+    var element = this.$.aggFilterOptionsMust;
+    element.id = temp;
+
+    var temp = "aggFilterOptionsMustNot" + uniqueID;
+    var element = this.$.aggFilterOptionsMustNot;
+    element.id = temp;
+
+    var temp = "aggFilterOptionsShould" + uniqueID;
+    var element = this.$.aggFilterOptionsShould;
+    element.id = temp;
+
+    var temp = this.$$("#modalTab1" + uniqueID);
+    var ref = "#aggFilterOptionsAnalytics" + uniqueID;
+    $(temp).attr("href", ref);
+
+    var temp = this.$$("#modalTab2" + uniqueID);
+    var ref = "#aggFilterOptionsMust" + uniqueID;
+    $(temp).attr("href", ref);
+
+    var temp = this.$$("#modalTab3" + uniqueID);
+    var ref = "#aggFilterOptionsMustNot" + uniqueID;
+    $(temp).attr("href", ref);
+
+    var temp = this.$$("#modalTab4" + uniqueID);
+    var ref = "#aggFilterOptionsShould" + uniqueID;
+    $(temp).attr("href", ref);
+
+
+  },
+
+  openModal: function(e){
+    var aggFilterOptions = this.$.aggFilterOptions;
+    $(aggFilterOptions).modal('toggle');
+
+  },
+
+
+
+  displayagg: function(aggField1P, aggType1P, aggSize1P, aggField2P, aggType2P, aggSize2P, mustDataP, mustNotDataP, shouldDataP){
+
+
+
+    var aggField1 = aggField1P;
+    var aggType1 = aggType1P;
+    var aggSize1 = aggSize1P;
+    var aggField2 = aggField2P;
+    var aggType2 = aggType2P;
+    var aggSize2 = aggSize2P;
+
+    if(aggSize1 == ""){
+      aggSize1 = 10;
+    }
+
+    if(aggSize2 == ""){
+      aggSize2 = 10;
+    }
+
+    if(!aggField2){
+      aggField2 = ""
+    }
+    if(!aggType2){
+      aggType2 = ""
+    }
+
+
+    var mustData = mustDataP;
+    var mustNotData = mustNotDataP;
+    var shouldData = shouldDataP;
+
+    var name;
+
+
+
+    var mainAggContainer = this.$.mainAggContainer;
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    //Sort Time Function///////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+
+    var sort_by = function(field, reverse, primer){
+
+      var key = primer ?
+      function(x) {return primer(x[field])} :
+      function(x) {return x[field]};
+
+      reverse = !reverse ? 1 : -1;
+
+      return function (a, b) {
+        return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+      }
+    }
+
+
+
+
+    var dps = [];
+
+    var currentdate = new Date();
+    var datetimeNow = ('0' + currentdate.getDate()).slice(-2) + "/" + ('0' + (currentdate.getMonth()+1)).slice(-2)  + "/" + currentdate.getFullYear() + " @ " + ('0' + currentdate.getHours()).slice(-2) + ":" + ('0' + currentdate.getMinutes()).slice(-2) + ":" + ('0' + currentdate.getSeconds()).slice(-2);
+
+
+    var user = this.getCookie('laserficheCloudAccessLogUser');
+    var data2;
+
+    function compareSecondColumn(a, b) {
+      if (a[1] === b[1]) {
+        return 0;
+      }
+      else {
+        return (a[1] > b[1]) ? -1 : 1;
+      }
+    };
+
+    var name1="";
+    var name2="";
+
+    if(aggField1 == "bytes_sent"){
+      name1 = name1 + "Bytes Sent ";
+    }
+    else if(aggField1 == "body_bytes_sent"){
+      name1 = name1 + "Body Bytes Sent ";
+    }
+    else if(aggField1 == "bytes_received"){
+      name1 = name1 + "Request Length ";
+    }
+    else if(aggField1 == "remote_addr"){
+      name1 = name1 + "IP Address";
+    }
+    else if(aggField1 == "time_iso8601"){
+      name1 = name1 + "Time";
+    }
+    else if(aggField1 == "request_time"){
+      name1 = name1 + "Time Elapsed";
+    }
+    else if(aggField1 == "request_uri"){
+      name1 = name1 + "Request URI";
+    }
+    else if(aggField1 == "request_method"){
+      name1 = name1 + "Request Method";
+    }
+    else if(aggField1 == "status"){
+      name1 = name1 + "Status Code";
+    }
+    else if(aggField1 == "http_host"){
+      name1 = name1 + "Host";
+    }
+    else if(aggField1 == "http_referer"){
+      name1 = name1 + "Referer";
+    }
+    else if(aggField1 == "http_agent"){
+      name1 = name1 + "User Agent";
+    }
+
+
+    if(aggField2 == "bytes_sent"){
+      name2 = name2 + "Bytes Sent ";
+    }
+    else if(aggField2 == "body_bytes_sent"){
+      name2 = name2 + "Body Bytes Sent ";
+    }
+    else if(aggField2 == "bytes_received"){
+      name2 = name2 + "Request Length ";
+    }
+    else if(aggField2 == "remote_addr"){
+      name2 = name2 + "IP Address";
+    }
+    else if(aggField2 == "time_iso8601"){
+      name2 = name2 + "Time";
+    }
+    else if(aggField2 == "request_time"){
+      name2 = name2 + "Time Elapsed";
+    }
+    else if(aggField2 == "request_uri"){
+      name2 = name2 + "Request URI";
+    }
+    else if(aggField2 == "request_method"){
+      name2 = name2 + "Request Method";
+    }
+    else if(aggField2 == "status"){
+      name2 = name2 + "Status Code";
+    }
+    else if(aggField2 == "http_host"){
+      name2 = name2 + "Host";
+    }
+    else if(aggField2 == "http_referer"){
+      name2 = name2 + "Referer";
+    }
+    else if(aggField2 == "http_agent"){
+      name2 = name2 + "User Agent";
+    }
+
+    if(aggType1 == "terms" && aggField2 != "" && aggType2 == "terms"){
+
+      var mainAggContainerInfo = this.$.mainAggContainerInfo;
+      var totalRequestSize;
+
+      data2 = {
+        'aggregation1': aggField1,
+        'aggregationType1': aggType1,
+        'aggregationSize1': aggSize1,
+        'aggregation2': aggField2,
+        'aggregationType2': aggType2,
+        'aggregationSize2': aggSize2,
+        'limit': '0',
+        'offset': '0',
+        'mustData' : JSON.stringify(mustData),
+        'mustNotData' : JSON.stringify(mustNotData),
+        'shouldData' : JSON.stringify(shouldData),
+        'datetimeNow' : datetimeNow,
+        'user' : user
+
+      };
+
+
+
+      $.post( "/elasticsearch/aggregation", data2, function( data ){
+
+        var series1 = [];
+        var series2 = [];
+        totalRequestSize = data.size;
+        $(mainAggContainerInfo).empty();
+        $(mainAggContainerInfo).append("<b>Top "+name1+"</b>");
+        $(mainAggContainerInfo).append( "<br></br>" );
+        $(mainAggContainerInfo).append("<b>Nested Aggregation by Terms: </b>"+name2);
+        $(mainAggContainerInfo).append( "<br></br>" );
+        $(mainAggContainerInfo).append("<b>Total Requests: </b>" + totalRequestSize);
+        $(mainAggContainerInfo).append( "<br></br>" );
+
+
+
+        $.each(data.grouping.buckets, function(index,value ){
+
+
+          var nameVal = data.grouping.buckets[index].key;
+          if(nameVal == "0"){
+            series1.push({name : "0.0", y : data.grouping.buckets[index].doc_count, drilldown : "0.0"});
+          }
+          else{
+            series1.push({name : data.grouping.buckets[index].key, y : data.grouping.buckets[index].doc_count, drilldown : data.grouping.buckets[index].key});
+          }
+
+          var series2Data = [];
+          $.each(data.grouping.buckets[index].aggregation2.buckets, function(index2,value ){
+            series2Data.push([""+data.grouping.buckets[index].aggregation2.buckets[index2].key+"", data.grouping.buckets[index].aggregation2.buckets[index2].doc_count]);
+          });
+          if(data.grouping.buckets[index].aggregation2.sum_other_doc_count != "0"){
+            series2Data.push(["Other", data.grouping.buckets[index].aggregation2.sum_other_doc_count]);
+            series2Data.sort(compareSecondColumn);
+          }
+
+
+          if(nameVal == "0"){
+            series2.push({name: "Percent of 0.0", id: "0.0", data : series2Data, totalCount: data.grouping.buckets[index].doc_count});
+          }
+          else{
+            series2.push({name: "Percent of " + data.grouping.buckets[index].key, id: data.grouping.buckets[index].key, data : series2Data, totalCount: data.grouping.buckets[index].doc_count});
+          }
+
+        });
+
+
+        if(data.grouping.sum_other_doc_count != "0"){
+          series1.push({name : "Other", y : data.grouping.sum_other_doc_count, drilldown : "null"})
+          series1.sort(sort_by('y', true, parseInt));
+        }
+
+
+        $.each(series1, function(index, value){
+          var percentTotalDay = parseInt(series1[index].y, 10)/parseInt(totalRequestSize, 10)*parseInt(100,10);
+          percentTotalDay = percentTotalDay + "%";
+          $(mainAggContainerInfo).append("<b>Key: </b>" +series1[index].name + " ");
+          $(mainAggContainerInfo).append("<b>Value: </b>" +series1[index].y + " ");
+          $(mainAggContainerInfo).append("<div class=progress><div class=progress-bar role=progressbar aria-valuenow=70aria-valuemin=0 aria-valuemax=100 style=width:"+percentTotalDay+"></div></div>");
+          $(mainAggContainerInfo).append( "<br></br>" );
+
+        });
+
+        $(mainAggContainer).highcharts({
+          chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie',
+            events :{
+              drilldown: function(e){
+                for(var i = 0; i < series2.length; i++)
+                {
+                  if(series2[i].id == e.point.name)
+                  {
+                    $(mainAggContainerInfo).empty();
+                    $(mainAggContainerInfo).append("<b>Breakdown of "+name1+" by "+name2+"</b>");
+                    $(mainAggContainerInfo).append( "<br></br>" );
+                    $(mainAggContainerInfo).append("<b>"+name1+": </b>" + e.point.name);
+                    $(mainAggContainerInfo).append( "<br></br>" );
+                    $(mainAggContainerInfo).append("<b>Total Requests: </b>" + series2[i].totalCount);
+                    $(mainAggContainerInfo).append( "<br></br>" );
+                    $.each(series2[i].data, function(index, value){
+                      var percentTotalDay = parseInt(series2[i].data[index][1], 10)/parseInt(series2[i].totalCount, 10)*parseInt(100,10);
+                      percentTotalDay = percentTotalDay + "%";
+                      $(mainAggContainerInfo).append("<b>Key: </b>" +series2[i].data[index][0] + " ");
+                      $(mainAggContainerInfo).append("<b>Value: </b>" +series2[i].data[index][1] + " ");
+                      $(mainAggContainerInfo).append("<div class=progress><div class=progress-bar role=progressbar aria-valuenow=70aria-valuemin=0 aria-valuemax=100 style=width:"+percentTotalDay+"></div></div>");
+                      $(mainAggContainerInfo).append( "<br></br>" );
+                    });
+                  }
+                }
+
+              },
+
+              drillup: function(e){
+                $(mainAggContainerInfo).empty();
+                $(mainAggContainerInfo).append("<b>Top "+name1+"</b>");
+                $(mainAggContainerInfo).append( "<br></br>" );
+                $(mainAggContainerInfo).append("<b>Nested Aggregation by Terms: </b>"+name2);
+                $(mainAggContainerInfo).append( "<br></br>" );
+                $(mainAggContainerInfo).append("<b>Total Requests: </b>" + totalRequestSize);
+                $(mainAggContainerInfo).append( "<br></br>" );
+                $.each(series1, function(index, value){
+                  var percentTotalDay = parseInt(series1[index].y, 10)/parseInt(totalRequestSize, 10)*parseInt(100,10);
+                  percentTotalDay = percentTotalDay + "%";
+                  $(mainAggContainerInfo).append("<b>Key: </b>" +series1[index].name + " ");
+                  $(mainAggContainerInfo).append("<b>Value: </b>" +series1[index].y + " ");
+                  $(mainAggContainerInfo).append("<div class=progress><div class=progress-bar role=progressbar aria-valuenow=70aria-valuemin=0 aria-valuemax=100 style=width:"+percentTotalDay+"></div></div>");
+                  $(mainAggContainerInfo).append( "<br></br>" );
+
+                });
+
+              }
+            }
+          },
+          title: {
+            text: "",
+            style: {"fontSize" : "12px"}
+          },
+          tooltip: {
+            pointFormat:'{series.name}: <b>{point.percentage:.1f}%</b> <br>Total Count: <b>{point.y}</b></br>',
+
+          },
+          plotOptions: {
+            pie: {
+              allowPointSelect: true,
+              cursor: 'pointer',
+              dataLabels: {
+                enabled: false
+              },
+              showInLegend: true
+            }
+          },
+          legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'top',
+            y: 30,
+            navigation: {
+              activeColor: '#3E576F',
+              animation: true,
+              arrowSize: 12,
+              inactiveColor: '#CCC',
+              style: {
+                fontWeight: 'bold',
+                color: '#333',
+                fontSize: '12px'
+              }
+            },
+            labelFormatter: function() {
+              if(this.name.length > 7){
+                var shortName = this.name.slice(0, 7) + "...";
+              }
+              else{
+                var shortName = this.name;
+              }
+              return shortName;
+            }
+          },
+          series: [{
+            name: "Percent",
+            colorByPoint: true,
+            data: series1
+          }],
+          drilldown: {
+            series: series2
+          }
+
+        });
+      });
+
+    }
+
+
+    else if(aggType1 == "terms" && aggField2 != "" && aggType2 == "stats"){
+
+      var mainAggContainerInfo = this.$.mainAggContainerInfo;
+      var totalRequestSize;
+
+      data2 = {
+        'aggregation1': aggField1,
+        'aggregationType1': aggType1,
+        'aggregationSize1': aggSize1,
+        'aggregation2': aggField2,
+        'aggregationType2': aggType2,
+        'limit': '0',
+        'offset': '0',
+        'mustData' : JSON.stringify(mustData),
+        'mustNotData' : JSON.stringify(mustNotData),
+        'shouldData' : JSON.stringify(shouldData),
+        'datetimeNow' : datetimeNow,
+        'user' : user
+
+      };
+
+      $.post( "/elasticsearch/aggregation", data2, function( data ){
+      var series1 = [];
+      var series2 = [];
+
+      totalRequestSize = data.size;
+      $(mainAggContainerInfo).empty();
+      $(mainAggContainerInfo).append("<b>Top "+name1+"</b>");
+      $(mainAggContainerInfo).append( "<br></br>" );
+      $(mainAggContainerInfo).append("<b>Nested Aggregation by Stats: </b>"+name2);
+      $(mainAggContainerInfo).append( "<br></br>" );
+      $(mainAggContainerInfo).append("<b>Total Requests: </b>" + totalRequestSize);
+      $(mainAggContainerInfo).append( "<br></br>" );
+
+
+
+      $.each(data.grouping.buckets, function(index,value ){
+        var series2Data = [];
+        var nameVal = data.grouping.buckets[index].key;
+        if(nameVal == "0"){
+          series1.push({name : "0.0", y : data.grouping.buckets[index].doc_count});
+        }
+        else{
+          series1.push({name : data.grouping.buckets[index].key, y : data.grouping.buckets[index].doc_count});
+        }
+
+          series2Data.push({avg: data.grouping.buckets[index].aggregation2.avg, count: data.grouping.buckets[index].aggregation2.count, max: data.grouping.buckets[index].aggregation2.max, min: data.grouping.buckets[index].aggregation2.min, sum: data.grouping.buckets[index].aggregation2.sum});
+
+        if(nameVal == "0"){
+          series2.push({name:  "0.0", data: series2Data});
+        }
+        else{
+          series2.push({name:  data.grouping.buckets[index].key, data: series2Data});
+        }
+
+      });
+
+
+      if(data.grouping.sum_other_doc_count != "0"){
+        series1.push({name : "Other", y : data.grouping.sum_other_doc_count})
+        series1.sort(sort_by('y', true, parseInt));
+      }
+
+      $.each(series1, function(index, value){
+        var percentTotalDay = parseInt(series1[index].y, 10)/parseInt(totalRequestSize, 10)*parseInt(100,10);
+        percentTotalDay = percentTotalDay + "%";
+        $(mainAggContainerInfo).append("<b>Key: </b>" +series1[index].name + " ");
+        $(mainAggContainerInfo).append("<b>Value: </b>" +series1[index].y + " ");
+        $(mainAggContainerInfo).append("<div class=progress><div class=progress-bar role=progressbar aria-valuenow=70aria-valuemin=0 aria-valuemax=100 style=width:"+percentTotalDay+"></div></div>");
+        $(mainAggContainerInfo).append( "<br></br>" );
+
+      });
+
+
+
+      $(mainAggContainer).highcharts({
+        chart: {
+          plotBackgroundColor: null,
+          plotBorderWidth: null,
+          plotShadow: false,
+          type: 'pie'
+        },
+        title: {
+          text: "",
+          style: {"fontSize" : "12px"}
+        },
+        tooltip: {
+          pointFormat:'{series.name}: <b>{point.percentage:.1f}%</b> <br>Total Count: <b>{point.y}</b></br>',
+
+        },
+        plotOptions: {
+          pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+              enabled: false
+            },
+            showInLegend: true
+          },
+          series: {
+              cursor: 'pointer',
+              point: {
+                  events: {
+                      click: function () {
+                          if(this.selected){
+                            $(mainAggContainerInfo).empty();
+                            $(mainAggContainerInfo).append("<b>Top "+name1+"</b>");
+                            $(mainAggContainerInfo).append( "<br></br>" );
+                            $(mainAggContainerInfo).append("<b>Nested Aggregation by Stats: </b>"+name2);
+                            $(mainAggContainerInfo).append( "<br></br>" );
+                            $(mainAggContainerInfo).append("<b>Total Requests: </b>" + totalRequestSize);
+                            $(mainAggContainerInfo).append( "<br></br>" );
+                            $.each(series1, function(index, value){
+                              var percentTotalDay = parseInt(series1[index].y, 10)/parseInt(totalRequestSize, 10)*parseInt(100,10);
+                              percentTotalDay = percentTotalDay + "%";
+                              $(mainAggContainerInfo).append("<b>Key: </b>" +series1[index].name + " ");
+                              $(mainAggContainerInfo).append("<b>Value: </b>" +series1[index].y + " ");
+                              $(mainAggContainerInfo).append("<div class=progress><div class=progress-bar role=progressbar aria-valuenow=70aria-valuemin=0 aria-valuemax=100 style=width:"+percentTotalDay+"></div></div>");
+                              $(mainAggContainerInfo).append( "<br></br>" );
+
+                            });
+
+
+                          }
+                          else{
+                            for(var i = 0; i < series2.length; i++)
+                            {
+                              if(series2[i].name == this.name){
+                                console.log(series2[i].data);
+                                $(mainAggContainerInfo).empty();
+                                $(mainAggContainerInfo).append("<b>Breakdown of "+name1+" by "+name2+"</b>");
+                                $(mainAggContainerInfo).append( "<br></br>" );
+                                $(mainAggContainerInfo).append("<b>"+name1+": </b>" + series2[i].name);
+                                $(mainAggContainerInfo).append( "<br></br>" );
+                                $(mainAggContainerInfo).append("<b>Total Requests by " + series2[i].name+ ": </b>" + series2[i].data[0].count);
+                                $(mainAggContainerInfo).append( "<br></br>" );
+                                $(mainAggContainerInfo).append("<b>Average "+name2+": </b>" + series2[i].data[0].avg);
+                                $(mainAggContainerInfo).append( "<br></br>" );
+                                $(mainAggContainerInfo).append("<b>Max "+name2+": </b>" + series2[i].data[0].max);
+                                $(mainAggContainerInfo).append( "<br></br>" );
+                                $(mainAggContainerInfo).append("<b>Min "+name2+": </b>" + series2[i].data[0].min);
+                                $(mainAggContainerInfo).append( "<br></br>" );
+                                $(mainAggContainerInfo).append("<b>Total "+name2+": </b>" + series2[i].data[0].sum);
+                                $(mainAggContainerInfo).append( "<br></br>" );
+
+                              }
+                            }
+                        }
+
+                      }
+                  }
+              }
+          }
+        },
+        legend: {
+          layout: 'vertical',
+          align: 'right',
+          verticalAlign: 'top',
+          y: 30,
+          navigation: {
+            activeColor: '#3E576F',
+            animation: true,
+            arrowSize: 12,
+            inactiveColor: '#CCC',
+            style: {
+              fontWeight: 'bold',
+              color: '#333',
+              fontSize: '12px'
+            }
+          },
+          labelFormatter: function() {
+            if(this.name.length > 7){
+              var shortName = this.name.slice(0, 7) + "...";
+            }
+            else{
+              var shortName = this.name;
+            }
+            return shortName;
+          }
+        },
+        series: [{
+          name: "Percent",
+          colorByPoint: true,
+          data: series1
+        }]
+
+      });
+
+
+    });
+  }
+
+  else if(aggType1 == "terms" && aggField2 == ""){
+
+    var mainAggContainerInfo = this.$.mainAggContainerInfo;
+    var totalRequestSize;
+
+    data2 = {
+      'aggregation1': aggField1,
+      'aggregationType1': aggType1,
+      'aggregationSize1': aggSize1,
+      'limit': '0',
+      'offset': '0',
+      'mustData' : JSON.stringify(mustData),
+      'mustNotData' : JSON.stringify(mustNotData),
+      'shouldData' : JSON.stringify(shouldData),
+      'datetimeNow' : datetimeNow,
+      'user' : user
+
+    };
+
+    $.post( "/elasticsearch/aggregation", data2, function( data ){
+    var series1 = [];
+    totalRequestSize = data.size;
+    $(mainAggContainerInfo).empty();
+    $(mainAggContainerInfo).append("<b>Top "+name1+"</b>");
+    $(mainAggContainerInfo).append( "<br></br>" );
+    $(mainAggContainerInfo).append("<b>Nested Aggregation: </b> None");
+    $(mainAggContainerInfo).append( "<br></br>" );
+    $(mainAggContainerInfo).append("<b>Total Requests: </b>" + totalRequestSize);
+    $(mainAggContainerInfo).append( "<br></br>" );
+
+
+
+    $.each(data.grouping.buckets, function(index,value ){
+
+      var nameVal = data.grouping.buckets[index].key;
+      if(nameVal == "0"){
+        series1.push({name : "0.0", y : data.grouping.buckets[index].doc_count});
+      }
+      else{
+        series1.push({name : data.grouping.buckets[index].key, y : data.grouping.buckets[index].doc_count});
+      }
+
+    });
+
+
+    if(data.grouping.sum_other_doc_count != "0"){
+      series1.push({name : "Other", y : data.grouping.sum_other_doc_count})
+      series1.sort(sort_by('y', true, parseInt));
+    }
+
+
+      $.each(series1, function(index, value){
+        var percentTotalDay = parseInt(series1[index].y, 10)/parseInt(totalRequestSize, 10)*parseInt(100,10);
+        percentTotalDay = percentTotalDay + "%";
+        $(mainAggContainerInfo).append("<b>Key: </b>" +series1[index].name + " ");
+        $(mainAggContainerInfo).append("<b>Value: </b>" +series1[index].y + " ");
+        $(mainAggContainerInfo).append("<div class=progress><div class=progress-bar role=progressbar aria-valuenow=70aria-valuemin=0 aria-valuemax=100 style=width:"+percentTotalDay+"></div></div>");
+        $(mainAggContainerInfo).append( "<br></br>" );
+
+      });
+
+
+
+    $(mainAggContainer).highcharts({
+      chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie'
+      },
+      title: {
+        text: "",
+        style: {"fontSize" : "12px"}
+      },
+      tooltip: {
+        pointFormat:'{series.name}: <b>{point.percentage:.1f}%</b> <br>Total Count: <b>{point.y}</b></br>',
+
+      },
+      plotOptions: {
+        pie: {
+          allowPointSelect: true,
+          cursor: 'pointer',
+          dataLabels: {
+            enabled: false
+          },
+          showInLegend: true
+        }
+      },
+      legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'top',
+        y: 30,
+        navigation: {
+          activeColor: '#3E576F',
+          animation: true,
+          arrowSize: 12,
+          inactiveColor: '#CCC',
+          style: {
+            fontWeight: 'bold',
+            color: '#333',
+            fontSize: '12px'
+          }
+        },
+        labelFormatter: function() {
+          if(this.name.length > 7){
+            var shortName = this.name.slice(0, 7) + "...";
+          }
+          else{
+            var shortName = this.name;
+          }
+          return shortName;
+        }
+      },
+      series: [{
+        name: "Percent",
+        colorByPoint: true,
+        data: series1
+      }]
+
+    });
+
+  });
+
+
+
+  }
+
+  else if(aggType1 == "stats"){
+    var mainAggContainerInfo = this.$.mainAggContainerInfo;
+    var totalRequestSize;
+    $(mainAggContainer).empty();
+    data2 = {
+      'aggregation1': aggField1,
+      'aggregationType1': aggType1,
+      'limit': '0',
+      'offset': '0',
+      'mustData' : JSON.stringify(mustData),
+      'mustNotData' : JSON.stringify(mustNotData),
+      'shouldData' : JSON.stringify(shouldData),
+      'datetimeNow' : datetimeNow,
+      'user' : user
+
+    };
+
+    $.post( "/elasticsearch/aggregation", data2, function( data ){
+    var series1 = [];
+    totalRequestSize = data.size;
+    $(mainAggContainerInfo).empty();
+    $(mainAggContainerInfo).append("<b>Stats of "+name1+"</b>");
+    $(mainAggContainerInfo).append( "<br></br>" );
+    $(mainAggContainerInfo).append("<b>Total Requests: </b>" + totalRequestSize);
+    $(mainAggContainerInfo).append( "<br></br>" );
+    $(mainAggContainerInfo).append("<b>Average "+name1+": </b>" + data.grouping.avg);
+    $(mainAggContainerInfo).append( "<br></br>" );
+    $(mainAggContainerInfo).append("<b>Max "+name2+": </b>" + data.grouping.max);
+    $(mainAggContainerInfo).append( "<br></br>" );
+    $(mainAggContainerInfo).append("<b>Min "+name2+": </b>" + data.grouping.min);
+    $(mainAggContainerInfo).append( "<br></br>" );
+    $(mainAggContainerInfo).append("<b>Total "+name2+": </b>" + data.grouping.sum);
+    $(mainAggContainerInfo).append( "<br></br>" );
+
+
+  });
+
+  }
+
+
+
+
+},
+
+getCookie: function(cname) {
+  var name = cname + "=";
+  var ca = document.cookie.split(';');
+  for(var i=0; i<ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0)==' ') c = c.substring(1);
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+},
+
+deleteAgg: function(){
+  $(this).hide('slow', function(){ $(this).remove(); });
+},
+
+intializeModal: function(aggField1, aggType1, aggSize1, aggField2, aggType2, aggSize2){
+
+  var aggFieldAnalyzed1 = this.$.aggFieldAnalyzed1Select;
+  var aggFieldAnalyzed1Type = this.$.aggFieldAnalyzed1TypeSelect;
+  var aggFieldAnalyzed1Size = this.$.aggFieldAnalyzed1SizeInput;
+
+  var aggFieldAnalyzed2 = this.$.aggFieldAnalyzed2Select;
+  var aggFieldAnalyzed2Type = this.$.aggFieldAnalyzed2TypeSelect;
+  var aggFieldAnalyzed2Size = this.$.aggFieldAnalyzed2SizeInput;
+
+
+  if (aggField1 == "remote_addr"){
+    aggFieldAnalyzed1.selectedIndex = "0";
+  }
+  else if (aggField1 == "time_iso8601"){
+    aggFieldAnalyzed1.selectedIndex = "1";
+  }
+  else if (aggField1 == "request_time"){
+    aggFieldAnalyzed1.selectedIndex = "2";
+  }
+  else if (aggField1 == "request_uri"){
+    aggFieldAnalyzed1.selectedIndex = "3";
+  }
+  else if (aggField1 == "request_method"){
+    aggFieldAnalyzed1.selectedIndex = "4";
+  }
+  else if (aggField1 == "status"){
+    aggFieldAnalyzed1.selectedIndex = "5";
+  }
+  else if (aggField1 == "bytes_received"){
+    aggFieldAnalyzed1.selectedIndex = "6";
+  }
+  else if (aggField1 == "body_bytes_sent"){
+    aggFieldAnalyzed1.selectedIndex = "7";
+  }
+  else if (aggField1 == "bytes_sent"){
+    aggFieldAnalyzed1.selectedIndex = "8";
+  }
+  else if (aggField1 == "http_host"){
+    aggFieldAnalyzed1.selectedIndex = "9";
+  }
+  else if (aggField1 == "http_referer"){
+    aggFieldAnalyzed1.selectedIndex = "10";
+  }
+  else if (aggField1 == "http_agent"){
+    aggFieldAnalyzed1.selectedIndex = "11";
+  }
+
+  if (aggType1 == "terms"){
+    aggFieldAnalyzed1Type.selectedIndex = "0";
+  }
+  else if (aggType1 == "stats"){
+    aggFieldAnalyzed1Type.selectedIndex = "1";
+  }
+
+  $(aggFieldAnalyzed1Size).val(aggSize1);
+
+
+
+  if (aggField2 == ""){
+    aggFieldAnalyzed2.selectedIndex = "0";
+  }
+  else if (aggField2 == "remote_addr"){
+    aggFieldAnalyzed2.selectedIndex = "1";
+  }
+  else if (aggField2 == "time_iso8601"){
+    aggFieldAnalyzed2.selectedIndex = "2";
+  }
+  else if (aggField2 == "request_time"){
+    aggFieldAnalyzed2.selectedIndex = "3";
+  }
+  else if (aggField2 == "request_uri"){
+    aggFieldAnalyzed2.selectedIndex = "4";
+  }
+  else if (aggField2 == "request_method"){
+    aggFieldAnalyzed2.selectedIndex = "5";
+  }
+  else if (aggField2 == "status"){
+    aggFieldAnalyzed2.selectedIndex = "6";
+  }
+  else if (aggField2 == "bytes_received"){
+    aggFieldAnalyzed2.selectedIndex = "7";
+  }
+  else if (aggField2 == "body_bytes_sent"){
+    aggFieldAnalyzed2.selectedIndex = "8";
+  }
+  else if (aggField2 == "bytes_sent"){
+    aggFieldAnalyzed2.selectedIndex = "9";
+  }
+  else if (aggField2 == "http_host"){
+    aggFieldAnalyzed2.selectedIndex = "10";
+  }
+  else if (aggField2 == "http_referer"){
+    aggFieldAnalyzed2.selectedIndex = "11";
+  }
+  else if (aggField2 == "http_agent"){
+    aggFieldAnalyzed2.selectedIndex = "12";
+  }
+
+  if (aggType2 == ""){
+    aggFieldAnalyzed2Type.selectedIndex = "0";
+  }
+  else if (aggType2 == "terms"){
+    aggFieldAnalyzed2Type.selectedIndex = "1";
+  }
+  else if (aggType2 == "stats"){
+    aggFieldAnalyzed2Type.selectedIndex = "2";
+  }
+
+  $(aggFieldAnalyzed2Size).val(aggSize2);
+
+
+
+}
+
+
+
+
+});
+
+
+</script>
+
+</dom-module>

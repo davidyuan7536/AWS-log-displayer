@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>TESTING</title>
+
+    <style>
+      .form-control {
+          display:none;
+      }
+
+      .cal-tab.active {
+          display:block;
+      }
+
+      #filter-tags {
+        background: none repeat scroll 0 0 #fff;
+        border: 1px solid #ccc;
+        display: table;
+        padding: 0.5em;
+        width: 100%;
+      }
+
+      #filter-tags li.filter-tag {
+        float: left;
+        margin-left: 0.25em;
+        margin-right: 0.25em;
+        list-style-type: none;
+      }
+
+      #filter-tags li.filter-tag {
+        background: none repeat scroll 0 0 #484848;
+        border-radius: 5px;
+        color: white;
+        padding: .5em;
+        margin: .2em;
+        font-size: 12px;
+      }
+      #filter-tags li.filter-tag .delete-filter-tag{
+        color: white;
+        padding-left: .5em;
+        cursor: pointer;
+      }
+
+      /*.tags input,
+      li.addedTag {
+        border: 1px solid transparent;
+        border-radius: 5px;
+        box-shadow: none;
+        display: block;
+        padding: 0.5em;
+      }
+
+      .tags input:hover { border: 1px solid #000; }*/
+
+    </style>
+  </head>
+  <body>
+
+    <!-- <div id="filter-box"> -->
+      <div id="filter-tags-div">
+        <ul id="filter-tags">
+        </ul>
+      <!-- </div> -->
+      <button id="new-filter-btn" onclick="newFilter();"> Add Filter </button>
+
+      <!-- FIELD -->
+      <select id="filter-field-selector" class="form-control">
+        <option value=""></option>
+        <option value="remote_addr">IP Address</option>
+        <option value="time_iso8601">Timestamp</option>
+        <option value="request_time">Request Time</option>
+        <option value="request_uri">Request URI</option>
+        <option value="request_method">Method</option>
+        <option value="status">Status</option>
+        <option value="bytes_received">Bytes Rcvd</option>
+        <option value="body_bytes_sent">Body Bytes Sent</option>
+        <option value="bytes_sent">Bytes Sent</option>
+        <option value="http_host">HTTP Host</option>
+        <option value="http_referer">HTTP Referer</option>
+        <option value="http_user_agent">User Agent</option>
+      </select>
+
+      <!-- TYPE -->
+      <select id="filter-type-selector" class="form-control">
+        <option value></option>
+        <option value="must">must</option>
+        <option value="mustNot">must not</option>
+        <option value="should">should</option>
+      </select>
+
+      <!-- CONDITION -->
+      <select id="filter-condition1-selector" class="form-control">
+        <option value="equal">equal to</option>
+      </select>
+
+      <select id="filter-condition2-selector" class="form-control">
+        <option value="range">between</option>
+      </select>
+
+      <select id="filter-condition3-selector" class="form-control">
+        <option value></option>
+        <option value="equal">equal to</option>
+        <option value="range">between</option>
+      </select>
+
+      <select id="filter-condition4-selector" class="form-control">
+        <option value></option>
+        <option value="equal">equal to</option>
+        <option value="partial">partially match</option>
+        <option value="regex">match Regex</option>
+      </select>
+
+      <!-- VALUE -->
+      <input id="filter-value-input" class="form-control"></input>
+
+      <span id="filter-timerange-input" class="form-control">
+        <input id="filter-timerange-input-lower" placeholder="2015-01-01 00:00:00"></input>
+        and
+        <input id="filter-timerange-input-upper" placeholder="2015-10-01 12:00:00"></input>
+      </span>
+
+      <span id="filter-range-input" class="form-control">
+        <input id="filter-range-input-lower"></input>
+        and
+        <input id="filter-range-input-upper"></input>
+      </span>
+
+      <!-- BUTTON -->
+      <button id="add-new-filter-btn" onclick="AddNewFilter();" class="form-control"> Add Condition </button>
+      <button id="cancel-new-filter-btn" onclick="CancelNewFilter();" class="form-control"> Cancel </button>
+      <button id="del-all-filter-btn" onclick="DeleteAllFilter();" class="form-control"> Delete All </button>
+    </div> <!-- END filter-box -->
+
+
+    <button style="margin-top: 20px;" onclick="test();"> Test </button>
+
+  <script src="../static/jquery.min.js"></script>
+  <script>
+
+    unreachable = "SHOULDN'T BE REACHABLE";
+
+    $("#filter-field-selector").change(function(){
+      if ($('#filter-field-selector').val() == "") {
+        // TO DO: HIDE ALL SUCCEEDING SELECTORS
+        hideCondition();
+        hideValue();
+        $('#filter-type-selector option[value=""]').prop('selected', true);
+      }
+      else{
+        if($("#filter-type-selector").is(":visible")){
+          // not initial select
+          hideCondition();
+          hideValue();
+          $('#filter-type-selector option[value=""]').prop('selected', true);
+        }
+        else{
+          // initial select
+          $("#filter-type-selector").show();
+        }
+      }
+    });
+
+    $("#filter-type-selector").change(function(){
+      if ($('#filter-type-selector').val() == "") {
+        // TO DO: HIDE ALL SUCCEEDING SELECTORS
+        hideCondition();
+        hideValue();
+      }
+      else{
+        if ($("#filter-condition1-selector").is(":visible") || $("#filter-condition2-selector").is(":visible") || $("#filter-condition3-selector").is(":visible") || $("#filter-condition4-selector").is(":visible")) {
+            // not initial select
+            hideValue();
+            showCondition();
+        }
+        else{
+          // initial select
+          showCondition();
+        }
+      } // end else
+    });
+
+    // 3: TERM + RANGE
+    $("#filter-condition3-selector").change(function(){
+      if ($('#filter-condition3-selector').val() == "") {
+        hideValue();
+      }
+      else{
+        if ($("#filter-value-input").is(":visible") || $("#filter-range-input").is(":visible")) {
+          // not initial select
+          showValue3();
+        }
+        else{
+          // initial select
+          showValue3();
+        }
+      }
+    });
+
+    // 4: TERM + REGEX + PARTIAL
+    $("#filter-condition4-selector").change(function(){
+      if ($('#filter-condition4-selector').val() == "") {
+        // TO DO: HIDE ALL SUCCEEDING SELECTORS
+        hideValue();
+      }
+      else{
+          $('#filter-value-input').prop('value', "");
+          $("#filter-value-input").show();
+          $("#add-new-filter-btn").show();
+      }
+    });
+
+    function test(){
+      resetForm();
+    }
+
+    function hideValue(){
+      $("#filter-value-input").hide();
+      $('#filter-value-input').prop('value', "");
+      $("#filter-range-input").hide();
+      $("#filter-range-input-lower").prop('value', "");
+      $("#filter-range-input-upper").prop('value', "");
+      $("#add-new-filter-btn").hide();
+    }
+
+    function showValue3(){
+      hideValue();
+      selected_field = $('#filter-condition3-selector').val();
+      switch (selected_field) {
+        case "equal":
+          $("#filter-value-input").show();
+          break;
+        case "range":
+          $("#filter-range-input").show();
+          break;
+        default:
+          alert(unreachable); console.trace();
+      }// end switch
+      $("#add-new-filter-btn").show();
+    }
+
+    function hideCondition(){
+      $("#filter-condition1-selector").hide();
+      $("#filter-value-input").hide();
+      $('#filter-value-input').prop('value', "");
+      $("#filter-condition2-selector").hide();
+      $("#filter-timerange-input").hide();
+      $("#filter-timerange-input-lower").prop('value', "");
+      $("#filter-timerange-input-upper").prop('value', "");
+      $("#filter-condition3-selector").hide();
+      $("#filter-condition4-selector").hide();
+      $('#filter-condition3-selector option[value=""]').prop('selected', true);
+      $('#filter-condition4-selector option[value=""]').prop('selected', true);
+      $("#add-new-filter-btn").hide();
+    }
+
+    function showCondition(){
+      selected_field = $('#filter-field-selector').val();
+      switch (selected_field) {
+        case "":
+          alert(unreachable); console.trace();
+          break;
+
+        case "remote_addr":
+        case "request_method":
+          // 1: TERM only
+            hideCondition();
+            $("#filter-condition1-selector").show();
+            $("#filter-value-input").show();
+            $("#add-new-filter-btn").show();
+            break;
+
+        case "time_iso8601":
+          // 2: TIME RANGE ONLY
+          hideCondition();
+          $("#filter-condition2-selector").show();
+          $("#filter-timerange-input").show();
+          $("#add-new-filter-btn").show();
+          break;
+
+        case "request_time":
+        case "status":
+        case "bytes_received":
+        case "body_bytes_sent":
+        case "bytes_sent":
+          // 3: TERM + RANGE
+          hideCondition();
+          $("#filter-condition3-selector").show();
+          break;
+
+        case "request_uri":
+        case "http_host":
+        case "http_referer":
+        case "http_user_agent":
+          // 4: TERM + REGEX + PARTIAL
+          hideCondition();
+          $("#filter-condition4-selector").show();
+          break;
+
+        default:
+          alert(unreachable); console.trace();
+      } // end switch
+    }
+
+    function resetForm(){
+      hideCondition();
+      hideValue();
+      $('#filter-field-selector').hide();
+      $('#filter-type-selector').hide();
+      $('#filter-field-selector option[value=""]').prop('selected', true);
+      $('#filter-type-selector option[value=""]').prop('selected', true);
+      $('#cancel-new-filter-btn').hide();
+      $('#new-filter-btn').show();
+    }
+
+    function newFilter(){
+      $("#new-filter-btn").hide();
+      $("#filter-field-selector").show();
+      $("#cancel-new-filter-btn").show();
+    }
+
+    function CancelNewFilter(){
+      hideValue();
+      hideCondition();
+      $("#cancel-new-filter-btn").hide();
+      $("#filter-field-selector").hide();
+      $("#filter-type-selector").hide();
+      $("#new-filter-btn").show();
+      resetForm();
+    }
+
+    function AddNewFilter(){
+      var timestamp = Date.now();
+      var field_name = $("#filter-field-selector option:selected").text();
+      var field_id = $("#filter-field-selector").val();
+      var type_name = $("#filter-type-selector option:selected").text();
+      var type_id = $("#filter-type-selector").val();
+
+      var condition_name, condition_id;
+      if ($("#filter-condition1-selector").is(":visible")){
+        condition_name = $("#filter-condition1-selector option:selected").text();
+        condition_id = $("#filter-condition1-selector").val();
+      }
+      else if ($("#filter-condition2-selector").is(":visible")){
+        condition_name = $("#filter-condition2-selector option:selected").text();
+        condition_id = $("#filter-condition2-selector").val();
+      }
+      else if ($("#filter-condition3-selector").is(":visible")){
+        condition_name = $("#filter-condition3-selector option:selected").text();
+        condition_id = $("#filter-condition3-selector").val();
+      }
+      else if ($("#filter-condition4-selector").is(":visible")){
+        condition_name = $("#filter-condition4-selector option:selected").text();
+        condition_id = $("#filter-condition4-selector").val();
+      }
+      else{
+        alert(unreachable); console.trace();
+      }
+
+      var value;
+      var lower, upper;
+      if ($("#filter-value-input").is(":visible")){
+        value = $("#filter-value-input").val();
+      }
+      else if ($("#filter-timerange-input").is(":visible")){
+        lower = $("#filter-timerange-input-lower").val();
+        upper = $("#filter-timerange-input-upper").val();
+      }
+      else if ($("#filter-range-input").is(":visible")){
+        lower = $("#filter-range-input-lower").val()
+        upper = $("#filter-range-input-upper").val();
+      }
+      else{
+        alert(unreachable); console.trace();
+      }
+
+      if (value != undefined) {
+        $("#filter-tags").append("<li class='filter-tag' id='tag-" + timestamp + "' field='" + field_id + "' type='" + type_id + "' condition='" + condition_id + "' value='" + value + "' onclick='editTag(" + timestamp + ");' >" + field_name + " " + type_name + " " + condition_name + " " + value + "<span class='delete-filter-tag' onclick='deleteTag(" + timestamp + ");'>×</span></li>");
+      }
+      else{
+        $("#filter-tags").append("<li class='filter-tag' id='tag-" + timestamp + "' field='" + field_id + "' type='" + type_id + "' condition='" + condition_id + "' lower='" + lower + "' upper='" + upper + "' onclick='editTag(" + timestamp + ");' >" + field_name + " " + type_name + " " + condition_name + " " + lower + " & " + upper + "<span class='delete-filter-tag' onclick='deleteTag(" + timestamp + ");'>×</span></li>");
+      }
+
+      resetForm();
+      $("#del-all-filter-btn").show();
+    }
+
+    function editTag(tag_id){
+      var tag = $("#tag-" + tag_id);
+      if (!tag.length) {
+        // for deleting
+        return;
+      }
+      console.log("EDIT");
+      var field = tag.attr("field");
+      var type = tag.attr("type");
+      var condition = tag.attr("condition");
+      // var value = tag.attr("value");
+      // var lower = tag.attr("lower");
+      // var upper = tag.attr("upper");
+      resetForm();
+      $('#new-filter-btn').hide();
+      $('#cancel-new-filter-btn').show();
+      $('#add-new-filter-btn').show();
+
+      $('#filter-field-selector').show();
+      $('#filter-field-selector option[value="' + field + '"]').prop('selected', true);
+      $('#filter-type-selector').show();
+      $('#filter-type-selector option[value="' + type + '"]').prop('selected', true);
+      switch (field) {
+        case "":
+          alert(unreachable); console.trace();
+          break;
+
+        case "remote_addr":
+        case "request_method":
+          // 1: TERM only
+          $("#filter-condition1-selector").show();
+          $("#filter-value-input").show();
+          $("#filter-value-input").val(tag.attr("value"));
+          break;
+
+        case "time_iso8601":
+          // 2: TIME RANGE ONLY
+          $("#filter-condition2-selector").show();
+          $("#filter-timerange-input").show();
+          $("#filter-timerange-input-lower").val(tag.attr("lower"));
+          $("#filter-timerange-input-upper").val(tag.attr("upper"));
+          break;
+
+        case "request_time":
+        case "status":
+        case "bytes_received":
+        case "body_bytes_sent":
+        case "bytes_sent":
+          // 3: TERM + RANGE
+          $("#filter-condition3-selector").show();
+          $('#filter-condition3-selector option[value="' + condition + '"]').prop('selected', true);
+          if (condition == "equal") {
+            $("#filter-value-input").show();
+            $("#filter-value-input").val(tag.attr("value"));
+          }
+          else if (condition == "range"){
+            $("#filter-range-input").show();
+            $("#filter-range-input-lower").val(tag.attr("lower"));
+            $("#filter-range-input-upper").val(tag.attr("upper"));
+          }
+          else{
+            alert(unreachable); console.trace();
+          }
+          break;
+
+        case "request_uri":
+        case "http_host":
+        case "http_referer":
+        case "http_user_agent":
+          // 4: TERM + REGEX + PARTIAL
+          $("#filter-condition4-selector").show();
+          $('#filter-condition4-selector option[value="' + condition + '"]').prop('selected', true);
+          $("#filter-value-input").show();
+          $("#filter-value-input").val(tag.attr("value"));
+          break;
+
+        default:
+          alert(unreachable); console.trace();
+      } // end switch
+    }
+
+    function deleteTag(tag_id){
+      $("#tag-" + tag_id).remove();
+      if ($("#filter-tags").children("li").length == 0) {
+        $("#del-all-filter-btn").hide();
+      }
+    }
+
+    function DeleteAllFilter(){
+      $("#filter-tags").children("li").each(function( index ) {
+        console.log( index + ": " + $( this ).attr("id").substring(4) );
+        deleteTag($( this ).attr("id").substring(4));
+      });
+      $("#del-all-filter-btn").hide();
+    }
+
+    // remote_addr
+    // time_iso8601
+    // request_time
+    // request_uri
+    // request_method
+    // status
+    // bytes_received
+    // body_bytes_sent
+    // bytes_sent
+    // http_host
+    // http_referer
+    // http_user_agent
+
+  </script>
+
+  </body>
+</html>

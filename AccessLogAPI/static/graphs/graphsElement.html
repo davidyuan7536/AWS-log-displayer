@@ -1,0 +1,1818 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="graphs-element">
+
+  <template>
+
+    <div id = "mainGraphContainer" style = "background-color: white; margin-bottom: 20px" class="state col-lg-12"></div>
+
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'graphs-element',
+
+      properties:{
+        uniqueId: {
+          type: Number,
+          value: '1',
+          observer: 'uniqueIdChanged'
+        },
+        bucketData : {
+          type: String,
+          value: "bytes_sent",
+          observer: 'bucketDataChanged'
+        },
+        bucketDataAnalyze: {
+          type: String,
+          value: "avg",
+          observer: 'bucketDataAnalyzeChanged'
+        },
+        granularity: {
+          type: String,
+          value: "day",
+          observer: 'granularityChanged'
+        },
+        mustData: {
+          type: Array,
+          value: [],
+          observer: 'mustDataChanged'
+        },
+        mustNotData: {
+          type: Array,
+          value: [],
+          observer: 'mustNotDataChanged'
+        },
+        shouldData: {
+          type: Array,
+          value: [],
+          observer: 'shouldDataChanged'
+        }
+      },
+
+
+
+      ready: function(){
+
+        var uniqueID = this.uniqueId;
+
+        var bucketData = this.bucketData;
+        var bucketDataAnalyze = this.bucketDataAnalyze;
+        var granularity = this.granularity;
+
+        var mustData = this.mustData;
+        var mustNotData = this.mustNotData;
+        var shouldData = this.shouldData;
+
+        var name;
+
+        if(bucketDataAnalyze == "avg"){
+            name = "Average ";
+        }
+        else if(bucketDataAnalyze == "min"){
+            name = "Minimum ";
+        }
+        else if(bucketDataAnalyze == "max"){
+            name = "Maximum ";
+        }
+        else if(bucketDataAnalyze == "sum"){
+            name = "Total ";
+        }
+
+
+        if(bucketData == "bytes_sent"){
+            name = name + "Bytes Sent ";
+        }
+        else if(bucketData == "body_bytes_sent"){
+            name = name + "Body Bytes Sent ";
+        }
+        else if(bucketData == "bytes_received"){
+            name = name + "Request Length ";
+        }
+
+
+
+        if (granularity == "second"){
+            name = name + "By Seconds";
+        }
+        else if (granularity == "minute"){
+            name = name + "By Minutes";
+        }
+        else if (granularity == "hour"){
+            name = name + "By Hours";
+        }
+        else if (granularity == "day"){
+            name = name + "By Days";
+        }
+        else if (granularity == "week"){
+            name = name + "By Weeks";
+        }
+        else if (granularity == "month"){
+            name = name + "By Months";
+        }
+        else if (granularity == "year"){
+            name = name + "By Years";
+        }
+
+
+        var temp = "mainGraphContainer" + this.uniqueId;
+        $('#mainGraphContainer').attr("id", temp);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        //Sort Time Function///////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+
+          var sort_by = function(field, reverse, primer){
+
+            var key = primer ?
+            function(x) {return primer(x[field])} :
+            function(x) {return x[field]};
+
+            reverse = !reverse ? 1 : -1;
+
+            return function (a, b) {
+              return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+            }
+          }
+
+
+
+          /////////////////////////////////////////////////////////////////////////////////////////////////
+          //Graph Container 1///////////////////////////////////////////////////////////////////////////////////
+          /////////////////////////////////////////////////////////////////////////////////////////////////
+
+          var options = {
+            rangeSelector : {
+              buttons : [{
+                type : 'day',
+                count : 1,
+                text : '1D'
+              }, {
+                type : 'week',
+                count : 1,
+                text : '1W'
+              }, {
+                type : 'month',
+                count : 1,
+                text : '1M'
+              }, {
+                type : 'all',
+                count : 1,
+                text : 'All'
+              }],
+              selected : 3,
+              inputEnabled : false
+            },
+
+            chart: {
+              renderTo: temp,
+              defaultSeriesType: 'line',
+              panning: 'true'
+            },
+
+            title: {
+              text: name
+            },
+            xAxis: {
+              type: 'datetime',
+              dateTimeLabelFormats: { // don't display the dummy year
+              day: '%b %e',
+              week: '%b %e',
+              month: '%b %e',
+              year: '%y'
+            },
+            title: {
+              text: 'Date'
+            }
+          },
+          yAxis: {
+            min: 0
+          },
+          tooltip: {
+
+          },
+
+          plotOptions: {
+            area: {
+              fillColor: {
+                linearGradient: {
+                  x1: 0,
+                  y1: 0,
+                  x2: 0,
+                  y2: 1
+                },
+                stops: [
+                  [0, Highcharts.getOptions().colors[0]],
+                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                ]
+              },
+              marker: {
+                radius: 2
+              },
+              lineWidth: 1,
+              states: {
+                hover: {
+                  lineWidth: 1
+                }
+              },
+              threshold: null
+            }
+          },
+
+          series: [],
+
+        };
+
+
+        var dps = [];
+
+
+        var data2 = {
+          'bucketData': bucketData,
+          'bucketDataAnalyze': bucketDataAnalyze,
+          'granularity': granularity,
+          'limit': '0',
+          'offset': '0',
+          'mustData' : JSON.stringify(mustData),
+          'mustNotData' : JSON.stringify(mustNotData),
+          'shouldData' : JSON.stringify(shouldData)
+        };
+
+        $.post( "/elasticsearch/dateHistogram", data2, function( data3 ){
+
+          var myDate
+          $.each(data3.grouping.buckets, function(index,value ){
+
+            // alert(data3.grouping.buckets[index].key_as_string);
+            myDate = new Date(data3.grouping.buckets[index].key_as_string);
+
+            var myEpoch = myDate.getTime()/1000.0;
+            // alert(data3.grouping.buckets[index].dataAnalyzeReturned.value);
+            dps.push({x: myEpoch, y: data3.grouping.buckets[index].dataAnalyzeReturned.value});
+
+
+          });
+          dps.sort(sort_by('x', false, parseInt));
+
+          dataHolder = [];
+          $.each(dps, function(index, value){
+            dataHolder.push([ dps[index]["x"]*1000, dps[index]["y"] ]);
+          });
+
+
+          options.series = [{name : 'testing', data: dataHolder}];
+
+          var chart = new Highcharts.StockChart(options);
+          chart.pointer.cmd = chart.pointer.onContainerMouseDown;
+          chart.pointer.onContainerMouseDown = function (a){
+            this.zoomX=this.zoomHor=this.hasZoom=a.shiftKey;
+            this.cmd(a);
+          };
+        });
+
+
+      },
+
+      uniqueIdChanged: function(newValue, oldValue){
+        var uniqueID = newValue;
+
+        var bucketData = this.bucketData;
+        var bucketDataAnalyze = this.bucketDataAnalyze;
+        var granularity = this.granularity;
+
+        var mustData = this.mustData;
+        var mustNotData = this.mustNotData;
+        var shouldData = this.shouldData;
+
+        var name;
+
+        if(bucketDataAnalyze == "avg"){
+            name = "Average ";
+        }
+        else if(bucketDataAnalyze == "min"){
+            name = "Minimum ";
+        }
+        else if(bucketDataAnalyze == "max"){
+            name = "Maximum ";
+        }
+        else if(bucketDataAnalyze == "sum"){
+            name = "Total ";
+        }
+
+
+        if(bucketData == "bytes_sent"){
+            name = name + "Bytes Sent ";
+        }
+        else if(bucketData == "body_bytes_sent"){
+            name = name + "Body Bytes Sent ";
+        }
+        else if(bucketData == "bytes_received"){
+            name = name + "Request Length ";
+        }
+
+
+
+        if (granularity == "second"){
+            name = name + "By Seconds";
+        }
+        else if (granularity == "minute"){
+            name = name + "By Minutes";
+        }
+        else if (granularity == "hour"){
+            name = name + "By Hours";
+        }
+        else if (granularity == "day"){
+            name = name + "By Days";
+        }
+        else if (granularity == "week"){
+            name = name + "By Weeks";
+        }
+        else if (granularity == "month"){
+            name = name + "By Months";
+        }
+        else if (granularity == "year"){
+            name = name + "By Years";
+        }
+
+
+        var temp = "mainGraphContainer" + this.uniqueId;
+        $('#mainGraphContainer').attr("id", temp);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        //Sort Time Function///////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+
+          var sort_by = function(field, reverse, primer){
+
+            var key = primer ?
+            function(x) {return primer(x[field])} :
+            function(x) {return x[field]};
+
+            reverse = !reverse ? 1 : -1;
+
+            return function (a, b) {
+              return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+            }
+          }
+
+
+
+          /////////////////////////////////////////////////////////////////////////////////////////////////
+          //Graph Container 1///////////////////////////////////////////////////////////////////////////////////
+          /////////////////////////////////////////////////////////////////////////////////////////////////
+
+          var options = {
+            rangeSelector : {
+              buttons : [{
+                type : 'day',
+                count : 1,
+                text : '1D'
+              }, {
+                type : 'week',
+                count : 1,
+                text : '1W'
+              }, {
+                type : 'month',
+                count : 1,
+                text : '1M'
+              }, {
+                type : 'all',
+                count : 1,
+                text : 'All'
+              }],
+              selected : 3,
+              inputEnabled : false
+            },
+
+            chart: {
+              renderTo: temp,
+              defaultSeriesType: 'line',
+              panning: 'true'
+            },
+
+            title: {
+              text: name
+            },
+            xAxis: {
+              type: 'datetime',
+              dateTimeLabelFormats: { // don't display the dummy year
+              day: '%b %e',
+              week: '%b %e',
+              month: '%b %e',
+              year: '%y'
+            },
+            title: {
+              text: 'Date'
+            }
+          },
+          yAxis: {
+            min: 0
+          },
+          tooltip: {
+
+          },
+
+          plotOptions: {
+            area: {
+              fillColor: {
+                linearGradient: {
+                  x1: 0,
+                  y1: 0,
+                  x2: 0,
+                  y2: 1
+                },
+                stops: [
+                  [0, Highcharts.getOptions().colors[0]],
+                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                ]
+              },
+              marker: {
+                radius: 2
+              },
+              lineWidth: 1,
+              states: {
+                hover: {
+                  lineWidth: 1
+                }
+              },
+              threshold: null
+            }
+          },
+
+          series: [],
+
+        };
+
+
+        var dps = [];
+
+
+        var data2 = {
+          'bucketData': bucketData,
+          'bucketDataAnalyze': bucketDataAnalyze,
+          'granularity': granularity,
+          'limit': '0',
+          'offset': '0',
+          'mustData' : JSON.stringify(mustData),
+          'mustNotData' : JSON.stringify(mustNotData),
+          'shouldData' : JSON.stringify(shouldData)
+        };
+
+        $.post( "/elasticsearch/dateHistogram", data2, function( data3 ){
+
+          var myDate
+          $.each(data3.grouping.buckets, function(index,value ){
+
+            // alert(data3.grouping.buckets[index].key_as_string);
+            myDate = new Date(data3.grouping.buckets[index].key_as_string);
+
+            var myEpoch = myDate.getTime()/1000.0;
+            // alert(data3.grouping.buckets[index].dataAnalyzeReturned.value);
+            dps.push({x: myEpoch, y: data3.grouping.buckets[index].dataAnalyzeReturned.value});
+
+
+          });
+          dps.sort(sort_by('x', false, parseInt));
+
+          dataHolder = [];
+          $.each(dps, function(index, value){
+            dataHolder.push([ dps[index]["x"]*1000, dps[index]["y"] ]);
+          });
+
+
+          options.series = [{name : 'testing', data: dataHolder}];
+
+          var chart = new Highcharts.StockChart(options);
+          chart.pointer.cmd = chart.pointer.onContainerMouseDown;
+          chart.pointer.onContainerMouseDown = function (a){
+            this.zoomX=this.zoomHor=this.hasZoom=a.shiftKey;
+            this.cmd(a);
+          };
+        });
+
+
+      },
+
+      bucketDataChanged: function(newValue, oldValue){
+        var uniqueID = this.uniqueId;
+
+        var bucketData = newValue;
+        var bucketDataAnalyze = this.bucketDataAnalyze;
+        var granularity = this.granularity;
+
+        var mustData = this.mustData;
+        var mustNotData = this.mustNotData;
+        var shouldData = this.shouldData;
+
+        var name;
+
+        if(bucketDataAnalyze == "avg"){
+            name = "Average ";
+        }
+        else if(bucketDataAnalyze == "min"){
+            name = "Minimum ";
+        }
+        else if(bucketDataAnalyze == "max"){
+            name = "Maximum ";
+        }
+        else if(bucketDataAnalyze == "sum"){
+            name = "Total ";
+        }
+
+
+        if(bucketData == "bytes_sent"){
+            name = name + "Bytes Sent ";
+        }
+        else if(bucketData == "body_bytes_sent"){
+            name = name + "Body Bytes Sent ";
+        }
+        else if(bucketData == "bytes_received"){
+            name = name + "Request Length ";
+        }
+
+
+
+        if (granularity == "second"){
+            name = name + "By Seconds";
+        }
+        else if (granularity == "minute"){
+            name = name + "By Minutes";
+        }
+        else if (granularity == "hour"){
+            name = name + "By Hours";
+        }
+        else if (granularity == "day"){
+            name = name + "By Days";
+        }
+        else if (granularity == "week"){
+            name = name + "By Weeks";
+        }
+        else if (granularity == "month"){
+            name = name + "By Months";
+        }
+        else if (granularity == "year"){
+            name = name + "By Years";
+        }
+
+
+        var temp = "mainGraphContainer" + this.uniqueId;
+        $('#mainGraphContainer').attr("id", temp);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        //Sort Time Function///////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+
+          var sort_by = function(field, reverse, primer){
+
+            var key = primer ?
+            function(x) {return primer(x[field])} :
+            function(x) {return x[field]};
+
+            reverse = !reverse ? 1 : -1;
+
+            return function (a, b) {
+              return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+            }
+          }
+
+
+
+          /////////////////////////////////////////////////////////////////////////////////////////////////
+          //Graph Container 1///////////////////////////////////////////////////////////////////////////////////
+          /////////////////////////////////////////////////////////////////////////////////////////////////
+
+          var options = {
+            rangeSelector : {
+              buttons : [{
+                type : 'day',
+                count : 1,
+                text : '1D'
+              }, {
+                type : 'week',
+                count : 1,
+                text : '1W'
+              }, {
+                type : 'month',
+                count : 1,
+                text : '1M'
+              }, {
+                type : 'all',
+                count : 1,
+                text : 'All'
+              }],
+              selected : 3,
+              inputEnabled : false
+            },
+
+            chart: {
+              renderTo: temp,
+              defaultSeriesType: 'line',
+              panning: 'true'
+            },
+
+            title: {
+              text: name
+            },
+            xAxis: {
+              type: 'datetime',
+              dateTimeLabelFormats: { // don't display the dummy year
+              day: '%b %e',
+              week: '%b %e',
+              month: '%b %e',
+              year: '%y'
+            },
+            title: {
+              text: 'Date'
+            }
+          },
+          yAxis: {
+            min: 0
+          },
+          tooltip: {
+
+          },
+
+          plotOptions: {
+            area: {
+              fillColor: {
+                linearGradient: {
+                  x1: 0,
+                  y1: 0,
+                  x2: 0,
+                  y2: 1
+                },
+                stops: [
+                  [0, Highcharts.getOptions().colors[0]],
+                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                ]
+              },
+              marker: {
+                radius: 2
+              },
+              lineWidth: 1,
+              states: {
+                hover: {
+                  lineWidth: 1
+                }
+              },
+              threshold: null
+            }
+          },
+
+          series: [],
+
+        };
+
+
+        var dps = [];
+
+
+        var data2 = {
+          'bucketData': bucketData,
+          'bucketDataAnalyze': bucketDataAnalyze,
+          'granularity': granularity,
+          'limit': '0',
+          'offset': '0',
+          'mustData' : JSON.stringify(mustData),
+          'mustNotData' : JSON.stringify(mustNotData),
+          'shouldData' : JSON.stringify(shouldData)
+        };
+
+        $.post( "/elasticsearch/dateHistogram", data2, function( data3 ){
+
+          var myDate
+          $.each(data3.grouping.buckets, function(index,value ){
+
+            // alert(data3.grouping.buckets[index].key_as_string);
+            myDate = new Date(data3.grouping.buckets[index].key_as_string);
+
+            var myEpoch = myDate.getTime()/1000.0;
+            // alert(data3.grouping.buckets[index].dataAnalyzeReturned.value);
+            dps.push({x: myEpoch, y: data3.grouping.buckets[index].dataAnalyzeReturned.value});
+
+
+          });
+          dps.sort(sort_by('x', false, parseInt));
+
+          dataHolder = [];
+          $.each(dps, function(index, value){
+            dataHolder.push([ dps[index]["x"]*1000, dps[index]["y"] ]);
+          });
+
+
+          options.series = [{name : 'testing', data: dataHolder}];
+
+          var chart = new Highcharts.StockChart(options);
+          chart.pointer.cmd = chart.pointer.onContainerMouseDown;
+          chart.pointer.onContainerMouseDown = function (a){
+            this.zoomX=this.zoomHor=this.hasZoom=a.shiftKey;
+            this.cmd(a);
+          };
+        });
+
+
+      },
+
+      bucketDataAnalyzeChanged: function(newValue, oldValue){
+        var uniqueID = this.uniqueId;
+
+        var bucketData = this.bucketData;
+        var bucketDataAnalyze = newValue;
+        var granularity = this.granularity;
+
+        var mustData = this.mustData;
+        var mustNotData = this.mustNotData;
+        var shouldData = this.shouldData;
+
+        var name;
+
+        if(bucketDataAnalyze == "avg"){
+            name = "Average ";
+        }
+        else if(bucketDataAnalyze == "min"){
+            name = "Minimum ";
+        }
+        else if(bucketDataAnalyze == "max"){
+            name = "Maximum ";
+        }
+        else if(bucketDataAnalyze == "sum"){
+            name = "Total ";
+        }
+
+
+        if(bucketData == "bytes_sent"){
+            name = name + "Bytes Sent ";
+        }
+        else if(bucketData == "body_bytes_sent"){
+            name = name + "Body Bytes Sent ";
+        }
+        else if(bucketData == "bytes_received"){
+            name = name + "Request Length ";
+        }
+
+
+
+        if (granularity == "second"){
+            name = name + "By Seconds";
+        }
+        else if (granularity == "minute"){
+            name = name + "By Minutes";
+        }
+        else if (granularity == "hour"){
+            name = name + "By Hours";
+        }
+        else if (granularity == "day"){
+            name = name + "By Days";
+        }
+        else if (granularity == "week"){
+            name = name + "By Weeks";
+        }
+        else if (granularity == "month"){
+            name = name + "By Months";
+        }
+        else if (granularity == "year"){
+            name = name + "By Years";
+        }
+
+
+        var temp = "mainGraphContainer" + this.uniqueId;
+        $('#mainGraphContainer').attr("id", temp);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        //Sort Time Function///////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+
+          var sort_by = function(field, reverse, primer){
+
+            var key = primer ?
+            function(x) {return primer(x[field])} :
+            function(x) {return x[field]};
+
+            reverse = !reverse ? 1 : -1;
+
+            return function (a, b) {
+              return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+            }
+          }
+
+
+
+          /////////////////////////////////////////////////////////////////////////////////////////////////
+          //Graph Container 1///////////////////////////////////////////////////////////////////////////////////
+          /////////////////////////////////////////////////////////////////////////////////////////////////
+
+          var options = {
+            rangeSelector : {
+              buttons : [{
+                type : 'day',
+                count : 1,
+                text : '1D'
+              }, {
+                type : 'week',
+                count : 1,
+                text : '1W'
+              }, {
+                type : 'month',
+                count : 1,
+                text : '1M'
+              }, {
+                type : 'all',
+                count : 1,
+                text : 'All'
+              }],
+              selected : 3,
+              inputEnabled : false
+            },
+
+            chart: {
+              renderTo: temp,
+              defaultSeriesType: 'line',
+              panning: 'true'
+            },
+
+            title: {
+              text: name
+            },
+            xAxis: {
+              type: 'datetime',
+              dateTimeLabelFormats: { // don't display the dummy year
+              day: '%b %e',
+              week: '%b %e',
+              month: '%b %e',
+              year: '%y'
+            },
+            title: {
+              text: 'Date'
+            }
+          },
+          yAxis: {
+            min: 0
+          },
+          tooltip: {
+
+          },
+
+          plotOptions: {
+            area: {
+              fillColor: {
+                linearGradient: {
+                  x1: 0,
+                  y1: 0,
+                  x2: 0,
+                  y2: 1
+                },
+                stops: [
+                  [0, Highcharts.getOptions().colors[0]],
+                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                ]
+              },
+              marker: {
+                radius: 2
+              },
+              lineWidth: 1,
+              states: {
+                hover: {
+                  lineWidth: 1
+                }
+              },
+              threshold: null
+            }
+          },
+
+          series: [],
+
+        };
+
+
+        var dps = [];
+
+
+        var data2 = {
+          'bucketData': bucketData,
+          'bucketDataAnalyze': bucketDataAnalyze,
+          'granularity': granularity,
+          'limit': '0',
+          'offset': '0',
+          'mustData' : JSON.stringify(mustData),
+          'mustNotData' : JSON.stringify(mustNotData),
+          'shouldData' : JSON.stringify(shouldData)
+        };
+
+        $.post( "/elasticsearch/dateHistogram", data2, function( data3 ){
+
+          var myDate
+          $.each(data3.grouping.buckets, function(index,value ){
+
+            // alert(data3.grouping.buckets[index].key_as_string);
+            myDate = new Date(data3.grouping.buckets[index].key_as_string);
+
+            var myEpoch = myDate.getTime()/1000.0;
+            // alert(data3.grouping.buckets[index].dataAnalyzeReturned.value);
+            dps.push({x: myEpoch, y: data3.grouping.buckets[index].dataAnalyzeReturned.value});
+
+
+          });
+          dps.sort(sort_by('x', false, parseInt));
+
+          dataHolder = [];
+          $.each(dps, function(index, value){
+            dataHolder.push([ dps[index]["x"]*1000, dps[index]["y"] ]);
+          });
+
+
+          options.series = [{name : 'testing', data: dataHolder}];
+
+          var chart = new Highcharts.StockChart(options);
+          chart.pointer.cmd = chart.pointer.onContainerMouseDown;
+          chart.pointer.onContainerMouseDown = function (a){
+            this.zoomX=this.zoomHor=this.hasZoom=a.shiftKey;
+            this.cmd(a);
+          };
+        });
+
+
+      },
+
+      granularityChanged: function(newValue, oldValue){
+        var uniqueID = this.uniqueId;
+
+        var bucketData = this.bucketData;
+        var bucketDataAnalyze = this.bucketDataAnalyze;
+        var granularity = newValue;
+
+        var mustData = this.mustData;
+        var mustNotData = this.mustNotData;
+        var shouldData = this.shouldData;
+
+        var name;
+
+        if(bucketDataAnalyze == "avg"){
+            name = "Average ";
+        }
+        else if(bucketDataAnalyze == "min"){
+            name = "Minimum ";
+        }
+        else if(bucketDataAnalyze == "max"){
+            name = "Maximum ";
+        }
+        else if(bucketDataAnalyze == "sum"){
+            name = "Total ";
+        }
+
+
+        if(bucketData == "bytes_sent"){
+            name = name + "Bytes Sent ";
+        }
+        else if(bucketData == "body_bytes_sent"){
+            name = name + "Body Bytes Sent ";
+        }
+        else if(bucketData == "bytes_received"){
+            name = name + "Request Length ";
+        }
+
+
+
+        if (granularity == "second"){
+            name = name + "By Seconds";
+        }
+        else if (granularity == "minute"){
+            name = name + "By Minutes";
+        }
+        else if (granularity == "hour"){
+            name = name + "By Hours";
+        }
+        else if (granularity == "day"){
+            name = name + "By Days";
+        }
+        else if (granularity == "week"){
+            name = name + "By Weeks";
+        }
+        else if (granularity == "month"){
+            name = name + "By Months";
+        }
+        else if (granularity == "year"){
+            name = name + "By Years";
+        }
+
+
+        var temp = "mainGraphContainer" + this.uniqueId;
+        $('#mainGraphContainer').attr("id", temp);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        //Sort Time Function///////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+
+          var sort_by = function(field, reverse, primer){
+
+            var key = primer ?
+            function(x) {return primer(x[field])} :
+            function(x) {return x[field]};
+
+            reverse = !reverse ? 1 : -1;
+
+            return function (a, b) {
+              return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+            }
+          }
+
+
+
+          /////////////////////////////////////////////////////////////////////////////////////////////////
+          //Graph Container 1///////////////////////////////////////////////////////////////////////////////////
+          /////////////////////////////////////////////////////////////////////////////////////////////////
+
+          var options = {
+            rangeSelector : {
+              buttons : [{
+                type : 'day',
+                count : 1,
+                text : '1D'
+              }, {
+                type : 'week',
+                count : 1,
+                text : '1W'
+              }, {
+                type : 'month',
+                count : 1,
+                text : '1M'
+              }, {
+                type : 'all',
+                count : 1,
+                text : 'All'
+              }],
+              selected : 3,
+              inputEnabled : false
+            },
+
+            chart: {
+              renderTo: temp,
+              defaultSeriesType: 'line',
+              panning: 'true'
+            },
+
+            title: {
+              text: name
+            },
+            xAxis: {
+              type: 'datetime',
+              dateTimeLabelFormats: { // don't display the dummy year
+              day: '%b %e',
+              week: '%b %e',
+              month: '%b %e',
+              year: '%y'
+            },
+            title: {
+              text: 'Date'
+            }
+          },
+          yAxis: {
+            min: 0
+          },
+          tooltip: {
+
+          },
+
+          plotOptions: {
+            area: {
+              fillColor: {
+                linearGradient: {
+                  x1: 0,
+                  y1: 0,
+                  x2: 0,
+                  y2: 1
+                },
+                stops: [
+                  [0, Highcharts.getOptions().colors[0]],
+                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                ]
+              },
+              marker: {
+                radius: 2
+              },
+              lineWidth: 1,
+              states: {
+                hover: {
+                  lineWidth: 1
+                }
+              },
+              threshold: null
+            }
+          },
+
+          series: [],
+
+        };
+
+
+        var dps = [];
+
+
+        var data2 = {
+          'bucketData': bucketData,
+          'bucketDataAnalyze': bucketDataAnalyze,
+          'granularity': granularity,
+          'limit': '0',
+          'offset': '0',
+          'mustData' : JSON.stringify(mustData),
+          'mustNotData' : JSON.stringify(mustNotData),
+          'shouldData' : JSON.stringify(shouldData)
+        };
+
+        $.post( "/elasticsearch/dateHistogram", data2, function( data3 ){
+
+          var myDate
+          $.each(data3.grouping.buckets, function(index,value ){
+
+            // alert(data3.grouping.buckets[index].key_as_string);
+            myDate = new Date(data3.grouping.buckets[index].key_as_string);
+
+            var myEpoch = myDate.getTime()/1000.0;
+            // alert(data3.grouping.buckets[index].dataAnalyzeReturned.value);
+            dps.push({x: myEpoch, y: data3.grouping.buckets[index].dataAnalyzeReturned.value});
+
+
+          });
+          dps.sort(sort_by('x', false, parseInt));
+
+          dataHolder = [];
+          $.each(dps, function(index, value){
+            dataHolder.push([ dps[index]["x"]*1000, dps[index]["y"] ]);
+          });
+
+
+          options.series = [{name : 'testing', data: dataHolder}];
+
+          var chart = new Highcharts.StockChart(options);
+          chart.pointer.cmd = chart.pointer.onContainerMouseDown;
+          chart.pointer.onContainerMouseDown = function (a){
+            this.zoomX=this.zoomHor=this.hasZoom=a.shiftKey;
+            this.cmd(a);
+          };
+        });
+
+
+      },
+
+      mustDataChanged: function(newValue, oldValue){
+        var uniqueID = this.uniqueId;
+
+        var bucketData = this.bucketData;
+        var bucketDataAnalyze = this.bucketDataAnalyze;
+        var granularity = this.granularity;
+
+        var mustData = newValue;
+        var mustNotData = this.mustNotData;
+        var shouldData = this.shouldData;
+
+        var name;
+
+        if(bucketDataAnalyze == "avg"){
+            name = "Average ";
+        }
+        else if(bucketDataAnalyze == "min"){
+            name = "Minimum ";
+        }
+        else if(bucketDataAnalyze == "max"){
+            name = "Maximum ";
+        }
+        else if(bucketDataAnalyze == "sum"){
+            name = "Total ";
+        }
+
+
+        if(bucketData == "bytes_sent"){
+            name = name + "Bytes Sent ";
+        }
+        else if(bucketData == "body_bytes_sent"){
+            name = name + "Body Bytes Sent ";
+        }
+        else if(bucketData == "bytes_received"){
+            name = name + "Request Length ";
+        }
+
+
+
+        if (granularity == "second"){
+            name = name + "By Seconds";
+        }
+        else if (granularity == "minute"){
+            name = name + "By Minutes";
+        }
+        else if (granularity == "hour"){
+            name = name + "By Hours";
+        }
+        else if (granularity == "day"){
+            name = name + "By Days";
+        }
+        else if (granularity == "week"){
+            name = name + "By Weeks";
+        }
+        else if (granularity == "month"){
+            name = name + "By Months";
+        }
+        else if (granularity == "year"){
+            name = name + "By Years";
+        }
+
+
+        var temp = "mainGraphContainer" + this.uniqueId;
+        $('#mainGraphContainer').attr("id", temp);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        //Sort Time Function///////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+
+          var sort_by = function(field, reverse, primer){
+
+            var key = primer ?
+            function(x) {return primer(x[field])} :
+            function(x) {return x[field]};
+
+            reverse = !reverse ? 1 : -1;
+
+            return function (a, b) {
+              return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+            }
+          }
+
+
+
+          /////////////////////////////////////////////////////////////////////////////////////////////////
+          //Graph Container 1///////////////////////////////////////////////////////////////////////////////////
+          /////////////////////////////////////////////////////////////////////////////////////////////////
+
+          var options = {
+            rangeSelector : {
+              buttons : [{
+                type : 'day',
+                count : 1,
+                text : '1D'
+              }, {
+                type : 'week',
+                count : 1,
+                text : '1W'
+              }, {
+                type : 'month',
+                count : 1,
+                text : '1M'
+              }, {
+                type : 'all',
+                count : 1,
+                text : 'All'
+              }],
+              selected : 3,
+              inputEnabled : false
+            },
+
+            chart: {
+              renderTo: temp,
+              defaultSeriesType: 'line',
+              panning: 'true'
+            },
+
+            title: {
+              text: name
+            },
+            xAxis: {
+              type: 'datetime',
+              dateTimeLabelFormats: { // don't display the dummy year
+              day: '%b %e',
+              week: '%b %e',
+              month: '%b %e',
+              year: '%y'
+            },
+            title: {
+              text: 'Date'
+            }
+          },
+          yAxis: {
+            min: 0
+          },
+          tooltip: {
+
+          },
+
+          plotOptions: {
+            area: {
+              fillColor: {
+                linearGradient: {
+                  x1: 0,
+                  y1: 0,
+                  x2: 0,
+                  y2: 1
+                },
+                stops: [
+                  [0, Highcharts.getOptions().colors[0]],
+                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                ]
+              },
+              marker: {
+                radius: 2
+              },
+              lineWidth: 1,
+              states: {
+                hover: {
+                  lineWidth: 1
+                }
+              },
+              threshold: null
+            }
+          },
+
+          series: [],
+
+        };
+
+
+        var dps = [];
+
+
+        var data2 = {
+          'bucketData': bucketData,
+          'bucketDataAnalyze': bucketDataAnalyze,
+          'granularity': granularity,
+          'limit': '0',
+          'offset': '0',
+          'mustData' : JSON.stringify(mustData),
+          'mustNotData' : JSON.stringify(mustNotData),
+          'shouldData' : JSON.stringify(shouldData)
+        };
+
+        $.post( "/elasticsearch/dateHistogram", data2, function( data3 ){
+
+          var myDate
+          $.each(data3.grouping.buckets, function(index,value ){
+
+            // alert(data3.grouping.buckets[index].key_as_string);
+            myDate = new Date(data3.grouping.buckets[index].key_as_string);
+
+            var myEpoch = myDate.getTime()/1000.0;
+            // alert(data3.grouping.buckets[index].dataAnalyzeReturned.value);
+            dps.push({x: myEpoch, y: data3.grouping.buckets[index].dataAnalyzeReturned.value});
+
+
+          });
+          dps.sort(sort_by('x', false, parseInt));
+
+          dataHolder = [];
+          $.each(dps, function(index, value){
+            dataHolder.push([ dps[index]["x"]*1000, dps[index]["y"] ]);
+          });
+
+
+          options.series = [{name : 'testing', data: dataHolder}];
+
+          var chart = new Highcharts.StockChart(options);
+          chart.pointer.cmd = chart.pointer.onContainerMouseDown;
+          chart.pointer.onContainerMouseDown = function (a){
+            this.zoomX=this.zoomHor=this.hasZoom=a.shiftKey;
+            this.cmd(a);
+          };
+        });
+      },
+
+      mustNotDataChanged: function(newValue, oldValue){
+        var uniqueID = this.uniqueId;
+
+        var bucketData = this.bucketData;
+        var bucketDataAnalyze = this.bucketDataAnalyze;
+        var granularity = this.granularity;
+
+        var mustData = this.mustData;
+        var mustNotData = newValue;
+        var shouldData = this.shouldData;
+
+        var name;
+
+        if(bucketDataAnalyze == "avg"){
+            name = "Average ";
+        }
+        else if(bucketDataAnalyze == "min"){
+            name = "Minimum ";
+        }
+        else if(bucketDataAnalyze == "max"){
+            name = "Maximum ";
+        }
+        else if(bucketDataAnalyze == "sum"){
+            name = "Total ";
+        }
+
+
+        if(bucketData == "bytes_sent"){
+            name = name + "Bytes Sent ";
+        }
+        else if(bucketData == "body_bytes_sent"){
+            name = name + "Body Bytes Sent ";
+        }
+        else if(bucketData == "bytes_received"){
+            name = name + "Request Length ";
+        }
+
+
+
+        if (granularity == "second"){
+            name = name + "By Seconds";
+        }
+        else if (granularity == "minute"){
+            name = name + "By Minutes";
+        }
+        else if (granularity == "hour"){
+            name = name + "By Hours";
+        }
+        else if (granularity == "day"){
+            name = name + "By Days";
+        }
+        else if (granularity == "week"){
+            name = name + "By Weeks";
+        }
+        else if (granularity == "month"){
+            name = name + "By Months";
+        }
+        else if (granularity == "year"){
+            name = name + "By Years";
+        }
+
+
+        var temp = "mainGraphContainer" + this.uniqueId;
+        $('#mainGraphContainer').attr("id", temp);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        //Sort Time Function///////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+
+          var sort_by = function(field, reverse, primer){
+
+            var key = primer ?
+            function(x) {return primer(x[field])} :
+            function(x) {return x[field]};
+
+            reverse = !reverse ? 1 : -1;
+
+            return function (a, b) {
+              return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+            }
+          }
+
+
+
+          /////////////////////////////////////////////////////////////////////////////////////////////////
+          //Graph Container 1///////////////////////////////////////////////////////////////////////////////////
+          /////////////////////////////////////////////////////////////////////////////////////////////////
+
+          var options = {
+            rangeSelector : {
+              buttons : [{
+                type : 'day',
+                count : 1,
+                text : '1D'
+              }, {
+                type : 'week',
+                count : 1,
+                text : '1W'
+              }, {
+                type : 'month',
+                count : 1,
+                text : '1M'
+              }, {
+                type : 'all',
+                count : 1,
+                text : 'All'
+              }],
+              selected : 3,
+              inputEnabled : false
+            },
+
+            chart: {
+              renderTo: temp,
+              defaultSeriesType: 'line',
+              panning: 'true'
+            },
+
+            title: {
+              text: name
+            },
+            xAxis: {
+              type: 'datetime',
+              dateTimeLabelFormats: { // don't display the dummy year
+              day: '%b %e',
+              week: '%b %e',
+              month: '%b %e',
+              year: '%y'
+            },
+            title: {
+              text: 'Date'
+            }
+          },
+          yAxis: {
+            min: 0
+          },
+          tooltip: {
+
+          },
+
+          plotOptions: {
+            area: {
+              fillColor: {
+                linearGradient: {
+                  x1: 0,
+                  y1: 0,
+                  x2: 0,
+                  y2: 1
+                },
+                stops: [
+                  [0, Highcharts.getOptions().colors[0]],
+                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                ]
+              },
+              marker: {
+                radius: 2
+              },
+              lineWidth: 1,
+              states: {
+                hover: {
+                  lineWidth: 1
+                }
+              },
+              threshold: null
+            }
+          },
+
+          series: [],
+
+        };
+
+
+        var dps = [];
+
+
+        var data2 = {
+          'bucketData': bucketData,
+          'bucketDataAnalyze': bucketDataAnalyze,
+          'granularity': granularity,
+          'limit': '0',
+          'offset': '0',
+          'mustData' : JSON.stringify(mustData),
+          'mustNotData' : JSON.stringify(mustNotData),
+          'shouldData' : JSON.stringify(shouldData)
+        };
+
+        $.post( "/elasticsearch/dateHistogram", data2, function( data3 ){
+
+          var myDate
+          $.each(data3.grouping.buckets, function(index,value ){
+
+            // alert(data3.grouping.buckets[index].key_as_string);
+            myDate = new Date(data3.grouping.buckets[index].key_as_string);
+
+            var myEpoch = myDate.getTime()/1000.0;
+            // alert(data3.grouping.buckets[index].dataAnalyzeReturned.value);
+            dps.push({x: myEpoch, y: data3.grouping.buckets[index].dataAnalyzeReturned.value});
+
+
+          });
+          dps.sort(sort_by('x', false, parseInt));
+
+          dataHolder = [];
+          $.each(dps, function(index, value){
+            dataHolder.push([ dps[index]["x"]*1000, dps[index]["y"] ]);
+          });
+
+
+          options.series = [{name : 'testing', data: dataHolder}];
+
+          var chart = new Highcharts.StockChart(options);
+          chart.pointer.cmd = chart.pointer.onContainerMouseDown;
+          chart.pointer.onContainerMouseDown = function (a){
+            this.zoomX=this.zoomHor=this.hasZoom=a.shiftKey;
+            this.cmd(a);
+          };
+        });
+      },
+
+      shouldDataChanged: function(newValue, oldValue){
+        var uniqueID = this.uniqueId;
+
+        var bucketData = this.bucketData;
+        var bucketDataAnalyze = this.bucketDataAnalyze;
+        var granularity = this.granularity;
+
+        var mustData = this.mustData;
+        var mustNotData = this.mustNotData;
+        var shouldData = newValue;
+
+        var name;
+
+        if(bucketDataAnalyze == "avg"){
+            name = "Average ";
+        }
+        else if(bucketDataAnalyze == "min"){
+            name = "Minimum ";
+        }
+        else if(bucketDataAnalyze == "max"){
+            name = "Maximum ";
+        }
+        else if(bucketDataAnalyze == "sum"){
+            name = "Total ";
+        }
+
+
+        if(bucketData == "bytes_sent"){
+            name = name + "Bytes Sent ";
+        }
+        else if(bucketData == "body_bytes_sent"){
+            name = name + "Body Bytes Sent ";
+        }
+        else if(bucketData == "bytes_received"){
+            name = name + "Request Length ";
+        }
+
+
+
+        if (granularity == "second"){
+            name = name + "By Seconds";
+        }
+        else if (granularity == "minute"){
+            name = name + "By Minutes";
+        }
+        else if (granularity == "hour"){
+            name = name + "By Hours";
+        }
+        else if (granularity == "day"){
+            name = name + "By Days";
+        }
+        else if (granularity == "week"){
+            name = name + "By Weeks";
+        }
+        else if (granularity == "month"){
+            name = name + "By Months";
+        }
+        else if (granularity == "year"){
+            name = name + "By Years";
+        }
+
+
+        var temp = "mainGraphContainer" + this.uniqueId;
+        $('#mainGraphContainer').attr("id", temp);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        //Sort Time Function///////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+
+          var sort_by = function(field, reverse, primer){
+
+            var key = primer ?
+            function(x) {return primer(x[field])} :
+            function(x) {return x[field]};
+
+            reverse = !reverse ? 1 : -1;
+
+            return function (a, b) {
+              return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+            }
+          }
+
+
+
+          /////////////////////////////////////////////////////////////////////////////////////////////////
+          //Graph Container 1///////////////////////////////////////////////////////////////////////////////////
+          /////////////////////////////////////////////////////////////////////////////////////////////////
+
+          var options = {
+            rangeSelector : {
+              buttons : [{
+                type : 'day',
+                count : 1,
+                text : '1D'
+              }, {
+                type : 'week',
+                count : 1,
+                text : '1W'
+              }, {
+                type : 'month',
+                count : 1,
+                text : '1M'
+              }, {
+                type : 'all',
+                count : 1,
+                text : 'All'
+              }],
+              selected : 3,
+              inputEnabled : false
+            },
+
+            chart: {
+              renderTo: temp,
+              defaultSeriesType: 'line',
+              panning: 'true'
+            },
+
+            title: {
+              text: name
+            },
+            xAxis: {
+              type: 'datetime',
+              dateTimeLabelFormats: { // don't display the dummy year
+              day: '%b %e',
+              week: '%b %e',
+              month: '%b %e',
+              year: '%y'
+            },
+            title: {
+              text: 'Date'
+            }
+          },
+          yAxis: {
+            min: 0
+          },
+          tooltip: {
+
+          },
+
+          plotOptions: {
+            area: {
+              fillColor: {
+                linearGradient: {
+                  x1: 0,
+                  y1: 0,
+                  x2: 0,
+                  y2: 1
+                },
+                stops: [
+                  [0, Highcharts.getOptions().colors[0]],
+                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                ]
+              },
+              marker: {
+                radius: 2
+              },
+              lineWidth: 1,
+              states: {
+                hover: {
+                  lineWidth: 1
+                }
+              },
+              threshold: null
+            }
+          },
+
+          series: [],
+
+        };
+
+
+        var dps = [];
+
+
+        var data2 = {
+          'bucketData': bucketData,
+          'bucketDataAnalyze': bucketDataAnalyze,
+          'granularity': granularity,
+          'limit': '0',
+          'offset': '0',
+          'mustData' : JSON.stringify(mustData),
+          'mustNotData' : JSON.stringify(mustNotData),
+          'shouldData' : JSON.stringify(shouldData)
+        };
+
+        $.post( "/elasticsearch/dateHistogram", data2, function( data3 ){
+
+          var myDate
+          $.each(data3.grouping.buckets, function(index,value ){
+
+            // alert(data3.grouping.buckets[index].key_as_string);
+            myDate = new Date(data3.grouping.buckets[index].key_as_string);
+
+            var myEpoch = myDate.getTime()/1000.0;
+            // alert(data3.grouping.buckets[index].dataAnalyzeReturned.value);
+            dps.push({x: myEpoch, y: data3.grouping.buckets[index].dataAnalyzeReturned.value});
+
+
+          });
+          dps.sort(sort_by('x', false, parseInt));
+
+          dataHolder = [];
+          $.each(dps, function(index, value){
+            dataHolder.push([ dps[index]["x"]*1000, dps[index]["y"] ]);
+          });
+
+
+          options.series = [{name : 'testing', data: dataHolder}];
+
+          var chart = new Highcharts.StockChart(options);
+          chart.pointer.cmd = chart.pointer.onContainerMouseDown;
+          chart.pointer.onContainerMouseDown = function (a){
+            this.zoomX=this.zoomHor=this.hasZoom=a.shiftKey;
+            this.cmd(a);
+          };
+        });
+      }
+
+
+    });
+
+  </script>
+
+</dom-module>

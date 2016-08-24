@@ -1,0 +1,47 @@
+.default-hidden {
+    display:none;
+}
+
+.cal-tab.active {
+    display:block;
+}
+
+#filter-tags {
+  background: none repeat scroll 0 0 transparent;
+  /*border: 1px solid #ccc;*/
+  display: table;
+  /*padding: 0.5em;*/
+  width: 100%;
+}
+
+#filter-tags li.filter-tag {
+  float: left;
+  margin-left: 0.25em;
+  margin-right: 0.25em;
+  list-style-type: none;
+}
+
+#filter-tags li.filter-tag {
+  background: none repeat scroll 0 0 #484848;
+  border-radius: 5px;
+  color: white;
+  padding: .4em;
+  margin: .2em;
+  font-size: 10px;
+}
+#filter-tags li.filter-tag .delete-filter-tag{
+  color: white;
+  padding-left: .5em;
+  cursor: pointer;
+}
+
+/*.tags input,
+li.addedTag {
+  border: 1px solid transparent;
+  border-radius: 5px;
+  box-shadow: none;
+  display: block;
+  padding: 0.5em;
+}
+
+.tags input:hover { border: 1px solid #000; }*/

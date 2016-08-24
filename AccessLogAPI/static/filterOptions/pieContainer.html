@@ -1,0 +1,85 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+
+
+<dom-module id="pie-container">
+
+<style>
+
+</style>
+
+<template>
+<div id = "pieWrap">
+
+
+  <div id = "headerColor" style = "background-color: #424242">
+    <paper-button type="button" on-tap = "focusStatsField" style = "color:white">
+        <span class="glyphicon glyphicon-screenshot" style = "color:white"></span>
+      Focus Stats Field
+    </paper-button>
+
+    <paper-button type="button" on-tap = "deleteStatsField" style = "color:white">
+        <span class="glyphicon glyphicon-remove" style = "color:white"></span>
+      Delete
+    </paper-button>
+</div>
+
+
+
+  <div>
+
+
+  <div id = "maindateAggContainerInfo"  style = "background-color: white; height : 300px; overflow-y: auto; overflow-x : auto" class="col-md-6"></div>
+  <div id = "maindateAggContainerPie" style = "background-color: white; height : 300px;" class="col-md-6"></div>
+</div>
+</div>
+</template>
+
+
+<script>
+
+Polymer({
+  is: "pie-container",
+
+  properties: {
+    uniqueId: {
+      type: Number,
+      value: '1'
+    },
+    focused: {
+      type: String,
+      value: "false",
+      observer: 'setFocused'
+    }
+  },
+
+  setFocused: function(newValue, oldValue){
+    var headerColor = this.$.headerColor;
+    if(newValue == "true"){
+      $(headerColor).removeAttr("style");
+      $(headerColor).attr("style", "background-color: #34AADC");
+
+    }
+    else{
+      $(headerColor).removeAttr("style");
+      $(headerColor).attr("style", "background-color: #424242");
+    }
+
+
+  },
+
+  focusStatsField: function(){
+    this.fire('updateFocusedStatsField', { statsFieldId : this.uniqueId});
+  },
+
+  deleteStatsField: function(){
+    this.fire('deleteFocusedStatsField', { statsFieldId : this.uniqueId});
+  }
+
+});
+
+
+</script>
+
+</dom-module>

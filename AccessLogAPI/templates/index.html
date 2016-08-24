@@ -1,0 +1,186 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.temp_header {
+  height: 20%;
+  background: url("http://i.imgur.com/nQlhPjD.jpg");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  padding-top: 1px;
+
+}
+.h1header {
+  color: white;
+
+}
+.temp_header2 {
+  float: left;
+  background: url("http://i.imgur.com/ylrrYB6.jpg");
+  height: 60%;
+  background-size: 100% 100%;
+  margin-right:  2.35765%;
+  width: 31.76157%;
+}
+
+</style>
+
+
+<div><section hero id="theme-info">
+  <div class="temp_header">
+
+    <h1 class = "h1header">Cloud Access Log Viewer</h1>
+
+
+
+  </div>
+
+
+
+  <div class="table-responsive-vertical shadow-z-1" style="PADDING-TOP: 5px">
+    <table id="example" class="display" cellspacing="0" width = "100%">
+      <thead>
+        <tr>
+          <th>id</th>
+          <th {% if key=="remote_addr": %} style="color:#e8485f" {% endif %}>remote_addr</th>
+          <th {% if key=="time_iso8601": %} style="color:#e8485f" {% endif %}>time_iso8601</th>
+          <th {% if key=="request_time": %} style="color:#e8485f" {% endif %}>request_time</th>
+          <th {% if key=="request_uri": %} style="color:#e8485f" {% endif %}>request_uri </th>
+          <th {% if key=="request_method": %} style="color:#e8485f" {% endif %}>request_method</th>
+          <th {% if key=="status": %} style="color:#e8485f" {% endif %}>status</th>
+          <th {% if key=="request_length": %} style="color:#e8485f" {% endif %}>request_length</th>
+          <th {% if key=="body_bytes_sent": %} style="color:#e8485f" {% endif %}>body_bytes_sent</th>
+          <th {% if key=="bytes_sent": %} style="color:#e8485f" {% endif %}>bytes_sent</th>
+          <th {% if key=="http_host": %} style="color:#e8485f" {% endif %}>http_host</th>
+          <th {% if key=="http_referer": %} style="color:#e8485f" {% endif %}>http_referer</th>
+          <th {% if key=="http_user_agent": %} style="color:#e8485f" {% endif %}>http_user_agent</th>
+        </tr>
+      </thead>
+
+      <tfoot>
+        <tr>
+          <th>id</th>
+          <th>remote_addr</th>
+          <th>time_iso8601</th>
+          <th>request_time</th>
+          <th>request_uri</th>
+          <th>request_method</th>
+          <th>status</th>
+          <th>request_length</th>
+          <th>body_bytes_sent</th>
+          <th>bytes_sent</th>
+          <th>http_host</th>
+          <th>http_referer</th>
+          <th>http_user_agent</th>
+        </tr>
+      </tfoot>
+
+      <tbody>
+        {% for row in rows: %}
+        <tr>
+          <td data-title = "id", id = "tableEntry_id">
+            {{ row[0] }}
+          </td>
+          <td data-title = "remote_addr">
+            <a href = "/attribute?attr=remote_addr&q={{ row[1] }}">{{ row[1] }}</a>
+          </td>
+          <td data-title = "time_iso8601">
+            <a href = "/attribute?attr=time_iso8601&q={{ row[2] }}">{{ row[2] }}</a>
+          </td>
+          <td data-title = "request_time">
+            <a href = "/attribute?attr=request_time&q={{ row[3] }}">{{ row[3] }}</a>
+          </td>
+          <td data-title = "request_uri">
+            <a href = "/attribute?attr=request_uri&q={{ row[4] }}">{{  row[4][0:15] }}</a>
+          </td>
+          <td data-title = "request_method">
+            <a href = "/attribute?attr=request_method&q={{ row[5] }}">{{ row[5] }}</a>
+          </td>
+          <td data-title = "status">
+            <a href = "/attribute?attr=status&q={{ row[6] }}">{{ row[6] }}</a>
+          </td>
+          <td data-title = "request_length">
+            <a href = "/attribute?attr=request_length&q={{ row[7] }}">{{ row[7] }}</a>
+          </td>
+          <td data-title = "body_bytes_sent">
+            <a href = "/attribute?attr=body_bytes_sent&q={{ row[8] }}">{{ row[8] }}</a>
+          </td>
+          <td data-title = "bytes_sent">
+            <a href = "/attribute?attr=bytes_sent&q={{ row[9] }}">{{ row[9] }}</a>
+          </td>
+          <td data-title = "http_host">
+            <a href = "/attribute?attr=http_host&q={{ row[10] }}">{{ row[10][0:10] }}</a>
+          </td>
+          <td data-title = "http_referer">
+            <a href = "/attribute?attr=http_referer&q={{ row[11] }}">{{ row[11][0:10] }}</a>
+          </td>
+          <td data-title = "http_user_agent">
+            <a href = "/attribute?attr=http_user_agent&q={{ row[12] }}">{{ row[12][0:10] }}</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+
+    </table>
+
+  <script>
+    $('#example').DataTable( {
+
+    } );
+
+  </script>
+
+
+
+  <section class="section  section--ptn-connectivity  personas">
+    <div class="container">
+
+      <div class="media media--lg media--stack  g--third">
+        <div class="media__figure">
+          <a href="">
+            <img src="http://i.imgur.com/ylrrYB6.jpg" alt="Learn">
+          </a>
+        </div>
+        <div class="media__body">
+          <h3 class="delta media__title">Line Graphs</h3>
+          <span class="zeta"><p>Click on the graph to go to the line graph page</p>
+          </span>
+        </div>
+      </div>
+
+      <div class="media media--lg media--stack  g--third">
+        <div class="media__figure">
+          <a href="">
+            <img src="http://i.imgur.com/B8gDcrP.jpg" alt="Evaluate">
+          </a>
+        </div>
+        <div class="media__body">
+          <h3 class="delta media__title">Bar Graphs</h3>
+          <span class="zeta"><p>Click on the graph to go to the bar graph page</p>
+          </span>
+        </div>
+      </div>
+
+      <div class="media media--lg media--stack  g--third">
+        <div class="media__figure">
+          <a href="">
+            <img src="http://i.imgur.com/aMk7ndU.jpg" alt="Engage">
+          </a>
+        </div>
+        <div class="media__body">
+          <h3 class="delta media__title">Search</h3>
+          <span class="zeta"><p>Stuff that David wanted us to do</p>
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+
+
+
+
+  {% endblock %}

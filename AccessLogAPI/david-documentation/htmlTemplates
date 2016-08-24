@@ -1,0 +1,13 @@
+Every page has a header and a side bar. These are polymer elements and can be found in
+"static/header/header.html" and "static/sidebar/sidebar.html"
+
+The pages that I were responsible for can be found in:
+
+dashboard.html
+aggregations.html
+graphStats.html
+graphTerms.html
+
+dashboard.js and dashboard.css handles all the site's styling and javascript. The polymer elements all have their own native javascript
+so dashboard.js is mainly only responsible for handling user authentication. User authentication is handled with a cookie. The cookie has a
+TTL of 1 day. The cookie name is "laserficheCloudAccessLogUser" and the user ID should be stored under this cookie if the user is logged in. 

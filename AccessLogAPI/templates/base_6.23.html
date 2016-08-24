@@ -1,0 +1,1246 @@
+
+<html>
+  <head>
+		<title>Access Log API</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <link rel="import" href="../static/bower_components/paper-styles/paper-styles.html">
+    <link rel="import" href="../static/bower_components/neon-animation/neon-animated-pages.html">
+    <link rel="import" href="../static/bower_components/neon-animation/neon-animations.html">
+    <link rel="import" href="../static/melon/circles-page.html">
+    <link rel="import" href="../static/melon/squares-page.html">
+
+    <script src="../static/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../static/bower_components/jquery/src/jquery.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="../static/bower_components/jquery.tablesorter/js/jquery.tablesorter.min.js"></script>
+    <link rel="stylesheet" href="../static/bower_components/jquery.tablesorter/css/theme.default.css" />
+    <script src="../static/melon/jquery.tablesorter.js"></script>
+
+    <link rel="import" href="../static/bower_components/paper-header-panel/paper-header-panel.html">
+    <link rel="import" href="../static/bower_components/core-animated-pages/core-animated-pages.html">
+
+    <link rel="import" href="../static/bower_components/paper-drawer-panel/paper-drawer-panel.html">
+    <link rel="import" href="../static/bower_components/paper-button/paper-button.html">
+    <link rel="import" href="../static/bower_components/paper-input/paper-input.html">
+    <link rel="import" href="../static/bower_components/paper-toolbar/paper-toolbar.html">
+		<link rel="import" href="../static/melon/melon.html">
+
+		<link rel="stylesheet" href="../static/melon/normalize.css">
+    <script type='text/javascript' src='//code.jquery.com/jquery-git.js'></script>
+    <link rel="stylesheet" type="text/css" href="/css/normalize.css">
+    <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+        <script type='text/javascript' src="http://mottie.github.com/tablesorter/js/jquery.tablesorter.js"></script>
+        <script type='text/javascript' src="http://mottie.github.com/tablesorter/js/jquery.tablesorter.widgets.js"></script>
+        <link rel="stylesheet" type="text/css" href="http://mottie.github.com/tablesorter/css/theme.blue.css">
+        <link rel="stylesheet" type="text/css" href="http://mottie.github.com/tablesorter/css/theme.dark.css">
+        <link rel="stylesheet" type="text/css" href="http://mottie.github.com/tablesorter/css/theme.default.css">
+        <link rel="stylesheet" type="text/css" href="http://mottie.github.com/tablesorter/css/theme.dropbox.css">
+        <link rel="stylesheet" type="text/css" href="http://mottie.github.com/tablesorter/css/theme.green.css">
+        <link rel="stylesheet" type="text/css" href="http://mottie.github.com/tablesorter/css/theme.grey.css">
+        <link rel="stylesheet" type="text/css" href="http://mottie.github.com/tablesorter/css/theme.ice.css">
+        <link rel="stylesheet" type="text/css" href="http://mottie.github.com/tablesorter/css/theme.black-ice.css">
+        <link rel="stylesheet" type="text/css" href="http://mottie.github.com/tablesorter/addons/pager/jquery.tablesorter.pager.css">
+        <script type='text/javascript' src="http://mottie.github.com/tablesorter/addons/pager/jquery.tablesorter.pager.js"></script>
+    <style type='text/css'>
+
+    </style>		<style is="custom-style">
+			html { -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; font-size: 16px; }
+
+			html, body { margin: 0px; padding: 0px; min-height: 100%; color: white; background-color: #2a363b; font-family: 'Roboto', sans-serif; font-weight: 400; }
+
+			section { padding: 40px 0px; text-align: center; }
+			section[hero] { background-color: #3a474c; }
+			section:after { content: if false, 'one', 'two'; }
+
+			h1, h2, h3, h4, h5, h6 { font-weight: 400; margin: 0px; padding: 0px; line-height: 1em; }
+
+			h1, h3, h5 { font-family: 'Lobster', cursive; }
+
+			h1 { font-size: 50px; margin: 30px 0px; }
+
+			h2 { color: white; font-size: 35px; margin: 20px 0px; }
+
+			h3 { font-size: 25px; margin: 15px 0px; }
+
+			h4 { font-size: 20px; }
+
+			a, a:active, a:visited, a:focus { color: white; text-decoration: none; }
+
+			a:hover { color: white; text-decoration: underline; }
+
+			:root { --default-primary-color: #e8485f; --dark-primary-color: #e84a5f; --light-primary-color: #c5cae9; --text-primary-color: #ffffff; --accent-color: #ff4081; --primary-background-color: #ffffff; --primary-text-color: white; --secondary-text-color: white; --disabled-text-color: #070809; --divider-color: #e0e0e0; --paper-checkbox-checked-color: #e8485f; --paper-checkbox-checked-ink-color: #e8485f; --paper-checkbox-unchecked-color: white; --paper-checkbox-unchecked-ink-color: white; --paper-checkbox-label-color: white; --paper-fab-background: #e8485f; --paper-fab-disabled-background: #7a8e95; --paper-fab-disabled-text: #070809; --paper-icon-button-disabled-text: #7a8e95; --paper-input-container-color: #ccc; --paper-input-container-focus-color: #e8485f; --paper-input-container-invalid-color: #f8bbd0; --paper-input-container-input-color: #ccc; --paper-menu-background-color: #3a474c; --paper-menu-color: white; --paper-menu-disabled-color: #7a8e95; --paper-progress-active-color: #e8485f; --paper-progress-secondary-color: #ff847c; --paper-radio-button-checked-color: #e8485f; --paper-radio-button-checked-ink-color: white; --paper-radio-button-unchecked-color: white; --paper-radio-button-unchecked-ink-color: white; --paper-radio-button-label-color: white; --paper-slider-knob-color: #e8485f; --paper-slider-active-color: #e8485f; --paper-slider-pin-color: #e8485f; --paper-spinner-layer-1-color: #e8485f; --paper-spinner-layer-2-color: #e8485f; --paper-spinner-layer-3-color: #e8485f; --paper-spinner-layer-4-color: #e8485f; --paper-tabs-selection-bar-color: #ff847c; --paper-tab-ink: #ff847c; --paper-toggle-button-checked-bar-color: #e8485f; --paper-toggle-button-checked-button-color: #e8485f; --paper-toggle-button-checked-ink-color: #e8485f; --paper-toggle-button-unchecked-bar-color: white; --paper-toggle-button-unchecked-button-color: white; --paper-toggle-button-unchecked-ink-color: white; --paper-toolbar-background: #e84a5f; --paper-toolbar-color: #ffffff; }
+
+			paper-toolbar a, paper-toolbar a:hover, paper-toolbar a:active, paper-toolbar a:visited, paper-toolbar a:focus { color: #ffffff; }
+
+			paper-button.primary, paper-button.btn-primary, paper-button[primary] { color: #e8485f; }
+			paper-button.primary[raised], paper-button.btn-primary[raised], paper-button[primary][raised] { background-color: #e8485f; color: #fff; }
+			paper-button.secondary, paper-button.btn-secondary, paper-button[secondary] { color: #ff847c; }
+			paper-button.secondary[raised], paper-button.btn-secondary[raised], paper-button[secondary][raised] { background-color: #ff847c; color: #4d2825; }
+			paper-button.success, paper-button.btn-success, paper-button[success] { color: #99b898; }
+			paper-button.success[raised], paper-button.btn-success[raised], paper-button[success][raised] { background-color: #99b898; color: #2e372e; }
+			paper-button.info, paper-button.btn-info, paper-button[info] { color: #fecea8; }
+			paper-button.info[raised], paper-button.btn-info[raised], paper-button[info][raised] { background-color: #fecea8; color: #4c3e32; }
+			paper-button.warning, paper-button.btn-warning, paper-button[warning] { color: #fff59d; }
+			paper-button.warning[raised], paper-button.btn-warning[raised], paper-button[warning][raised] { background-color: #fff59d; color: #4d4a2f; }
+			paper-button.error, paper-button.btn-error, paper-button[error] { color: #f8bbd0; }
+			paper-button.error[raised], paper-button.btn-error[raised], paper-button[error][raised] { background-color: #f8bbd0; color: #4a383e; }
+			paper-button.link, paper-button.btn-link, paper-button[link] { text-decoration: underline; }
+			paper-button[raised] { color: white; }
+			paper-button[disabled] { color: #070809 !important; background: #7a8e95 !important; }
+
+			paper-icon-button.primary, paper-icon-button.btn-primary, paper-icon-button[primary] { color: #e8485f; }
+			paper-icon-button.primary:hover, paper-icon-button.btn-primary:hover, paper-icon-button[primary]:hover { background-color: #3d383f; background-color: rgba(232, 72, 95, 0.2); border-radius: 50%; }
+			paper-icon-button.secondary, paper-icon-button.btn-secondary, paper-icon-button[secondary] { color: #ff847c; }
+			paper-icon-button.secondary:hover, paper-icon-button.btn-secondary:hover, paper-icon-button[secondary]:hover { background-color: #3f3e42; background-color: rgba(255, 132, 124, 0.2); border-radius: 50%; }
+			paper-icon-button.success, paper-icon-button.btn-success, paper-icon-button[success] { color: #99b898; }
+			paper-icon-button.success:hover, paper-icon-button.btn-success:hover, paper-icon-button[success]:hover { background-color: #354344; background-color: rgba(153, 184, 152, 0.2); border-radius: 50%; }
+			paper-icon-button.info, paper-icon-button.btn-info, paper-icon-button[info] { color: #fecea8; }
+			paper-icon-button.info:hover, paper-icon-button.btn-info:hover, paper-icon-button[info]:hover { background-color: #3f4546; background-color: rgba(254, 206, 168, 0.2); border-radius: 50%; }
+			paper-icon-button.warning, paper-icon-button.btn-warning, paper-icon-button[warning] { color: #fff59d; }
+			paper-icon-button.warning:hover, paper-icon-button.btn-warning:hover, paper-icon-button[warning]:hover { background-color: #3f4945; background-color: rgba(255, 245, 157, 0.2); border-radius: 50%; }
+			paper-icon-button.error, paper-icon-button.btn-error, paper-icon-button[error] { color: #f8bbd0; }
+			paper-icon-button.error:hover, paper-icon-button.btn-error:hover, paper-icon-button[error]:hover { background-color: #3f434a; background-color: rgba(248, 187, 208, 0.2); border-radius: 50%; }
+
+			paper-checkbox #checkmark.paper-checkbox, paper-checkbox /deep/, paper-checkbox::shadow #checkmark.paper-checkbox { border-color: #fff !important; }
+
+			paper-dialog { color: white; background-color: #2a363b; font-family: 'Roboto', sans-serif; font-weight: 400; }
+			paper-dialog h1, paper-dialog h2, paper-dialog h3, paper-dialog h4, paper-dialog h5, paper-dialog h6 { overflow: visible; padding: 0 1em; text-align: center; }
+
+			paper-fab { --text-primary-color: white; }
+
+			paper-fab { background-color: #e8485f; color: #fff; --paper-fab-keyboard-focus-background: #9d1427; }
+			paper-fab.primary, paper-fab.btn-primary, paper-fab[primary] { background-color: #e8485f; color: #fff; --paper-fab-keyboard-focus-background: #9d1427; }
+			paper-fab.secondary, paper-fab.btn-secondary, paper-fab[secondary] { background-color: #ff847c; color: #4d2825; --paper-fab-keyboard-focus-background: #fc0f00; }
+			paper-fab.success, paper-fab.btn-success, paper-fab[success] { background-color: #99b898; color: #2e372e; --paper-fab-keyboard-focus-background: #567b55; }
+			paper-fab.info, paper-fab.btn-info, paper-fab[info] { background-color: #fecea8; color: #4c3e32; --paper-fab-keyboard-focus-background: #fd872a; }
+			paper-fab.warning, paper-fab.btn-warning, paper-fab[warning] { background-color: #fff59d; color: #4d4a2f; --paper-fab-keyboard-focus-background: #ffe81e; }
+			paper-fab.error, paper-fab.btn-error, paper-fab[error] { background-color: #f8bbd0; color: #4a383e; --paper-fab-keyboard-focus-background: #ec4780; }
+			paper-fab[disabled] { color: #070809 !important; background: #7a8e95 !important; }
+
+			section.hero paper-menu, section[hero] paper-menu { --paper-menu-background-color: #3a474c; }
+
+			paper-tabs { background-color: #e84a5f; color: #ffffff; }
+		</style>
+
+
+
+<style is="custom-style">@media screen and (max-width:767px){.hidden-mobile{display:none}}@media screen and (min-width:768px){.hidden-desktop{display:none}}.horizontal-section{margin:0 12px}.layout.horizontal.center-justified{-ms-flex-wrap:wrap;-webkit-flex-wrap:wrap;flex-wrap:wrap}.horizontal-section-wrapper > h4{padding:15px 0 5px 0}#top-nav-right-links{text-align:right}#top-nav-right-links a{display:inline-block;vertical-align:middle}#top-nav-right-links a i{font-size:1.3em;display:inline-block;vertical-align:middle;position:relative;top:-1px}#theme-selector-menu{border-right:1px solid rgba(0,0,0,0.2)}#theme-selector-menu a{color:#fff;background-color:#3a474c;text-decoration:none;font-family:'Lobster',cursive}#theme-selector-menu a paper-item paper-item-body{font-family:'Roboto',sans-serif}#theme-selector-menu a{color:#fff;background-color:#3a474c;text-decoration:none}#theme-selector-menu a:hover,#theme-selector-menu a.selected{background-color:#2a363b;text-decoration:none}#theme-selector-menu a paper-item paper-item-body [secondary]{color:#fff;text-decoration:none;font-family:'Roboto',sans-serif}section{padding:40px 5px 60px 5px}section h3{margin:0;padding:10px 0 60px 0}.horizontal-section,.vertical-section{background-color:#3a474c}section.hero .horizontal-section,section.hero .vertical-section,section[hero] .horizontal-section,section[hero] .vertical-section{background-color:#2a363b}.download-btn-container{display:inline-block;padding:10px 15px;text-align:center}.download-btn-container .btn-subtext a{display:inline-block;padding:10px 0;line-spacing:1px}paper-toolbar a{color:#fff;display:inline-block;padding:5px}paper-toolbar .toolbar-tools.paper-toolbar [title]{font-size:14px}paper-dialog{padding:0 10px 15px 10px}#footer-section{padding:25px 0 30px 0}#footer-section h4{font-weight:300;font-size:1.1em;padding:20px 0}#footer-section .polymer-themes-logo-container{position:relative;padding-bottom:20px}#footer-section .polymer-themes-logo-container .polymer-icon-container{position:absolute;left:0;right:0;top:0;z-index:1;color:#e84a5f;text-align:center}#footer-section .polymer-themes-logo-container .polymer-icon-container i{font-size:60px}#footer-section .polymer-themes-logo-container h4{position:relative;z-index:2}#footer-section .small{font-size:.7em;letter-spacing:1px;opacity:.8}.footer-links{font-size:.7em;padding:0 0 20px 0}.footer-links a{letter-spacing:2px;text-decoration:none}.footer-links a:hover{text-decoration:underline}paper-dialog.usage{position:fixed;top:50px;text-align:center;margin:0 auto}paper-dialog.usage p{font-size:1.2em;line-height:1.8em;letter-spacing:1px;font-weight:normal}paper-dialog.usage h2{font-size:2em;padding-bottom:20px}paper-dialog.usage code{padding:0;font-weight:bold}paper-dialog.usage pre{font-size:1.5em;line-height:1.5em;padding:15px 20px 20px 20px;opacity:.85;text-align:left;overflow-x:scroll;display:inline-block;margin:0 auto}body{opacity:1}body.invisible{opacity:0}
+</style>
+
+
+<style>
+
+@import "https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic&subset=latin,cyrillic";
+
+*,
+*:after,
+*:before {
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+/* -- Demo style ------------------------------- */
+html,
+body {
+position: relative;
+min-height: 100%;
+height: 100%;
+}
+html {
+position: relative;
+overflow-x: hidden;
+margin: 16px;
+padding: 0;
+min-height: 100%;
+font-size: 62.5%;
+}
+body {
+font-family: 'RobotoDraft', 'Roboto', 'Helvetica Neue, Helvetica, Arial', sans-serif;
+font-style: normal;
+font-weight: 300;
+font-size: 1.4rem;
+line-height: 2rem;
+letter-spacing: 0.01rem;
+color: #212121;
+background-color: #f5f5f5;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+text-rendering: optimizeLegibility;
+}
+#demo {
+margin: 20px auto;
+max-width: 960px;
+}
+#demo h1 {
+font-size: 2.4rem;
+line-height: 3.2rem;
+letter-spacing: 0;
+font-weight: 300;
+color: #212121;
+text-transform: inherit;
+margin-bottom: 1rem;
+text-align: center;
+}
+#demo h2 {
+font-size: 1.5rem;
+line-height: 2.8rem;
+letter-spacing: 0.01rem;
+font-weight: 400;
+color: #212121;
+text-align: center;
+}
+.shadow-z-1 {
+-webkit-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 1px 2px 0 rgba(0, 0, 0, 0.24);
+-moz-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 1px 2px 0 rgba(0, 0, 0, 0.24);
+box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 1px 2px 0 rgba(0, 0, 0, 0.24);
+}
+/* -- Material Design Table style -------------- */
+.table {
+width: 100%;
+max-width: 100%;
+margin-bottom: 2rem;
+background-color: #2a363b;
+}
+.table > thead > tr,
+.table > tbody > tr,
+.table > tfoot > tr {
+-webkit-transition: all 0.3s ease;
+-o-transition: all 0.3s ease;
+transition: all 0.3s ease;
+}
+.table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+text-align: left;
+padding: 1rem;
+vertical-align: top;
+border-top: 0;
+-webkit-transition: all 0.3s ease;
+-o-transition: all 0.3s ease;
+transition: all 0.3s ease;
+}
+.table > thead > tr > th {
+font-weight: 400;
+color: #757575;
+vertical-align: bottom;
+border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+.table > caption + thead > tr:first-child > th,
+.table > colgroup + thead > tr:first-child > th,
+.table > thead:first-child > tr:first-child > th,
+.table > caption + thead > tr:first-child > td,
+.table > colgroup + thead > tr:first-child > td,
+.table > thead:first-child > tr:first-child > td {
+border-top: 0;
+}
+.table > tbody + tbody {
+border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+.table .table {
+background-color: #ffffff;
+}
+.table .no-border {
+border: 0;
+}
+.table-condensed > thead > tr > th,
+.table-condensed > tbody > tr > th,
+.table-condensed > tfoot > tr > th,
+.table-condensed > thead > tr > td,
+.table-condensed > tbody > tr > td,
+.table-condensed > tfoot > tr > td {
+padding: 0.8rem;
+}
+.table-bordered {
+border: 0;
+}
+.table-bordered > thead > tr > th,
+.table-bordered > tbody > tr > th,
+.table-bordered > tfoot > tr > th,
+.table-bordered > thead > tr > td,
+.table-bordered > tbody > tr > td,
+.table-bordered > tfoot > tr > td {
+border: 0;
+border-bottom: 1px solid #e0e0e0;
+}
+.table-bordered > thead > tr > th,
+.table-bordered > thead > tr > td {
+border-bottom-width: 2px;
+}
+.table-striped > tbody > tr:nth-child(odd) > td,
+.table-striped > tbody > tr:nth-child(odd) > th {
+background-color: #f5f5f5;
+}
+.table-hover > tbody > tr:hover > td,
+.table-hover > tbody > tr:hover > th {
+background-color: rgba(0, 0, 0, 0.12);
+}
+@media screen and (max-width: 768px) {
+.table-responsive-vertical > .table {
+margin-bottom: 0;
+background-color: transparent;
+}
+.table-responsive-vertical > .table > thead,
+.table-responsive-vertical > .table > tfoot {
+display: none;
+}
+.table-responsive-vertical > .table > tbody {
+display: block;
+}
+.table-responsive-vertical > .table > tbody > tr {
+display: block;
+border: 1px solid #e0e0e0;
+border-radius: 2px;
+margin-bottom: 1.6rem;
+}
+.table-responsive-vertical > .table > tbody > tr > td {
+background-color: #ffffff;
+display: block;
+vertical-align: middle;
+text-align: right;
+}
+.table-responsive-vertical > .table > tbody > tr > td[data-title]:before {
+content: attr(data-title);
+float: left;
+font-size: inherit;
+font-weight: 400;
+color: #757575;
+}
+.table-responsive-vertical.shadow-z-1 {
+-webkit-box-shadow: none;
+-moz-box-shadow: none;
+box-shadow: none;
+}
+.table-responsive-vertical.shadow-z-1 > .table > tbody > tr {
+border: none;
+-webkit-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 1px 2px 0 rgba(0, 0, 0, 0.24);
+-moz-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 1px 2px 0 rgba(0, 0, 0, 0.24);
+box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 1px 2px 0 rgba(0, 0, 0, 0.24);
+}
+.table-responsive-vertical > .table-bordered {
+border: 0;
+}
+.table-responsive-vertical > .table-bordered > tbody > tr > td {
+border: 0;
+border-bottom: 1px solid #e0e0e0;
+}
+.table-responsive-vertical > .table-bordered > tbody > tr > td:last-child {
+border-bottom: 0;
+}
+.table-responsive-vertical > .table-striped > tbody > tr > td,
+.table-responsive-vertical > .table-striped > tbody > tr:nth-child(odd) {
+background-color: #ffffff;
+}
+.table-responsive-vertical > .table-striped > tbody > tr > td:nth-child(odd) {
+background-color: #f5f5f5;
+}
+.table-responsive-vertical > .table-hover > tbody > tr:hover > td,
+.table-responsive-vertical > .table-hover > tbody > tr:hover {
+background-color: #ffffff;
+}
+.table-responsive-vertical > .table-hover > tbody > tr > td:hover {
+background-color: rgba(0, 0, 0, 0.12);
+}
+}
+.table-striped.table-mc-red > tbody > tr:nth-child(odd) > td,
+.table-striped.table-mc-red > tbody > tr:nth-child(odd) > th {
+background-color: #fde0dc;
+}
+.table-hover.table-mc-red > tbody > tr:hover > td,
+.table-hover.table-mc-red > tbody > tr:hover > th {
+background-color: #f9bdbb;
+}
+@media screen and (max-width: 767px) {
+.table-responsive-vertical .table-striped.table-mc-red > tbody > tr > td,
+.table-responsive-vertical .table-striped.table-mc-red > tbody > tr:nth-child(odd) {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-striped.table-mc-red > tbody > tr > td:nth-child(odd) {
+background-color: #fde0dc;
+}
+.table-responsive-vertical .table-hover.table-mc-red > tbody > tr:hover > td,
+.table-responsive-vertical .table-hover.table-mc-red > tbody > tr:hover {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-hover.table-mc-red > tbody > tr > td:hover {
+background-color: #f9bdbb;
+}
+}
+.table-striped.table-mc-pink > tbody > tr:nth-child(odd) > td,
+.table-striped.table-mc-pink > tbody > tr:nth-child(odd) > th {
+background-color: #fce4ec;
+}
+.table-hover.table-mc-pink > tbody > tr:hover > td,
+.table-hover.table-mc-pink > tbody > tr:hover > th {
+background-color: #f8bbd0;
+}
+@media screen and (max-width: 767px) {
+.table-responsive-vertical .table-striped.table-mc-pink > tbody > tr > td,
+.table-responsive-vertical .table-striped.table-mc-pink > tbody > tr:nth-child(odd) {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-striped.table-mc-pink > tbody > tr > td:nth-child(odd) {
+background-color: #fce4ec;
+}
+.table-responsive-vertical .table-hover.table-mc-pink > tbody > tr:hover > td,
+.table-responsive-vertical .table-hover.table-mc-pink > tbody > tr:hover {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-hover.table-mc-pink > tbody > tr > td:hover {
+background-color: #f8bbd0;
+}
+}
+.table-striped.table-mc-purple > tbody > tr:nth-child(odd) > td,
+.table-striped.table-mc-purple > tbody > tr:nth-child(odd) > th {
+background-color: #f3e5f5;
+}
+.table-hover.table-mc-purple > tbody > tr:hover > td,
+.table-hover.table-mc-purple > tbody > tr:hover > th {
+background-color: #e1bee7;
+}
+@media screen and (max-width: 767px) {
+.table-responsive-vertical .table-striped.table-mc-purple > tbody > tr > td,
+.table-responsive-vertical .table-striped.table-mc-purple > tbody > tr:nth-child(odd) {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-striped.table-mc-purple > tbody > tr > td:nth-child(odd) {
+background-color: #f3e5f5;
+}
+.table-responsive-vertical .table-hover.table-mc-purple > tbody > tr:hover > td,
+.table-responsive-vertical .table-hover.table-mc-purple > tbody > tr:hover {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-hover.table-mc-purple > tbody > tr > td:hover {
+background-color: #e1bee7;
+}
+}
+.table-striped.table-mc-deep-purple > tbody > tr:nth-child(odd) > td,
+.table-striped.table-mc-deep-purple > tbody > tr:nth-child(odd) > th {
+background-color: #ede7f6;
+}
+.table-hover.table-mc-deep-purple > tbody > tr:hover > td,
+.table-hover.table-mc-deep-purple > tbody > tr:hover > th {
+background-color: #d1c4e9;
+}
+@media screen and (max-width: 767px) {
+.table-responsive-vertical .table-striped.table-mc-deep-purple > tbody > tr > td,
+.table-responsive-vertical .table-striped.table-mc-deep-purple > tbody > tr:nth-child(odd) {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-striped.table-mc-deep-purple > tbody > tr > td:nth-child(odd) {
+background-color: #ede7f6;
+}
+.table-responsive-vertical .table-hover.table-mc-deep-purple > tbody > tr:hover > td,
+.table-responsive-vertical .table-hover.table-mc-deep-purple > tbody > tr:hover {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-hover.table-mc-deep-purple > tbody > tr > td:hover {
+background-color: #d1c4e9;
+}
+}
+.table-striped.table-mc-indigo > tbody > tr:nth-child(odd) > td,
+.table-striped.table-mc-indigo > tbody > tr:nth-child(odd) > th {
+background-color: #e8eaf6;
+}
+.table-hover.table-mc-indigo > tbody > tr:hover > td,
+.table-hover.table-mc-indigo > tbody > tr:hover > th {
+background-color: #c5cae9;
+}
+@media screen and (max-width: 767px) {
+.table-responsive-vertical .table-striped.table-mc-indigo > tbody > tr > td,
+.table-responsive-vertical .table-striped.table-mc-indigo > tbody > tr:nth-child(odd) {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-striped.table-mc-indigo > tbody > tr > td:nth-child(odd) {
+background-color: #e8eaf6;
+}
+.table-responsive-vertical .table-hover.table-mc-indigo > tbody > tr:hover > td,
+.table-responsive-vertical .table-hover.table-mc-indigo > tbody > tr:hover {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-hover.table-mc-indigo > tbody > tr > td:hover {
+background-color: #c5cae9;
+}
+}
+.table-striped.table-mc-blue > tbody > tr:nth-child(odd) > td,
+.table-striped.table-mc-blue > tbody > tr:nth-child(odd) > th {
+background-color: #e7e9fd;
+}
+.table-hover.table-mc-blue > tbody > tr:hover > td,
+.table-hover.table-mc-blue > tbody > tr:hover > th {
+background-color: #d0d9ff;
+}
+@media screen and (max-width: 767px) {
+.table-responsive-vertical .table-striped.table-mc-blue > tbody > tr > td,
+.table-responsive-vertical .table-striped.table-mc-blue > tbody > tr:nth-child(odd) {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-striped.table-mc-blue > tbody > tr > td:nth-child(odd) {
+background-color: #e7e9fd;
+}
+.table-responsive-vertical .table-hover.table-mc-blue > tbody > tr:hover > td,
+.table-responsive-vertical .table-hover.table-mc-blue > tbody > tr:hover {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-hover.table-mc-blue > tbody > tr > td:hover {
+background-color: #d0d9ff;
+}
+}
+.table-striped.table-mc-light-blue > tbody > tr:nth-child(odd) > td,
+.table-striped.table-mc-light-blue > tbody > tr:nth-child(odd) > th {
+background-color: #e1f5fe;
+}
+.table-hover.table-mc-light-blue > tbody > tr:hover > td,
+.table-hover.table-mc-light-blue > tbody > tr:hover > th {
+background-color: #b3e5fc;
+}
+@media screen and (max-width: 767px) {
+.table-responsive-vertical .table-striped.table-mc-light-blue > tbody > tr > td,
+.table-responsive-vertical .table-striped.table-mc-light-blue > tbody > tr:nth-child(odd) {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-striped.table-mc-light-blue > tbody > tr > td:nth-child(odd) {
+background-color: #e1f5fe;
+}
+.table-responsive-vertical .table-hover.table-mc-light-blue > tbody > tr:hover > td,
+.table-responsive-vertical .table-hover.table-mc-light-blue > tbody > tr:hover {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-hover.table-mc-light-blue > tbody > tr > td:hover {
+background-color: #b3e5fc;
+}
+}
+.table-striped.table-mc-cyan > tbody > tr:nth-child(odd) > td,
+.table-striped.table-mc-cyan > tbody > tr:nth-child(odd) > th {
+background-color: #e0f7fa;
+}
+.table-hover.table-mc-cyan > tbody > tr:hover > td,
+.table-hover.table-mc-cyan > tbody > tr:hover > th {
+background-color: #b2ebf2;
+}
+@media screen and (max-width: 767px) {
+.table-responsive-vertical .table-striped.table-mc-cyan > tbody > tr > td,
+.table-responsive-vertical .table-striped.table-mc-cyan > tbody > tr:nth-child(odd) {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-striped.table-mc-cyan > tbody > tr > td:nth-child(odd) {
+background-color: #e0f7fa;
+}
+.table-responsive-vertical .table-hover.table-mc-cyan > tbody > tr:hover > td,
+.table-responsive-vertical .table-hover.table-mc-cyan > tbody > tr:hover {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-hover.table-mc-cyan > tbody > tr > td:hover {
+background-color: #b2ebf2;
+}
+}
+.table-striped.table-mc-teal > tbody > tr:nth-child(odd) > td,
+.table-striped.table-mc-teal > tbody > tr:nth-child(odd) > th {
+background-color: #e0f2f1;
+}
+.table-hover.table-mc-teal > tbody > tr:hover > td,
+.table-hover.table-mc-teal > tbody > tr:hover > th {
+background-color: #b2dfdb;
+}
+@media screen and (max-width: 767px) {
+.table-responsive-vertical .table-striped.table-mc-teal > tbody > tr > td,
+.table-responsive-vertical .table-striped.table-mc-teal > tbody > tr:nth-child(odd) {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-striped.table-mc-teal > tbody > tr > td:nth-child(odd) {
+background-color: #e0f2f1;
+}
+.table-responsive-vertical .table-hover.table-mc-teal > tbody > tr:hover > td,
+.table-responsive-vertical .table-hover.table-mc-teal > tbody > tr:hover {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-hover.table-mc-teal > tbody > tr > td:hover {
+background-color: #b2dfdb;
+}
+}
+.table-striped.table-mc-green > tbody > tr:nth-child(odd) > td,
+.table-striped.table-mc-green > tbody > tr:nth-child(odd) > th {
+background-color: #d0f8ce;
+}
+.table-hover.table-mc-green > tbody > tr:hover > td,
+.table-hover.table-mc-green > tbody > tr:hover > th {
+background-color: #a3e9a4;
+}
+@media screen and (max-width: 767px) {
+.table-responsive-vertical .table-striped.table-mc-green > tbody > tr > td,
+.table-responsive-vertical .table-striped.table-mc-green > tbody > tr:nth-child(odd) {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-striped.table-mc-green > tbody > tr > td:nth-child(odd) {
+background-color: #d0f8ce;
+}
+.table-responsive-vertical .table-hover.table-mc-green > tbody > tr:hover > td,
+.table-responsive-vertical .table-hover.table-mc-green > tbody > tr:hover {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-hover.table-mc-green > tbody > tr > td:hover {
+background-color: #a3e9a4;
+}
+}
+.table-striped.table-mc-light-green > tbody > tr:nth-child(odd) > td,
+.table-striped.table-mc-light-green > tbody > tr:nth-child(odd) > th {
+background-color: #f1f8e9;
+}
+.table-hover.table-mc-light-green > tbody > tr:hover > td,
+.table-hover.table-mc-light-green > tbody > tr:hover > th {
+background-color: #dcedc8;
+}
+@media screen and (max-width: 767px) {
+.table-responsive-vertical .table-striped.table-mc-light-green > tbody > tr > td,
+.table-responsive-vertical .table-striped.table-mc-light-green > tbody > tr:nth-child(odd) {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-striped.table-mc-light-green > tbody > tr > td:nth-child(odd) {
+background-color: #f1f8e9;
+}
+.table-responsive-vertical .table-hover.table-mc-light-green > tbody > tr:hover > td,
+.table-responsive-vertical .table-hover.table-mc-light-green > tbody > tr:hover {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-hover.table-mc-light-green > tbody > tr > td:hover {
+background-color: #dcedc8;
+}
+}
+.table-striped.table-mc-lime > tbody > tr:nth-child(odd) > td,
+.table-striped.table-mc-lime > tbody > tr:nth-child(odd) > th {
+background-color: #f9fbe7;
+}
+.table-hover.table-mc-lime > tbody > tr:hover > td,
+.table-hover.table-mc-lime > tbody > tr:hover > th {
+background-color: #f0f4c3;
+}
+@media screen and (max-width: 767px) {
+.table-responsive-vertical .table-striped.table-mc-lime > tbody > tr > td,
+.table-responsive-vertical .table-striped.table-mc-lime > tbody > tr:nth-child(odd) {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-striped.table-mc-lime > tbody > tr > td:nth-child(odd) {
+background-color: #f9fbe7;
+}
+.table-responsive-vertical .table-hover.table-mc-lime > tbody > tr:hover > td,
+.table-responsive-vertical .table-hover.table-mc-lime > tbody > tr:hover {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-hover.table-mc-lime > tbody > tr > td:hover {
+background-color: #f0f4c3;
+}
+}
+.table-striped.table-mc-yellow > tbody > tr:nth-child(odd) > td,
+.table-striped.table-mc-yellow > tbody > tr:nth-child(odd) > th {
+background-color: #fffde7;
+}
+.table-hover.table-mc-yellow > tbody > tr:hover > td,
+.table-hover.table-mc-yellow > tbody > tr:hover > th {
+background-color: #fff9c4;
+}
+@media screen and (max-width: 767px) {
+.table-responsive-vertical .table-striped.table-mc-yellow > tbody > tr > td,
+.table-responsive-vertical .table-striped.table-mc-yellow > tbody > tr:nth-child(odd) {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-striped.table-mc-yellow > tbody > tr > td:nth-child(odd) {
+background-color: #fffde7;
+}
+.table-responsive-vertical .table-hover.table-mc-yellow > tbody > tr:hover > td,
+.table-responsive-vertical .table-hover.table-mc-yellow > tbody > tr:hover {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-hover.table-mc-yellow > tbody > tr > td:hover {
+background-color: #fff9c4;
+}
+}
+.table-striped.table-mc-amber > tbody > tr:nth-child(odd) > td,
+.table-striped.table-mc-amber > tbody > tr:nth-child(odd) > th {
+background-color: #fff8e1;
+}
+.table-hover.table-mc-amber > tbody > tr:hover > td,
+.table-hover.table-mc-amber > tbody > tr:hover > th {
+background-color: #ffecb3;
+}
+@media screen and (max-width: 767px) {
+.table-responsive-vertical .table-striped.table-mc-amber > tbody > tr > td,
+.table-responsive-vertical .table-striped.table-mc-amber > tbody > tr:nth-child(odd) {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-striped.table-mc-amber > tbody > tr > td:nth-child(odd) {
+background-color: #fff8e1;
+}
+.table-responsive-vertical .table-hover.table-mc-amber > tbody > tr:hover > td,
+.table-responsive-vertical .table-hover.table-mc-amber > tbody > tr:hover {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-hover.table-mc-amber > tbody > tr > td:hover {
+background-color: #ffecb3;
+}
+}
+.table-striped.table-mc-orange > tbody > tr:nth-child(odd) > td,
+.table-striped.table-mc-orange > tbody > tr:nth-child(odd) > th {
+background-color: #fff3e0;
+}
+.table-hover.table-mc-orange > tbody > tr:hover > td,
+.table-hover.table-mc-orange > tbody > tr:hover > th {
+background-color: #ffe0b2;
+}
+@media screen and (max-width: 767px) {
+.table-responsive-vertical .table-striped.table-mc-orange > tbody > tr > td,
+.table-responsive-vertical .table-striped.table-mc-orange > tbody > tr:nth-child(odd) {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-striped.table-mc-orange > tbody > tr > td:nth-child(odd) {
+background-color: #fff3e0;
+}
+.table-responsive-vertical .table-hover.table-mc-orange > tbody > tr:hover > td,
+.table-responsive-vertical .table-hover.table-mc-orange > tbody > tr:hover {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-hover.table-mc-orange > tbody > tr > td:hover {
+background-color: #ffe0b2;
+}
+}
+.table-striped.table-mc-deep-orange > tbody > tr:nth-child(odd) > td,
+.table-striped.table-mc-deep-orange > tbody > tr:nth-child(odd) > th {
+background-color: #fbe9e7;
+}
+.table-hover.table-mc-deep-orange > tbody > tr:hover > td,
+.table-hover.table-mc-deep-orange > tbody > tr:hover > th {
+background-color: #ffccbc;
+}
+@media screen and (max-width: 767px) {
+.table-responsive-vertical .table-striped.table-mc-deep-orange > tbody > tr > td,
+.table-responsive-vertical .table-striped.table-mc-deep-orange > tbody > tr:nth-child(odd) {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-striped.table-mc-deep-orange > tbody > tr > td:nth-child(odd) {
+background-color: #fbe9e7;
+}
+.table-responsive-vertical .table-hover.table-mc-deep-orange > tbody > tr:hover > td,
+.table-responsive-vertical .table-hover.table-mc-deep-orange > tbody > tr:hover {
+background-color: #ffffff;
+}
+.table-responsive-vertical .table-hover.table-mc-deep-orange > tbody > tr > td:hover {
+background-color: #ffccbc;
+}
+}
+
+</style>
+
+
+
+  </head>
+
+	<body>
+
+	<paper-drawer-panel responsive-width="4000px">
+  <paper-header-panel drawer style="background-color:#3a474c">
+    <paper-toolbar>
+      <div>Navigation</div>
+    </paper-toolbar>
+    <div id="theme-selector-menu"><a class="selected" style="display: block" href="/index"><paper-item>
+              <paper-item-body two-line>
+                <div> Home Page </div>
+              </paper-item-body>
+            </paper-item></a><a class="" style="display: block" href="/uri_stat"><paper-item >
+              <paper-item-body two-line>
+                <div> Request# by URI </div>
+              </paper-item-body>
+            </paper-item></a><a class="" style="display: block" href="/host_stat"><paper-item >
+              <paper-item-body two-line>
+                <div> Dataflow by Host </div>
+              </paper-item-body>
+            </paper-item></a><a class="" style="display: block" href="/search"><paper-item >
+              <paper-item-body two-line>
+                <div> Search for Range </div>
+              </paper-item-body>
+
+            </paper-item></a></div>
+  </paper-header-panel>
+
+
+			<paper-header-panel main>
+		    <paper-toolbar>
+					<paper-button icon="menu" paper-drawer-toggle>MENU</paper-button>
+		        <span class="flex">&nbsp;</span>
+		      		<div id="top-navigation">
+								<a>Test Button 1</a>
+								<a href="/index">Home</a>
+							</div>
+		    </paper-toolbar>
+
+{% block content %}{% endblock %}
+
+  <div>
+    <h2>Description</h2>
+    <p>Template of Table to be used.</p>
+    <p>Table Constructor element should allow users to browse through the table with ease</p>
+  </div>
+
+
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+
+<script>
+	$(document).ready(function () {
+
+    $("#loadhere").load("main.html");
+
+    var table = $('#table');
+    $('#table-bordered').change(function () {
+        var value = $(this).val();
+        table.removeClass('table-bordered').addClass(value);
+    });
+    $('#table-striped').change(function () {
+        var value = $(this).val();
+        table.removeClass('table-striped').addClass(value);
+    });
+    $('#table-hover').change(function () {
+        var value = $(this).val();
+        table.removeClass('table-hover').addClass(value);
+    });
+    $('#table-color').change(function () {
+        var value = $(this).val();
+        table.removeClass(/^table-mc-/).addClass(value);
+    });
+
+    //$('#table').tablesorter().tablesorterPager();
+    $('#table').tablesorter({
+    // *** APPEARANCE ***
+    // Add a theme - try 'blackice', 'blue', 'dark', 'default'
+    //  'dropbox', 'green', 'grey' or 'ice'
+    // to use 'bootstrap' or 'jui', you'll need to add the "uitheme"
+    // widget and also set it to the same name
+    // this option only adds a table class name "tablesorter-{theme}"
+    theme: 'dark',
+    // fix the column widths
+    widthFixed: false,
+    // Show an indeterminate timer icon in the header when the table
+    // is sorted or filtered
+    showProcessing: false,
+    // header layout template (HTML ok); {content} = innerHTML,
+    // {icon} = <i/> (class from cssIcon)
+    headerTemplate: '{content}',
+    // return the modified template string
+    onRenderTemplate: null, // function(index, template){ return template; },
+
+    // called after each header cell is rendered, use index to target the column
+    // customize header HTML
+    onRenderHeader: function (index) {
+        // the span wrapper is added by default
+        $(this).find('div.tablesorter-header-inner').addClass('roundedCorners');
+    },
+    // *** FUNCTIONALITY ***
+    // prevent text selection in header
+    cancelSelection: true,
+    // other options: "ddmmyyyy" & "yyyymmdd"
+    dateFormat: "mmddyyyy",
+    // The key used to select more than one column for multi-column
+    // sorting.
+    sortMultiSortKey: "shiftKey",
+    // key used to remove sorting on a column
+    sortResetKey: 'ctrlKey',
+    // false for German "1.234.567,89" or French "1 234 567,89"
+    usNumberFormat: true,
+    // If true, parsing of all table cell data will be delayed
+    // until the user initializes a sort
+    delayInit: false,
+    // if true, server-side sorting should be performed because
+    // client-side sorting will be disabled, but the ui and events
+    // will still be used.
+    serverSideSorting: false,
+    // *** SORT OPTIONS ***
+    // These are detected by default,
+    // but you can change or disable them
+    // these can also be set using data-attributes or class names
+    headers: {
+        // set "sorter : false" (no quotes) to disable the column
+        0: {
+            sorter: "text"
+        },
+        1: {
+            sorter: "digit"
+        },
+        2: {
+            sorter: "text"
+        },
+        3: {
+            sorter: "url"
+        }
+    },
+
+    // ignore case while sorting
+    ignoreCase: true,
+    // forces the user to have this/these column(s) sorted first
+    sortForce: null,
+    // initial sort order of the columns, example sortList: [[0,0],[1,0]],
+    // [[columnIndex, sortDirection], ... ]
+    sortList: [
+        [0, 0],
+        [1, 0],
+        [2, 0]
+    ],
+    // default sort that is added to the end of the users sort
+    // selection.
+    sortAppend: null,
+    // starting sort direction "asc" or "desc"
+    sortInitialOrder: "asc",
+    // Replace equivalent character (accented characters) to allow
+    // for alphanumeric sorting
+    sortLocaleCompare: false,
+    // third click on the header will reset column to default - unsorted
+    sortReset: false,
+    // restart sort to "sortInitialOrder" when clicking on previously
+    // unsorted columns
+    sortRestart: false,
+    // sort empty cell to bottom, top, none, zero
+    emptyTo: "bottom",
+    // sort strings in numerical column as max, min, top, bottom, zero
+    stringTo: "max",
+    // extract text from the table - this is how is
+    // it done by default
+    textExtraction: {
+        0: function (node) {
+            return $(node).text();
+        },
+        1: function (node) {
+            return $(node).text();
+        }
+    },
+    // use custom text sorter
+    // function(a,b){ return a.sort(b); } // basic sort
+    textSorter: null,
+    // *** WIDGETS ***
+
+    // apply widgets on tablesorter initialization
+    initWidgets: true,
+    // include zebra and any other widgets, options:
+    // 'columns', 'filter', 'stickyHeaders' & 'resizable'
+    // 'uitheme' is another widget, but requires loading
+    // a different skin and a jQuery UI theme.
+    widgets: ['zebra', 'columns'],
+    widgetOptions: {
+        // zebra widget: adding zebra striping, using content and
+        // default styles - the ui css removes the background
+        // from default even and odd class names included for this
+        // demo to allow switching themes
+        // [ "even", "odd" ]
+        zebra: [
+            "ui-widget-content even",
+            "ui-state-default odd"],
+        // uitheme widget: * Updated! in tablesorter v2.4 **
+        // Instead of the array of icon class names, this option now
+        // contains the name of the theme. Currently jQuery UI ("jui")
+        // and Bootstrap ("bootstrap") themes are supported. To modify
+        // the class names used, extend from the themes variable
+        // look for the "$.extend($.tablesorter.themes.jui" code below
+        uitheme: 'jui',
+        // columns widget: change the default column class names
+        // primary is the 1st column sorted, secondary is the 2nd, etc
+        columns: [
+            "primary",
+            "secondary",
+            "tertiary"],
+        // columns widget: If true, the class names from the columns
+        // option will also be added to the table tfoot.
+        columns_tfoot: true,
+        // columns widget: If true, the class names from the columns
+        // option will also be added to the table thead.
+        columns_thead: true,
+        // filter widget: If there are child rows in the table (rows with
+        // class name from "cssChildRow" option) and this option is true
+        // and a match is found anywhere in the child row, then it will make
+        // that row visible; default is false
+        filter_childRows: false,
+        // filter widget: If true, a filter will be added to the top of
+        // each table column.
+        filter_columnFilters: true,
+        // filter widget: css class applied to the table row containing the
+        // filters & the inputs within that row
+        filter_cssFilter: "tablesorter-filter",
+        // filter widget: Customize the filter widget by adding a select
+        // dropdown with content, custom options or custom filter functions
+        // see http://goo.gl/HQQLW for more details
+        filter_functions: null,
+        // filter widget: Set this option to true to hide the filter row
+        // initially. The rows is revealed by hovering over the filter
+        // row or giving any filter input/select focus.
+        filter_hideFilters: false,
+        // filter widget: Set this option to false to keep the searches
+        // case sensitive
+        filter_ignoreCase: true,
+        // filter widget: jQuery selector string of an element used to
+        // reset the filters.
+        filter_reset: null,
+        // Delay in milliseconds before the filter widget starts searching;
+        // This option prevents searching for every character while typing
+        // and should make searching large tables faster.
+        filter_searchDelay: 300,
+        // Set this option to true if filtering is performed on the server-side.
+        filter_serversideFiltering: false,
+        // filter widget: Set this option to true to use the filter to find
+        // text from the start of the column. So typing in "a" will find
+        // "albert" but not "frank", both have a's; default is false
+        filter_startsWith: false,
+        // filter widget: If true, ALL filter searches will only use parsed
+        // data. To only use parsed data in specific columns, set this option
+        // to false and add class name "filter-parsed" to the header
+        filter_useParsedData: false,
+        // Resizable widget: If this option is set to false, resized column
+        // widths will not be saved. Previous saved values will be restored
+        // on page reload
+        resizable: true,
+        // saveSort widget: If this option is set to false, new sorts will
+        // not be saved. Any previous saved sort will be restored on page
+        // reload.
+        saveSort: true,
+        // stickyHeaders widget: css class name applied to the sticky header
+        stickyHeaders: "tablesorter-stickyHeader"
+    },
+
+    // *** CALLBACKS ***
+    // function called after tablesorter has completed initialization
+    initialized: function (table) {},
+
+    // *** CSS CLASS NAMES ***
+    tableClass: 'tablesorter',
+    cssAsc: "tablesorter-headerSortUp",
+    cssDesc: "tablesorter-headerSortDown",
+    cssHeader: "tablesorter-header",
+    cssHeaderRow: "tablesorter-headerRow",
+    cssIcon: "tablesorter-icon",
+    cssChildRow: "tablesorter-childRow",
+    cssInfoBlock: "tablesorter-infoOnly",
+    cssProcessing: "tablesorter-processing",
+
+    // *** SELECTORS ***
+    // jQuery selectors used to find the header cells.
+    selectorHeaders: '> thead th, > thead td',
+
+    // jQuery selector of content within selectorHeaders
+    // that is clickable to trigger a sort.
+    selectorSort: "th, td",
+
+    // rows with this class name will be removed automatically
+    // before updating the table cache - used by "update",
+    // "addRows" and "appendCache"
+    selectorRemove: "tr.remove-me",
+
+    // *** DEBUGING ***
+    // send messages to console
+    debug: false
+
+  }).tablesorterPager({
+
+    // target the pager markup - see the HTML block below
+    container: $(".pager"),
+
+    // use this url format "http:/mydatabase.com?page={page}&size={size}"
+    ajaxUrl: null,
+
+    // process ajax so that the data object is returned along with the
+    // total number of rows; example:
+    // {
+    //   "data" : [{ "ID": 1, "Name": "Foo", "Last": "Bar" }],
+    //   "total_rows" : 100
+    // }
+    ajaxProcessing: function(ajax) {
+        if (ajax && ajax.hasOwnProperty('data')) {
+            // return [ "data", "total_rows" ];
+            return [ajax.data, ajax.total_rows];
+        }
+    },
+
+    // output string - default is '{page}/{totalPages}';
+    // possible variables:
+    // {page}, {totalPages}, {startRow}, {endRow} and {totalRows}
+    output: '{startRow} to {endRow} ({totalRows})',
+    // apply disabled classname to the pager arrows when the rows at
+    // either extreme is visible - default is true
+    updateArrows: true,
+    // starting page of the pager (zero based index)
+    page: 0,
+    // Number of visible rows - default is 10
+    size: 10,
+    // if true, the table will remain the same height no matter how many
+    // records are displayed. The space is made up by an empty
+    // table row set to a height to compensate; default is false
+    fixedHeight: true,
+    // remove rows from the table to speed up the sort of large tables.
+    // setting this to false, only hides the non-visible rows; needed
+    // if you plan to add/remove rows with the pager enabled.
+    removeRows: false,
+    // css class names of pager arrows
+    // next page arrow
+    cssNext: '.next',
+    // previous page arrow
+    cssPrev: '.prev',
+    // go to first page arrow
+    cssFirst: '.first',
+    // go to last page arrow
+    cssLast: '.last',
+    // select dropdown to allow choosing a page
+    cssGoto: '.gotoPage',
+    // location of where the "output" is displayed
+    cssPageDisplay: '.pagedisplay',
+    // dropdown that sets the "size" option
+    cssPageSize: '.pagesize',
+    // class added to arrows when at the extremes
+    // (i.e. prev/first arrows are "disabled" when on the first page)
+    // Note there is no period "." in front of this class name
+    cssDisabled: 'disabled'
+
+  });
+
+  // Extend the themes to change any of the default class names ** NEW **
+  $.extend($.tablesorter.themes.jui, {
+    // change default jQuery uitheme icons - find the full list of icons
+    // here: http://jqueryui.com/themeroller/ (hover over them for their name)
+    table: 'ui-widget ui-widget-content ui-corner-all', // table classes
+    header: 'ui-widget-header ui-corner-all ui-state-default', // header classes
+    icons: 'ui-icon', // icon class added to the <i> in the header
+    sortNone: 'ui-icon-carat-2-n-s',
+    sortAsc: 'ui-icon-carat-1-n',
+    sortDesc: 'ui-icon-carat-1-s',
+    active: 'ui-state-active', // applied when column is sorted
+    hover: 'ui-state-hover', // hover class
+    filterRow: '',
+    even: 'ui-widget-content', // even row zebra striping
+    odd: 'ui-state-default' // odd row zebra striping
+  });
+
+
+  });
+  (function (removeClass) {
+    jQuery.fn.removeClass = function (value) {
+        if (value && typeof value.test === 'function') {
+            for (var i = 0, l = this.length; i < l; i++) {
+                if (window.CP.shouldStopExecution(2)) {
+                    break;
+                }
+                var elem = this[i];
+                if (elem.nodeType === 1 && elem.className) {
+                    var classNames = elem.className.split(/\s+/);
+                    for (var n = classNames.length; n--;) {
+                        if (window.CP.shouldStopExecution(1)) {
+                            break;
+                        }
+                        if (value.test(classNames[n])) {
+                            classNames.splice(n, 1);
+                        }
+                    }
+                    window.CP.exitedLoop(1);
+                    elem.className = jQuery.trim(classNames.join(' '));
+                }
+            }
+            window.CP.exitedLoop(2);
+        } else {
+            removeClass.call(this, value);
+        }
+        return this;
+    };
+}
+
+(jQuery.fn.removeClass));
+      //@ sourceURL=pen.js
+
+</script>
+
+</div>
+
+		    <div style="padding: 20px 0px 10px 0px; text-align: center;">
+		        <div><a
+		            title="Customize this theme"
+		            href="/custom-style/?base=melon"><paper-button raised class="info"> &nbsp;<iron-icon icon="polymer"></iron-icon> &nbsp; Customize this theme</paper-button></a></div>
+		    </div>
+
+			</section><section id="section-paper-button">
+
+		  <h3><a href="https://elements.polymer-project.org/elements/paper-button">paper-button</a></h3>
+
+		  <style is="custom-style">
+		    #section-paper-button .horizontal-section {
+		      min-width: 130px;
+		    }
+
+		    #section-paper-button paper-button {
+		      display: block;
+		      margin-bottom: 24px;
+		    }
+
+		    #section-paper-button paper-button[toggles] {
+		      transition: background-color 0.3s;
+		    }
+
+		    #section-paper-button paper-button[toggles][active] {
+		      background-color: rgba(0, 0, 0, 0.25);
+		    }
+		  </style>
+
+		  <div class="horizontal center-justified layout">
+
+		    <div class="horizontal-section-wrapper">
+		      <h4>Flat</h4>
+		      <div class="horizontal-section">
+		        <paper-button tabindex="0">default</paper-button>
+		        <paper-button tabindex="0" disabled>disabled</paper-button>
+		        <paper-button tabindex="0" noink>noink</paper-button>
+		        <paper-button tabindex="0"><iron-icon icon="polymer"></iron-icon> icon</paper-button>
+		        <paper-button tabindex="0" class="primary">primary</paper-button>
+		        <paper-button tabindex="0" class="secondary">secondary</paper-button>
+		        <paper-button tabindex="0" class="success">success</paper-button>
+		        <paper-button tabindex="0" class="info">info</paper-button>
+		        <paper-button tabindex="0" class="warning">warning</paper-button>
+		        <paper-button tabindex="0" class="error">error</paper-button>
+		        <paper-button tabindex="0" class="link">link</paper-button>
+		      </div>
+		    </div>
+
+		    <div class="horizontal-section-wrapper">
+		      <h4>Raised</h4>
+		      <div class="horizontal-section">
+		        <paper-button tabindex="0" raised>default</paper-button>
+		        <paper-button tabindex="0" raised disabled>disabled</paper-button>
+		        <paper-button tabindex="0" raised noink>noink</paper-button>
+		        <paper-button tabindex="0" raised><iron-icon icon="polymer"></iron-icon> icon</paper-button>
+		        <paper-button tabindex="0" raised class="primary">primary</paper-button>
+		        <paper-button tabindex="0" raised class="secondary">secondary</paper-button>
+		        <paper-button tabindex="0" raised class="success">success</paper-button>
+		        <paper-button tabindex="0" raised class="info">info</paper-button>
+		        <paper-button tabindex="0" raised class="warning">warning</paper-button>
+		        <paper-button tabindex="0" raised class="error">error</paper-button>
+		        <paper-button tabindex="0" raised class="link">link</paper-button>
+		      </div>
+		    </div>
+
+		    <div class="horizontal-section-wrapper">
+		      <h4>Toggleable</h4>
+		      <div class="horizontal-section">
+		        <paper-button tabindex="0" toggles>default</paper-button>
+		        <paper-button tabindex="0" toggles disabled>disabled</paper-button>
+		        <paper-button tabindex="0" toggles noink>noink</paper-button>
+		        <paper-button tabindex="0" toggles><iron-icon icon="polymer"></iron-icon> icon</paper-button>
+		        <paper-button tabindex="0" toggles class="primary">primary</paper-button>
+		        <paper-button tabindex="0" toggles class="secondary">secondary</paper-button>
+		        <paper-button tabindex="0" toggles class="success">success</paper-button>
+		        <paper-button tabindex="0" toggles class="info">info</paper-button>
+		        <paper-button tabindex="0" toggles class="warning">warning</paper-button>
+		        <paper-button tabindex="0" toggles class="error">error</paper-button>
+		        <paper-button tabindex="0" toggles class="link">link</paper-button>
+		      </div>
+		    </div>
+
+		  </div>
+
+		</section>
+	</paper-header-panel main>
+
+	</body>
+</html>

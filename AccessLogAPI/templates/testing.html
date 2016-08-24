@@ -1,0 +1,150 @@
+<head>
+
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <script src="http://code.highcharts.com/stock/highstock.js"></script>
+
+  <script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+
+
+
+  <link rel="stylesheet" href="../static/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
+  <link rel="stylesheet" href="../static/bootstrap/dist/css/bootstrap-theme.min.css" type="text/css"/>
+  <script src="../static/bootstrap/dist/js/bootstrap.min.js"></script>
+
+
+  <link rel="stylesheet" href="../static/dashboard/dashboard.css">
+  <script src="../static/dashboard/dashboard.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="../static/datetimepicker-master/jquery.datetimepicker.css"/ >
+  <script src="../static/datetimepicker-master/jquery.datetimepicker.js"></script>
+  <link rel="import" href="../static/bower_components/paper-button/paper-button.html">
+
+  <link rel="import" href="../static/bower_components/polymer/polymer.html">
+  <link rel="import" href="../static/filterOptions/mustFilter.html">
+  <link rel="import" href="../static/filterOptions/mustNotFilter.html">
+  <link rel="import" href="../static/filterOptions/shouldFilter.html">
+  <link rel="import" href="../static/filterOptions/filterModal.html">
+
+  <link rel="import" href="../static/header/header.html">
+  <link rel="import" href="../static/sidebar/sidebar.html">
+  <link rel="import" href="../static/graphs/graphsElement.html">
+
+
+  <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+  <script type="text/javascript" src="../static/ipmapper/ipmapper.js"></script>
+  <link rel="import" href="../static/filterOptions/filterModalIpMap.html">
+
+  <link rel="stylesheet" href="../static/gridster/jquery.gridster.css">
+  <script src="../static/gridster/jquery.gridster.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/packery/1.4.3/packery.pkgd.js"></script>
+
+  <script type="text/javascript">
+  $(function(){
+      try{
+          IPMapper.initializeMap("map");
+      } catch(e){
+
+      }
+
+      var mustData = [];
+      var mustNotData = [];
+      var shouldData = [];
+
+
+      var currentdate = new Date();
+      var datetimeNow = ('0' + currentdate.getDate()).slice(-2) + "/" + ('0' + (currentdate.getMonth()+1)).slice(-2)  + "/" + currentdate.getFullYear() + " @ " + ('0' + currentdate.getHours()).slice(-2) + ":" + ('0' + currentdate.getMinutes()).slice(-2) + ":" + ('0' + currentdate.getSeconds()).slice(-2);
+
+
+      var user = getCookie('laserficheCloudAccessLogUser');
+
+      var data = {
+        'aggregation1' : 'remote_addr',
+        'aggregationType1' : 'terms',
+        'aggregation2' : 'bytes_sent',
+        'aggregationType2' : 'stats',
+        'limit': '0',
+        'offset': '0',
+        'mustData' : JSON.stringify(mustData),
+        'mustNotData' : JSON.stringify(mustNotData),
+        'shouldData' : JSON.stringify(shouldData),
+        'datetimeNow' : datetimeNow,
+        'user' : user
+
+      };
+
+      $.post( "/elasticsearch/aggregation", data, function( data ){
+        $.each(data.grouping.buckets, function(index,value ){
+
+            IPMapper.addIPMarker(data.grouping.buckets[index].key_as_string, data.grouping.buckets[index].doc_count);
+
+
+
+
+        });
+
+
+      });
+
+      function getCookie(cname) {
+          var name = cname + "=";
+          var ca = document.cookie.split(';');
+          for(var i=0; i<ca.length; i++) {
+              var c = ca[i];
+              while (c.charAt(0)==' ') c = c.substring(1);
+              if (c.indexOf(name) == 0) {
+                  return c.substring(name.length, c.length);
+              }
+          }
+          return "";
+      };
+
+  });
+  </script>
+
+
+
+</head>
+
+<body>
+  <!-- container section start -->
+  <section id="dashboardContainer" class="">
+
+    <!--header start-->
+    <global-header></global-header>
+    <!--header end-->
+
+    <!--sidebar start-->
+    <global-sidebar></global-sidebar>
+    <!--sidebar end-->
+    <section id = "main-content">
+      <section class="wrapper">
+        <div id = "mainContentHeader">
+          <div id = "toggleSideBarWrap">
+            <div style = "float: right; padding-top: 10px; padding-right: 10px; color: white">Aggregations</div>
+
+          </div>
+        </div>
+
+        <div style = "padding-top: 20px"></div>
+
+
+
+        <div id="ipmap" style="height: 500px;"></div>
+        <filter-modalIpMap unique-id = "defaultMap1"></filter-modalIpMap>
+
+
+
+
+
+
+
+
+
+      </section>
+    </section>
+  </section>
+</body>

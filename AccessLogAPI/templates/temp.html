@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"
+          rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h3 class="text-muted">How To Upload a File</h3>
+      </div>
+      <hr/>
+      <div>
+
+      <form action="upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file"><br /><br />
+        <input type="submit" value="Upload!">
+      </form>
+
+      <form action="remove_all" method="post" enctype="multipart/form-data">
+        <button>Remove All Records</button>
+      </form>
+
+      <form action="sort_all" method="get">
+        <button>Test sorting</button>
+      </form>
+
+      <form action="get_by_attr" method="get">
+        <button>Test Getting by Attribute</button>
+      </form>
+
+      <form action="get_by_range" method="get">
+        <button>Test Getting by Range</button>
+      </form>
+
+      <form action="get_request_stats" method="get">
+        <button>Test Request Stats</button>
+      </form>
+
+      <form action="get_host_stats" method="get">
+        <button>Test Host Stats</button>
+      </form>
+
+
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,81 @@
+========
+BACK END
+========
+
+· Flask
+  - The RESTful API structure is built using Flask Framework
+    > http://flask.pocoo.org/
+    Version and API used for development
+    > http://flask.pocoo.org/docs/0.10/api/
+
+· ElasticSearch
+  - ES used in a DB fashion for storing & retrieving data
+  > https://www.elastic.co/products/elasticsearch
+  - Python plugin to serve as ES Client
+  > https://elasticsearch-py.readthedocs.org/en/master/
+
+=========
+FRONT END
+=========
+
+- Most of the JS variables for table & calendar are declared in html rather than js file because some of them needs to read variables passed from back end with flask/jinja template
+
+· Table
+
+  · SlickGrid
+    - Main Library for building the table
+    > https://github.com/mleibman/SlickGrid/wiki
+    - Main logic in > static/table.js
+                      static/slick Folder
+
+  · Pagination
+    - Main logic in > static/slick/controls/slick.pager.js
+
+  · Filtering
+    - Main logic in > static/filter_form.js
+    - Style/UI in > static/filter_form.css
+
+  · Sharing Table
+    - JS Variables gets passed through URL and backend table() method to the new page for rendering
+    - Table Schema and Filters DON'T get passed right now
+    - To pass through Filters:
+      > table.js
+      * modify generate_link() to pass the filters variable via URL
+      * check filters variable for adding filter tags upon initiation
+      > table.html
+      * modify filters variable initiation to read from backend: {{filters}}
+      > api2.py
+      * modify table() to take filters from URL, check/modify and pass it through
+
+  · Download Data
+    - Not fully implemented
+      - What's done:  > table.js
+                      * click calls backend method
+                      > api2.py
+                      * return a file for download
+      - What's left:  > table.js
+                      * pass the data through URL
+                      > api2.py
+                      * generate the file according to data
+
+· Calendar
+
+  · Cal Heatmap
+  - Main Library Used
+  > https://github.com/wa0x6e/cal-heatmap
+
+  · Filtering
+    - Main logic in > static/cal_filter_form.js
+
+  · Statistics
+    - The back end method for Stats calendar_stat() in api2.py actually returns a complete breakdown instead of just the top one.
+      So you have all the IP Addresses along with their request# & bytes sent/received.
+      The Current UI only displays the top one but it's easy to make the field name a link to the full list without any additional calls to the backend.
+      The default number of entries shown for each field aggregation might be set (to 10), check ES API to confirm and modify the ES request in calendar_stat() by adding "size: xxx" into each aggregation
+
+  · Linking with Table
+    - This can be done after making the filters passable through URL for the table (See Sharing Table above)
+      All the filters are stored in JS variable. So all that needs to be done is to generate the right URL specifying the right filter conditions.
+      The linking could be done in multiple ways.
+      For Example:  1. Click on a Calendar cell refreshes the Stats. For each Stats there could be a link to the table showing only data of that day/hour with the applied Calendar filters.
+                    2. The Stats Page shows the top entry of multiple fields (IP, URL, Host etc.), they could be links to view all those entries having that value during that time period.

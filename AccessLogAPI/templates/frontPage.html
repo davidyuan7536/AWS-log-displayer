@@ -1,0 +1,497 @@
+<head>
+
+  <title>Cloud Access Log Viewer</title>
+
+  <script src="../static/canvasjs/canvasjs.min.js"></script>
+
+  <script src="../static/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+
+  <script src="static/jquery.min.js"></script>
+
+
+  <link rel="import" href="../static/bower_components/paper-header-panel/paper-header-panel.html">
+  <link rel="import" href="../static/bower_components/paper-drawer-panel/paper-drawer-panel.html">
+  <link rel="import" href="../static/bower_components/paper-button/paper-button.html">
+  <link rel="import" href="../static/bower_components/paper-input/paper-input.html">
+  <link rel="import" href="../static/bower_components/paper-toolbar/paper-toolbar.html">
+  <link rel="import" href="../static/bower_components/paper-styles/paper-styles.html">
+  <!--  FOR icons -->
+  <link rel="import" href="../static/bower_components/iron-icons/iron-icons.html">
+  <link rel="import" href="../static/bower_components/iron-icons/notification-icons.html">
+  <link rel="import" href="../static/bower_components/iron-icons/editor-icons.html">
+
+  <link rel="import" href="../static/bower_components/paper-tabs/paper-tabs.html">
+
+  <link rel="stylesheet" href="../static/bootstrap/dist/css/bootstrap.min.css" type="text/css"/>
+  <link rel="stylesheet" href="../static/bootstrap/dist/css/bootstrap-theme.min.css" type="text/css"/>
+  <script src="../static/bootstrap/dist/js/bootstrap.min.js"></script>
+
+  <link rel="stylesheet" href="../static/main.css">
+
+  <script src="../static/d3/d3.min.js"></script>
+  <link rel="stylesheet" href="static/cal-heatmap.css" type="text/css"/>
+  <script type="text/javascript" src="static/cal-heatmap.min.js"></script>
+
+  <script src="static/moment.min.js"></script>
+  <script src="static/helper.js"></script>
+
+  <script src="../static/table.js"></script>
+  <script src="../static/graph.js"></script>
+  <script src="../static/frontPage.js"></script>
+
+
+</head>
+
+<body>
+
+
+<!-- page scrolling options -->
+
+<!-- end of page scrolling options -->
+
+
+<div class="hold">
+  <div class="header">
+    <div class="hcontainer">
+
+      <ul class="nav">
+        <li><a href="#">Home Page</a></li>
+        <li><a href="#">Search</a></li>
+        <li><a href="#">Visual Analysis</a></li>
+        <li><a href="#">About</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="slider">
+    <div class="container slidercontent">
+      <h1 class="hero">Cloud Access Log Viewer</h1>
+      <h3 class="hero">Laserfiche Cloud Infrastructure Intern Team</h3>
+    </div>
+  </div>
+
+
+  <style is="custom-style">
+  .nav-btn-size {
+    --iron-icon-height: 50px;
+    --iron-icon-width: 50px;
+  }
+  </style>
+
+  <div class="section">
+    <div class="container">
+      <div class="col three">
+        <div style="width:85px; margin: 0 auto;" class = "icon">
+          <a href = "#calendarSection" style="padding: 15px"><iron-icon icon="notification:event-note" class="nav-btn-size" ></iron-icon></a>
+        </div>
+        <h1 class="service">Calender</h1>
+        <p>View requests aggregated by date and time</p>
+      </div>
+      <div class="col three">
+        <div style="width:85px; margin: 0 auto;" class = "icon">
+          <a href = "#tableSection" style="padding: 15px"><iron-icon icon="view-list" class="nav-btn-size" ></iron-icon></a>
+        </div>
+        <h1 class="service">Table</h1>
+        <p>View raw access log data and seach by varius fields</p>
+      </div>
+      <div class="responsivegroup"></div>
+      <div class="col three">
+        <div style="width:85px; margin: 0 auto;" class = "icon">
+          <a href = "#graphSection" style="padding: 15px"><iron-icon icon="editor:insert-chart" class="nav-btn-size" ></iron-icon></a>
+        </div>
+        <h1 class="service">Graphs</h1>
+        <p>View data displayed in various types of graphs</p>
+      </div>
+      <div class="group"></div>
+    </div>
+  </div>
+
+
+  <a class = "anchor" name = "calendarSection"></a>
+  <div class="section bg">
+    <div class="container">
+      <h1>Calendar</h1>
+      <div id = "loadingWrap2">
+        <div class="col month-cal bg nopad pointer">
+          <div class="calholder" id="month-cal"></div>
+        </div>
+      </div>
+      <div class="group margin"></div>
+      <div id = "loadingWrap3">
+        <div class="col day-cal bg nopad pointer">
+          <div class="calholder" id="day-cal"></div>
+          <!-- <h1 class="feature">Hours</h1> -->
+        </div>
+      </div>
+      <div class="col stats bg nopad pointer" style = "overflow-y:auto">
+        <div class="calholder" id="specific-stats" style = "padding: 10px 0px 10px 0px"></div>
+        <!-- <h1 class="feature">Stats</h1> -->
+      </div>
+
+      <div class="group"></div>
+    </div>
+  </div>
+
+
+  <script>
+  $(function(){
+
+    // var containerElement = document.getElementById('loadingWrap2');
+    // containerElement.setAttribute('class', 'blur');
+    // $('#loaderAnimation').fadeTo(1000, 1);
+    //
+    $("#month-cal").load("calendar?domain=month&obj=num_request");
+
+    // $("#loadingWrap2").removeClass( "blur" );
+    // $('#loaderAnimation').hide();
+  });
+
+  $(function(){
+    // var containerElement = document.getElementById('loadingWrap3');
+    // containerElement.setAttribute('class', 'blur');
+    // $('#loaderAnimation').fadeTo(1000, 1);
+
+    $("#day-cal").load("calendar?domain=day&obj=num_request");
+    //
+    // $("#loadingWrap3").removeClass( "blur" );
+    // $('#loaderAnimation').hide();
+
+  });
+  </script>
+
+
+
+
+
+<!-- start of table section -->
+
+  <a class = "anchor" name = "tableSection"></a>
+  <div class="section">
+    <div class="container">
+
+      <h1>Table</h1>
+
+      <style>
+
+      </style>
+
+      <div class="table" style="PADDING-TOP: 5px">
+
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="form-group">
+              <label for="recordsPerPage">Records Per Page</label>
+              <select class="form-control" id="recordsPerPage"><option value="10">10</option><option value="20">20</option><option value="30">30</option></select>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div class="form-group">
+            <label for="tableHeaderDisplayedTemp">Filter By</label>
+            <select class="form-control" id="tableHeaderDisplayedTemp">
+              <option id = "options-defaultSelected" selected="selected" value=""></option>
+              <option id = "options-id" value = "id">ID</option>
+              <option id = "options-remote_addr" value = "remote_addr">IP Address</option>
+              <option id = "options-time_iso8601" value = "time_iso8601">Time</option>
+              <option id = "options-request_time" value = "request_time">Time Elapsed</option>
+              <option id = "options-request_uri" value = "request_uri">Request URI</option>
+              <option id = "options-request_method" value = "request_method">Request Method</option>
+              <option id = "options-status" value = "status">Status Code</option>
+              <option id = "options-request_length" value = "request_length">Request Length</option>
+              <option id = "options-body_bytes_sent" value = "body_bytes_sent">Body Bytes Sent</option>
+              <option id = "options-bytes_sent" value = "bytes_sent">Bytes Sent</option>
+              <option id = "options-http_host" value = "http_host">Host</option>
+              <option id = "options-http_referer" value = "http_referer">Referer</option>
+              <option id = "options-http_user_agent" value = "http_user_agent">User Agent</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div id = "tableDataDisplayedTempHidden" class="form-group" style = "display:none">
+            <label for="exampleInputPassword1" style = "color: white">Equals</label>
+            <input class="form-control" id="tableDataDisplayedTemp" disabled>
+          </div>
+        </div>
+
+        <div class="col table bg nopad pointer">
+          <form class="form-inline">
+            <div class="form-group">
+              <label for="curPage">Page</label>
+              <input id="curPage" type="text" class="form-control" value = "1">
+            </div>
+          </form>
+
+          <div id="tableContainer">
+            <table id="example" class="table table-hover table-bordered table-condensed" style="table-layout:fixed" cellspacing="0" width = "100%">
+              <colgroup>
+                <col class = "coloredColumn" id = "col_id">
+                <col id = "col_remote_addr">
+                <col id = "col_time_iso8601">
+                <col id = "col_request_time">
+                <col id = "col_request_uri">
+                <col id = "col_request_method">
+                <col id = "col_status">
+                <col id = "col_request_length">
+                <col id = "col_body_bytes_sent">
+                <col id = "col_bytes_sent">
+                <col id = "col_http_host">
+                <col id = "col_http_referer">
+                <col id = "col_http_user_agent">
+              </colgroup>
+              <thead>
+                <tr style="cursor: pointer; background-color: #424242; height: 60px">
+                  <th id = "header-id" class = "headerOrdered" style = "color: #FFFFFF; font-size: 15px">ID</th>
+                  <th id = "header-remote_addr" {% if key=="remote_addr": %} style="color:#e8485f" {% else %} style = "color: #FFFFFF; font-size: 15px" {% endif %}>IP Address</th>
+                  <th id = "header-time_iso8601" {% if key=="time_iso8601": %} style="color:#e8485f" {% else %} style = "color: #FFFFFF; font-size: 15px" {% endif %}>Time</th>
+                  <th id = "header-request_time" {% if key=="request_time": %} style="color:#e8485f" {% else %} style = "color: #FFFFFF; font-size: 15px" {% endif %}>Time Elapsed</th>
+                  <th id = "header-request_uri" {% if key=="request_uri": %} style="color:#e8485f" {% else %} style = "color: #FFFFFF; font-size: 15px" {% endif %}>Request URI</th>
+                  <th id = "header-request_method" {% if key=="request_method": %} style="color:#e8485f" {% else %} style = "color: #FFFFFF; font-size: 15px" {% endif %}>Request Method</th>
+                  <th id = "header-status" {% if key=="status": %} style="color:#e8485f" {% else %} style = "color: #FFFFFF; font-size: 15px" {% endif %}>Status Code</th>
+                  <th id = "header-request_length" {% if key=="request_length": %} style="color:#e8485f" {% else %} style = "color: #FFFFFF; font-size: 15px" {% endif %}>Request Length</th>
+                  <th id = "header-body_bytes_sent" {% if key=="body_bytes_sent": %} style="color:#e8485f" {% else %} style = "color: #FFFFFF; font-size: 15px" {% endif %}>Body Bytes Sent</th>
+                  <th id = "header-bytes_sent" {% if key=="bytes_sent": %} style="color:#e8485f" {% else %} style = "color: #FFFFFF; font-size: 15px" {% endif %}>Bytes Sent</th>
+                  <th id = "header-http_host" {% if key=="http_host": %} style="color:#e8485f" {% else %} style = "color: #FFFFFF; font-size: 15px" {% endif %}>Host</th>
+                  <th id = "header-http_referer" {% if key=="http_referer": %} style="color:#e8485f" {% else %} style = "color: #FFFFFF; font-size: 15px" {% endif %}>Referer</th>
+                  <th id = "header-http_user_agent" {% if key=="http_user_agent": %} style="color:#e8485f" {% else %} style = "color: #FFFFFF; font-size: 15px" {% endif %}>User Agent</th>
+                </tr>
+              </thead>
+              <tfoot>
+                <tr>
+                  <th>ID</th>
+                  <th>IP Address</th>
+                  <th>Time</th>
+                  <th>Time Elapsed</th>
+                  <th>Request URI</th>
+                  <th>Request Method</th>
+                  <th>Status Code</th>
+                  <th>Request Lenght</th>
+                  <th>Body Bytes Sent</th>
+                  <th>Bytes Sent</th>
+                  <th>Host</th>
+                  <th>Referer</th>
+                  <th>User Agent</th>
+                </tr>
+              </tfoot>
+              <tbody>
+                <!--
+                {% for row in rows: %}
+                <tr>
+                <td data-title = "id">{{ row[0] }}</td>
+                <td data-title = "remote_addr"><a href = "/remote_addr?q={{ row[1] }}">{{ row[1] }}</a></td>
+                <td data-title = "time_iso8601"><a href = "/time_iso8601?q={{ row[2] }}">{{ row[2] }}</a></td>
+                <td data-title = "request_time"><a href = "/request_time?q={{ row[3] }}">{{ row[3] }}</a></td>
+                <td data-title = "request_uri"><a href = "/request_uri?q={{ row[4] }}">{{  row[4][0:15] }}</a></td>
+                <td data-title = "request_method"><a href = "/request_method?q={{ row[5] }}">{{ row[5] }}</a></td>
+                <td data-title = "status"><a href = "/status?q={{ row[6] }}">{{ row[6] }}</a></td>
+                <td data-title = "request_length"><a href = "/request_length?q={{ row[7] }}">{{ row[7] }}</a></td>
+                <td data-title = "body_bytes_sent"><a href = "/body_bytes_sent?q={{ row[8] }}">{{ row[8] }}</a></td>
+                <td data-title = "bytes_sent"><a href = "/bytes_sent?q={{ row[9] }}">{{ row[9] }}</a></td>
+                <td data-title = "http_host"><a href = "/http_host?q={{ row[10] }}">{{ row[10][0:10] }}</a></td>
+                <td data-title = "http_referer"><a href = "/http_referer?q={{ row[11] }}">{{ row[11][0:10] }}</a></td>
+                <td data-title = "http_user_agent"><a href = "/http_user_agent?q={{ row[12] }}">{{ row[12][0:10] }}</a></td>
+                </tr>
+                {% endfor %}
+                -->
+              </tbody>
+            </table>
+
+          </div>
+          Total Pages: <input id="totalPages" type="text" value="" readonly style = "border: 0" >
+
+          <input id="limit" type = "hidden" value="10">
+          <input id="logSize" type = "hidden" value="">
+          <input id="orderad" type = "hidden" value="">
+          <section id = "hiddenSectionFilterByAttribute" style = "display: none">
+            <input id="tableHeaderDisplayed" value="">
+            <input id="tableDataDisplayed" value="">
+          </section>
+
+          <div class="tableButtons">
+            <paper-button class="secondary"   autofocus id = "firstButton">First</paper-button>
+            <paper-button class="secondary"   autofocus id = "prevButton">Previous</paper-button>
+            <paper-button class="secondary"  autofocus id = "nextButton">Next</paper-button>
+            <paper-button class="secondary"   autofocus id = "lastButton">Last</paper-button>
+            <paper-button class="secondaryCustom"   autofocus id = "resetTableButton">Reset</paper-button>
+            <br></br>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+<!-- end of table section -->
+
+
+
+
+<!-- start of calendar section -->
+<a class = "anchor" name = "graphSection"></a>
+  <div class="section bg">
+    <div class="container">
+      <h1>Graphs</h1>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="scope">Date Range</label>
+          <select id="scope" class="form-control">
+            <option value="Today">Today</option>
+            <option value="CurrentWeek">Current Week</option>
+            <option value="Last7">Last 7 Days</option>
+            <option value="LastWeek">Last Week</option>
+            <option value="CurrentMonth" selected="selected">Current Month</option>
+            <option value="Last30">Last 30 Days</option>
+            <option value="LastMonth">Last Month</option>
+            <option value="CurrentYear">Current Year</option>
+            <option value="LastYear">Last Year</option>
+            <option value="Custom">Custom Range</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="granularity">Granularity</label>
+          <select id="granularity" class="form-control">
+            <option value="Second">Seconds</option>
+            <option value="Minute">Minutes</option>
+            <option value="Hour">Hours</option>
+            <option value="Day" selected="selected">Days</option>
+            <option value="Week">Weeks</option>
+            <option value="Month">Months</option>
+            <option value="Year">Years</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class = "customDateRange" style = "display:none">
+          <div class="form-group">
+            <label for="lower">Start Time</label>
+            <input type="text" class="form-control" id="lower" value = "">
+          </div>
+          <div class="form-group">
+            <label for="upper">End Time</label>
+            <input type="text" class="form-control" id="upper"  value = "">
+          </div>
+        </div>
+      </div>
+
+
+      <paper-button class="secondary"  autofocus id = "lineGraphGenerate">Refresh</paper-button>
+
+
+      <input id="numRequests" type = "hidden" value="">
+
+      <div id = "loadingWrap">
+        <div class="section">
+          <div class="container">
+            <div class="col two">
+              <h1 class="feature side">Data In/Data Out</h1>
+              <div id="chartContainer" style="height: 800px; width: 100%;"></div>
+            </div>
+            <div class="col two">
+              <h1 class="feature side">Number of Requests</h1>
+              <div id="chartContainer2" style="height: 800px; width: 100%;"></div>
+            </div>
+            <div class="group margin"></div>
+          </div>
+        </div>
+      </div>
+
+
+      <br></br>
+      <!--
+      <button id = "hideGraphInfo">Hide</button>
+      -->
+      <div><span id="specific-stats"></span></div>
+      <br></br>
+
+
+    </div>
+
+
+    <!--
+    <br></br>
+    <div class="col two bg margin extrapad">
+    <h1 class="icon side">[]</h1>
+    <span class="feature side">Line Graphs</span><span class="side"> - []</span>
+    <p class="side"></p>
+    </div>
+    <div class="col two bg margin extrapad">
+    <h1 class="icon side">[]</h1>
+    <span class="feature side">Bar Graphs</span><span class="side"> - []</span>
+    <p class="side"></p>
+    </div>
+    <div class="group margin"></div>
+    <div class="col two bg margin extrapad">
+    <h1 class="icon side">[]</h1>
+    <span class="feature side">Cross Filter Graph</span><span class="side"> - []</span>
+    <p class="side"></p>
+    </div>
+    <div class="col two bg margin extrapad">
+    <h1 class="icon side">[]</h1>
+    <span class="feature side">Cross Filter Graph Selector</span><span class="side"> -[]</span>
+    <p class="side"></p>
+    </div>
+    <div class="group"></div>
+    -->
+
+  </div>
+</div>
+<!-- end of calendar section -->
+
+
+
+<a class = "anchor" name = "searchSection"></a>
+<div class="section">
+  <div class="container">
+    <div class="col two">
+    </div>
+    <div class="col two">
+    </div>
+    <div class="group"></div>
+  </div>
+</div>
+
+
+
+<div class="section">
+  <div class="footer">
+    <div class="container white">
+      <div class="col four left">
+
+      </div>
+      <div class="col four left">
+
+      </div>
+      <div class="col four left">
+
+      </div>
+      <div class="col four left">
+
+      </div>
+      <div class="group"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- loading animation
+var containerElement = document.getElementById('loadingWrap');
+containerElement.setAttribute('class', 'blur');
+$('#loaderAnimation').fadeTo(1000, 1);
+
+$("#loadingWrap").removeClass( "blur" );
+$('#loaderAnimation').hide();
+-->
+
+<div id = "loaderAnimation" class="host" style = "display: none">
+  <div class="loading loading-0"></div>
+  <div class="loading loading-1"></div>
+  <div class="loading loading-2"></div>
+  LOADING
+</div>
+</body>
